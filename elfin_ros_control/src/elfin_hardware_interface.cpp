@@ -230,7 +230,11 @@ int main(int argc, char** argv)
 {
     ros::init(argc,argv,"elfin_hardware_interface", ros::init_options::AnonymousName);
 
-    elfin_ethercat_driver::EtherCatManager em("eth0");
+    ros::NodeHandle nh("~");
+    std::string ethernet_name;
+    ethernet_name=nh.param<std::string>("elfin_ethernet_name", "eth0");
+
+    elfin_ethercat_driver::EtherCatManager em(ethernet_name);
     elfin_ros_control::ElfinHWInterface elfin_hw(&em);
     elfin_hw.read_init();
 

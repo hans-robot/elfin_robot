@@ -8,7 +8,7 @@
   <arg name="publish_monitored_planning_scene" value="true" />
  </include>
  # The visualization component of MoveIt!
- <include file="$(find elfin_moveit)/launch/moveit_rviz.launch">
+ <include file="$(find elfin3_moveit_config)/launch/moveit_rviz.launch">
    <arg name="config" value="true"/>
  </include>
  
