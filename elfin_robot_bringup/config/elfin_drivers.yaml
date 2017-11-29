@@ -1,0 +1,5 @@
+elfin:
+    slave_no: [1, 2, 3]
+    joint_names: [elfin_joint2, elfin_joint1, elfin_joint3, elfin_joint4, elfin_joint5, elfin_joint6]
+    reduction_ratios: [101, 101, 101, 101, 101, 101]
+    count_zeros: [0, 0, 0, 0, 0, 0]

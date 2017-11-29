@@ -1,0 +1,12 @@
+controller_list:
+  - name: fake_elfin_arm_controller
+    joints:
+      - elfin_joint1
+      - elfin_joint2
+      - elfin_joint3
+      - elfin_joint4
+      - elfin_joint5
+      - elfin_joint6
+  - name: fake_elfin_end_group_controller
+    joints:
+      []

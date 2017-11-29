@@ -1,0 +1,7 @@
+<launch>
+
+  <include file="$(find elfin3_moveit_config)/launch/moveit_planning_execution.launch"/>
+ 
+  <include file="$(find elfin_basic_api)/launch/elfin_basic_api.launch"/>
+ 
+</launch>

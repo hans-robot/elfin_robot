@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <transmission name="elfin_joint1_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint1">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint1_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="elfin_joint2_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint2">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint2_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+    <transmission name="elfin_joint3_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint3">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint3_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+    <transmission name="elfin_joint4_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint4">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint4_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+    <transmission name="elfin_joint5_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint5">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint5_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+    <transmission name="elfin_joint6_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elfin_joint6">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elfin_joint6_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+</robot>
