@@ -52,6 +52,10 @@ $ roslaunch elfin_gazebo elfin3_empty_world.launch
 ```sh
 $ roslaunch elfin3_moveit_config moveit_planning_execution.launch
 ```
+如果你此时不想运行RViz界面，请用以下命令:
+```sh
+$ roslaunch elfin3_moveit_config moveit_planning_execution.launch display:=false
+```
 
 运行后台程序及Elfin Control Panel界面：
 ```sh
@@ -98,6 +102,10 @@ $ roslaunch elfin_robot_bringup elfin_ros_control.launch
 运行MoveIt!模块, RViz界面:
 ```sh
 $ roslaunch elfin3_moveit_config moveit_planning_execution.launch
+```
+如果你此时不想运行RViz界面，请用以下命令:
+```sh
+$ roslaunch elfin3_moveit_config moveit_planning_execution.launch display:=false
 ```
 
 运行后台程序及Elfin Control Panel界面：
