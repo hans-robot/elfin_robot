@@ -45,15 +45,11 @@ import rospy
 import math
 import tf
 import moveit_commander
-from std_msgs.msg import Bool, String, Int64, Empty
-from actionlib_msgs.msg import GoalID
-from elfin_msgs.srv import TeleopCode, TeleopCodeRequest
-from elfin_msgs.srv import Command, CommandRequest
+from std_msgs.msg import Bool
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
 import wx
 from sensor_msgs.msg import JointState
-from moveit_msgs.srv._GetPositionFK import GetPositionFKRequest, GetPositionFK
 from actionlib import SimpleActionClient
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 import threading

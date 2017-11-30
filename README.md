@@ -47,10 +47,17 @@ $ source devel/setup.bash
 ```sh
 $ roslaunch elfin_gazebo elfin3_empty_world.launch
 ```
-运行MoveIt!模块, RViz界面和Elfin Control Panel界面:
+
+运行MoveIt!模块, RViz界面:
 ```sh
-$ roslaunch elfin_robot_bringup elfin3_moveit_gui.launch
+$ roslaunch elfin3_moveit_config moveit_planning_execution.launch
 ```
+
+运行后台程序及Elfin Control Panel界面：
+```sh
+roslaunch elfin_basic_api elfin_basic_api.launch
+```
+
 > 关于MoveIt!的使用方法可以参考[docs/moveit_plugin_tutorial.md](docs/moveit_plugin_tutorial.md)  
 Tips:  
 每次规划路径时，都要设置初始位置为当前位置。
@@ -88,9 +95,14 @@ $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control.launch
 ```
 
-运行MoveIt!模块, RViz界面和Elfin Control Panel界面:
+运行MoveIt!模块, RViz界面:
 ```sh
-$ roslaunch elfin_robot_bringup elfin3_moveit_gui.launch
+$ roslaunch elfin3_moveit_config moveit_planning_execution.launch
+```
+
+运行后台程序及Elfin Control Panel界面：
+```sh
+roslaunch elfin_basic_api elfin_basic_api.launch
 ```
 
 用Elfin Control Panel界面给Elfin使能指令，如果此时没有报错，直接按下"Servo On"即可使能。如果报错，需先按"Clear Fault"清错后再按下"Servo On"使能。

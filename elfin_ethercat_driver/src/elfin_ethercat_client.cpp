@@ -335,7 +335,7 @@ void *ElfinEtherCATClient::setDisable(void *threadarg)
 
 bool ElfinEtherCATClient::isWarning()
 {
-    if((readInput_unit(elfin_txpdo::AXIS1_STATUSWORD) & 0x80)==0x80 || (readInput_unit(elfin_txpdo::AXIS2_STATUSWORD) & 0x80)==0x80 )
+    if((readInput_unit(elfin_txpdo::AXIS1_STATUSWORD) & 0x08)==0x08 || (readInput_unit(elfin_txpdo::AXIS2_STATUSWORD) & 0x08)==0x08 )
         return true;
     else
         return false;
