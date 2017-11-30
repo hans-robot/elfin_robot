@@ -10,6 +10,9 @@ example: function_pub_joints() in elfin_robot_bringup/script/cmd_pub.py
 令机械臂规划到达指定空间位置的路径并执行此路径  
 example: function_pub_cart_xxx() in elfin_robot_bringup/script/cmd_pub.py
 
+**elfin_arm_controller/command (trajectory_msgs/JointTrajectory)**  
+本消息内容为一条轨迹，可令机械臂沿着这条轨迹运动
+
 **elfin_teleop_joint_cmd_no_limit (std_msgs/Int64)**  
 本指令为调试机器时使用的指令，不建议客户使用。发送本指令后，机械臂的特定关节会向一个方向移动一点距离，连续发送就会连续运动。  
 消息内容含义如下：
@@ -32,8 +35,8 @@ example: function_pub_cart_xxx() in elfin_robot_bringup/script/cmd_pub.py
 ------
 ### Published Topics:
 
-**joint_states (sensor_msgs/JointState)**  
-各个关节的当前状态
+**elfin_arm_controller/state (control_msgs/JointTrajectoryControllerState)**  
+反映机械臂各个关节的状态
 
 **elfin_ros_control/elfin/enable_state (std_msgs/Bool)**  
 反映此时Elfin机械臂上电机的使能状态。  
@@ -64,7 +67,7 @@ true: 有报错  / false: 无报错
 **elfin_ros_control/elfin/get_current_position (std_srvs/SetBool)**  
 呼叫本服务得到的反馈信息中会包含机械臂各轴的位置的编码器值  
 
-*以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用*
+***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 
 **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  
 呼叫本服务可使机械臂使能，建议调用本服务前先调用elfin_basic_api/stop_teleop，以免未使能时发出的运动指令影响到使能的过程。  
