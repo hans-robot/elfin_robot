@@ -47,7 +47,7 @@ $ source devel/setup.bash
 ```sh
 $ roslaunch elfin_gazebo elfin3_empty_world.launch
 ```
-运行MoveIt!模块, RViz界面和elfin_gui界面:
+运行MoveIt!模块, RViz界面和Elfin Control Panel界面:
 ```sh
 $ roslaunch elfin_robot_bringup elfin3_moveit_gui.launch
 ```
@@ -55,7 +55,7 @@ $ roslaunch elfin_robot_bringup elfin3_moveit_gui.launch
 Tips:  
 每次规划路径时，都要设置初始位置为当前位置。
 
-运行以下程序开启手柄遥控功能：
+如果你有手柄的话，可以运行以下程序开启手柄遥控功能：
 ```sh
 $ roslaunch elfin3_moveit_config joystick_control.launch
 ```
@@ -70,6 +70,9 @@ Tips:
 ---
 
 ### 使用真实的Elfin机器人
+
+先把购买机器人时得到的elfin_drivers.yaml放到elfin_robot_bringup/config/文件夹下。
+
 将Elfin通过网线连接到电脑。先通过`ifconfig`指令来确定与Elfin连接的网卡名称。本软件包默认的名称是eth0 。假如当前名称不是eth0的话，请对elfin_robot_bringup/config/elfin_drivers.yaml的相应部分进行修改。
 ```
 elfin_ethernet_name: eth0
@@ -85,18 +88,18 @@ $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control.launch
 ```
 
-运行MoveIt!模块, RViz界面和elfin_gui界面:
+运行MoveIt!模块, RViz界面和Elfin Control Panel界面:
 ```sh
 $ roslaunch elfin_robot_bringup elfin3_moveit_gui.launch
 ```
 
-用elfin_gui界面给Elfin使能指令，如果此时没有报错，直接按下"Servo On"即可使能。如果报错，需先按"Clear Fault"清错后再按下"Servo On"使能。
+用Elfin Control Panel界面给Elfin使能指令，如果此时没有报错，直接按下"Servo On"即可使能。如果报错，需先按"Clear Fault"清错后再按下"Servo On"使能。
 
 > 关于MoveIt!的使用方法可以参考[docs/moveit_plugin_tutorial.md](docs/moveit_plugin_tutorial.md)  
 Tips:  
 每次规划路径时，都要设置初始位置为当前位置。
 
-运行以下程序开启手柄遥控功能：
+如果你有手柄的话，可以运行以下程序开启手柄遥控功能：
 ```sh
 $ roslaunch elfin3_moveit_config joystick_control.launch
 ```
@@ -106,6 +109,6 @@ Tips:
 > 1. In the Motion Planning plugin of Rviz, enable “Allow External Comm.” checkbox in the “Planning” tab.   
 > 2. Add “Pose” to rviz Displays and subscribe to /joy_pose in order to see the output from joystick. Note that only planning groups that have IK solvers for all their End Effector parent groups will work.
 
-在关闭机械臂电源前，需先按下elfin_gui界面的"Servo Off"给Elfin去使能。
+在关闭机械臂电源前，需先按下Elfin Control Panel界面的"Servo Off"给Elfin去使能。
 
 更多关于API的信息请看[docs/API_description.md](docs/API_description.md)

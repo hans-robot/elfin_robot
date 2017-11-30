@@ -78,9 +78,9 @@ private:
         std::string driver_name_;
         ros::NodeHandle root_nh_, ed_nh_;
 
-        ros::ServiceServer get_txpdo_server;
-        ros::ServiceServer get_rxpdo_server;
-        ros::ServiceServer get_current_position_server;
+        ros::ServiceServer get_txpdo_server_;
+        ros::ServiceServer get_rxpdo_server_;
+        ros::ServiceServer get_current_position_server_;
         ros::ServiceServer enable_robot_;
         ros::ServiceServer disable_robot_;
         ros::ServiceServer clear_fault_;

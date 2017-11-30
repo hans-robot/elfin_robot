@@ -119,9 +119,9 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     }
 
     //Initialize ros service server
-    get_txpdo_server=ed_nh_.advertiseService("get_txpdo", &ElfinEtherCATDriver::getTxPDO_cb, this);
-    get_rxpdo_server=ed_nh_.advertiseService("get_rxpdo", &ElfinEtherCATDriver::getRxPDO_cb, this);
-    get_current_position_server=ed_nh_.advertiseService("get_current_position", &ElfinEtherCATDriver::getCurrentPosition_cb, this);
+    get_txpdo_server_=ed_nh_.advertiseService("get_txpdo", &ElfinEtherCATDriver::getTxPDO_cb, this);
+    get_rxpdo_server_=ed_nh_.advertiseService("get_rxpdo", &ElfinEtherCATDriver::getRxPDO_cb, this);
+    get_current_position_server_=ed_nh_.advertiseService("get_current_position", &ElfinEtherCATDriver::getCurrentPosition_cb, this);
     enable_robot_=ed_nh_.advertiseService("enable_robot", &ElfinEtherCATDriver::enableRobot_cb, this);
     disable_robot_=ed_nh_.advertiseService("disable_robot", &ElfinEtherCATDriver::disableRobot_cb, this);
     clear_fault_=ed_nh_.advertiseService("clear_fault", &ElfinEtherCATDriver::clearFault_cb, this);
