@@ -59,7 +59,7 @@ $ roslaunch elfin3_moveit_config moveit_planning_execution.launch display:=false
 
 运行后台程序及Elfin Control Panel界面：
 ```sh
-roslaunch elfin_basic_api elfin_basic_api.launch
+$ roslaunch elfin_basic_api elfin_basic_api.launch
 ```
 
 > 关于MoveIt!的使用方法可以参考[docs/moveit_plugin_tutorial.md](docs/moveit_plugin_tutorial.md)  
@@ -110,7 +110,7 @@ $ roslaunch elfin3_moveit_config moveit_planning_execution.launch display:=false
 
 运行后台程序及Elfin Control Panel界面：
 ```sh
-roslaunch elfin_basic_api elfin_basic_api.launch
+$ roslaunch elfin_basic_api elfin_basic_api.launch
 ```
 
 用Elfin Control Panel界面给Elfin使能指令，如果此时没有报错，直接按下"Servo On"即可使能。如果报错，需先按"Clear Fault"清错后再按下"Servo On"使能。
