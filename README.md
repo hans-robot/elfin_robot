@@ -1,6 +1,8 @@
 Elfin Robot
 ======
 
+If you don't speak chinese, please [click here](./README_english.md)
+
 ![elfin_robot](docs/images/elfin.png)
 
 本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 14.04 及 ROS Indigo，其他环境下的运行情况没有测试过。
