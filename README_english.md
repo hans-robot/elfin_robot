@@ -50,6 +50,9 @@ $ source devel/setup.bash
 
 ### Usage with Gazebo Simulation
 
+***There are launch files available to bringup a simulated robot - either Elfin3, Elfin5 or Elfin10.  
+In the following the commands for Elfin3 are given. For Elfin5 or Elfin10, simply replace the prefix accordingly.***
+
 Bring up the simulated robot in Gazebo:
 ```sh
 $ roslaunch elfin_gazebo elfin3_empty_world.launch
@@ -88,6 +91,9 @@ For more information about API, see [docs/API_description_english.md](docs/API_d
 ---
 
 ###  Usage with real Hardware
+
+***There are launch files available to bringup a real robot - either Elfin3, Elfin5 or Elfin10.  
+In the following the commands for Elfin3 are given. For Elfin5 or Elfin10, simply replace the prefix accordingly.***
 
 Put the file *elfin_drivers.yaml*, that you got from the vendor, into the folder elfin_robot_bringup/config/.
 

@@ -45,6 +45,8 @@ $ source devel/setup.bash
 
 ### 使用仿真模型
 
+***下面给出的是启动Elfin3的一系列命令。启动Elfin5和Elfin10的方法与之类似，只要在相应的地方替换掉相应的前缀即可。***
+
 用Gazebo仿真请运行：
 ```sh
 $ roslaunch elfin_gazebo elfin3_empty_world.launch
@@ -83,6 +85,8 @@ Tips:
 ---
 
 ### 使用真实的Elfin机器人
+
+***下面给出的是启动Elfin3的一系列命令。启动Elfin5和Elfin10的方法与之类似，只要在相应的地方替换掉相应的前缀即可。***
 
 先把购买机器人时得到的elfin_drivers.yaml放到elfin_robot_bringup/config/文件夹下。
 
