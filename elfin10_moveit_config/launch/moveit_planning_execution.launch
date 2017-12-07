@@ -1,0 +1,16 @@
+<launch>
+
+ # The planning and execution components of MoveIt! configured to 
+ # publish the current configuration of the robot (simulated or real)
+ # and the current state of the world as seen by the planner
+  
+ <include file="$(find elfin10_moveit_config)/launch/move_group.launch">
+  <arg name="publish_monitored_planning_scene" value="true" />
+ </include>
+ # The visualization component of MoveIt!
+ <arg name="display" default="true"/>
+ <include file="$(find elfin10_moveit_config)/launch/moveit_rviz.launch" if="$(arg display)">
+   <arg name="config" value="true"/>
+ </include>
+ 
+</launch>
