@@ -68,13 +68,41 @@ class CmdPub(object):
         ps.pose.orientation.z=0
         ps.pose.orientation.w=0.968
         self.cart_pub.publish(ps)
+    
+    def function_pub_cart_elfin5(self):
+        ps=PoseStamped()
+        ps.header.stamp=rospy.get_rostime()
+        ps.header.frame_id='elfin_base_link'
+        ps.pose.position.x=0.13
+        ps.pose.position.y=-0.1
+        ps.pose.position.z=1.008
+        ps.pose.orientation.x=0.295
+        ps.pose.orientation.y=0
+        ps.pose.orientation.z=0
+        ps.pose.orientation.w=0.956
+        self.cart_pub.publish(ps)
+        
+    def function_pub_cart_elfin10(self):
+        ps=PoseStamped()
+        ps.header.stamp=rospy.get_rostime()
+        ps.header.frame_id='elfin_base_link'
+        ps.pose.position.x=0.097
+        ps.pose.position.y=-0.124
+        ps.pose.position.z=1.226
+        ps.pose.orientation.x=0.317
+        ps.pose.orientation.y=0
+        ps.pose.orientation.z=0
+        ps.pose.orientation.w=0.948
+        self.cart_pub.publish(ps)
 
 if __name__=='__main__':
     rospy.init_node('cmd_pub', anonymous=True)
     cp=CmdPub()
     rospy.sleep(1)
-#    cp.function_pub_joints()
-    cp.function_pub_cart_elfin3()
+    cp.function_pub_joints()
+#    cp.function_pub_cart_elfin3()
+#    cp.function_pub_cart_elfin5()
+#    cp.function_pub_cart_elfin10()
 
     rospy.spin()
 
