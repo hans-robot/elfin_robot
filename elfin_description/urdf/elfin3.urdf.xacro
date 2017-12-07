@@ -118,7 +118,7 @@
     type="revolute">
     <origin
       xyz="0 0 0.031"
-      rpy="1.5708 0 0" />
+      rpy="${PI/2} 0 0" />
     <parent
       link="elfin_base" />
     <child
@@ -234,7 +234,7 @@
     type="revolute">
     <origin
       xyz="0 0.266 0"
-      rpy="-3.1416 0 0" />
+      rpy="${-PI} 0 0" />
     <parent
       link="elfin_link2" />
     <child
@@ -292,7 +292,7 @@
     type="revolute">
     <origin
       xyz="0.068808 -0.10523 0"
-      rpy="3.1416 0 0" />
+      rpy="${PI} 0 0" />
     <parent
       link="elfin_link3" />
     <child
@@ -350,7 +350,7 @@
     type="revolute">
     <origin
       xyz="0 0.21877 0"
-      rpy="-3.1416 0 0" />
+      rpy="${-PI} 0 0" />
     <parent
       link="elfin_link4" />
     <child
@@ -408,7 +408,7 @@
     type="revolute">
     <origin
       xyz="0 -0.1065 0"
-      rpy="-3.1416 0 -3.1416" />
+      rpy="${-PI} 0 ${-PI}" />
     <parent
       link="elfin_link5" />
     <child
