@@ -32,5 +32,17 @@
   <material name="white">
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
+  
+  <material name="metal">
+    <color rgba="0.768627450980392 0.749019607843137 0.729411764705882 1" />
+  </material>
+  
+  <material name="metal_grey">
+    <color rgba="0.501960784313725 0.501960784313725 0.501960784313725 1" />
+  </material>
+  
+  <material name="metal_white">
+    <color rgba="0.866666666666667 0.866666666666667 0.890196078431373 1" />
+  </material>
 
 </robot>
