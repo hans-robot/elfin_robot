@@ -52,6 +52,8 @@ Created on Mon Nov 13 15:20:10 2017
 #include <std_srvs/SetBool.h>
 #include <std_msgs/Int64.h>
 #include <std_msgs/Empty.h>
+#include "elfin_basic_api/ElfinTeleopAPIDynamicReconfigureConfig.h"
+#include <dynamic_reconfigure/server.h>
 
 namespace elfin_basic_api {
 
@@ -64,6 +66,9 @@ public:
     void teleopJointCmdCB(const std_msgs::Int64ConstPtr &msg);
     void teleopCartCmdCB(const std_msgs::Int64ConstPtr &msg);
     void teleopStopCB(const std_msgs::EmptyConstPtr &msg);
+
+    void dynamicReconfigureCallback(ElfinTeleopAPIDynamicReconfigureConfig &config, uint32_t level);
+    void setVelocityScaling(int data);
 
     bool jointTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
     bool cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
@@ -86,8 +91,14 @@ private:
     ros::ServiceServer home_teleop_server_;
     ros::ServiceServer teleop_stop_server_;
 
+    dynamic_reconfigure::Server<ElfinTeleopAPIDynamicReconfigureConfig> dynamic_reconfigure_server_;
+
     double joint_step_;
     double joint_duration_ns_;
+    double joint_speed_limit_;
+    double velocity_scaling_;
+    double joint_speed_default_;
+    double cart_duration_default_;
     double joint_speed_;
     double cart_duration_; // in second
     std::string teleop_link_;

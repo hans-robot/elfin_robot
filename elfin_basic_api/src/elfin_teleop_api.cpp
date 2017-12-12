@@ -53,12 +53,31 @@ ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std
     home_teleop_server_=teleop_nh_.advertiseService("home_teleop", &ElfinTeleopAPI::homeTeleop_cb, this);
     teleop_stop_server_=teleop_nh_.advertiseService("stop_teleop", &ElfinTeleopAPI::teleopStop_cb, this);
 
+    // parameter for teleop no limit
     joint_step_=M_PI/100;
     joint_duration_ns_=1e+8;
-    joint_speed_=0.2;
-    cart_duration_=0.1;
+
+    // parameter for normal teleop
+    joint_speed_limit_=1.57;
+    joint_speed_default_=joint_speed_limit_;
+    cart_duration_default_=0.02;
+
+    dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinTeleopAPI::dynamicReconfigureCallback, this, _1, _2));
 
     teleop_link_=group_->getEndEffectorLink();
+}
+
+void ElfinTeleopAPI::dynamicReconfigureCallback(ElfinTeleopAPIDynamicReconfigureConfig &config, uint32_t level)
+{
+    setVelocityScaling(config.velocity_scaling);
+}
+
+void ElfinTeleopAPI::setVelocityScaling(int data)
+{
+    velocity_scaling_=data/100.0;
+    joint_speed_=joint_speed_default_*velocity_scaling_;
+    cart_duration_=cart_duration_default_/velocity_scaling_;
+    group_->setMaxVelocityScalingFactor(velocity_scaling_);
 }
 
 void ElfinTeleopAPI::teleopJointCmdNoLimitCB(const std_msgs::Int64ConstPtr &msg)
@@ -233,7 +252,7 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
                         biggest_shift=shift_tmp;
                 }
             }
-            if(biggest_shift>cart_duration_*1)
+            if(biggest_shift>cart_duration_*joint_speed_limit_)
                 break;
             ros::Duration dur((i+1)*cart_duration_);
             point_tmp.time_from_start=dur;
