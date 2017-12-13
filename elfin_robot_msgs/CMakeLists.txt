@@ -54,6 +54,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   SetInt16.srv
+  SetFloat64.srv
 )
 
 ## Generate actions in the 'action' folder

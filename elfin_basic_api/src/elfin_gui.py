@@ -45,7 +45,7 @@ import rospy
 import math
 import tf
 import moveit_commander
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Empty
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
 import wx
@@ -127,11 +127,11 @@ class MyFrame(wx.Frame):
         # the variables about velocity scaling
         self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns)
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
-                                              default=20)
-        default_velocity_scaling=str(velocity_scaling_init)
+                                              default=0.2)
+        default_velocity_scaling=str(round(velocity_scaling_init, 2))
         self.velocity_setting_label=wx.StaticText(self.panel, label='Velocity Scaling',
                                                   pos=(20, btn_height-70))
-        self.velocity_setting=wx.Slider(self.panel, value=velocity_scaling_init,
+        self.velocity_setting=wx.Slider(self.panel, value=int(velocity_scaling_init*100),
                                         minValue=1, maxValue=100,
                                         style = wx.SL_HORIZONTAL,
                                         size=(500, 30),
@@ -142,7 +142,7 @@ class MyFrame(wx.Frame):
                                                     pos=(550, btn_height-45))
         self.velocity_setting_show=wx.TextCtrl(self.panel, 
                                                style=(wx.TE_CENTER|wx.TE_READONLY), 
-                                                value=default_velocity_scaling+'%',
+                                                value=default_velocity_scaling,
                                                 pos=(600, btn_height-55))
         self.velocity_setting.Bind(wx.EVT_SLIDER, self.velocity_setting_cb)
         
@@ -285,7 +285,7 @@ class MyFrame(wx.Frame):
                                    lambda evt, mark=i+1 : self.release_button(evt, mark) )
     
     def velocity_setting_cb(self, event):
-        current_velocity_scaling=self.velocity_setting.GetValue()
+        current_velocity_scaling=self.velocity_setting.GetValue()*0.01
         self.teleop_api_dynamic_reconfig_client.update_configuration({'velocity_scaling': current_velocity_scaling})
         wx.CallAfter(self.update_velocity_scaling_show, current_velocity_scaling)
     
@@ -391,7 +391,7 @@ class MyFrame(wx.Frame):
             self.fault_state_show.SetValue('No Fault')
         
     def update_velocity_scaling_show(self, msg):
-        self.velocity_setting_show.SetValue(str(msg)+'%')
+        self.velocity_setting_show.SetValue(str(round(msg, 2)))
     
     
     def js_call_back(self, data):
@@ -430,10 +430,17 @@ class MyFrame(wx.Frame):
         self.fault_state=data.data
         wx.CallAfter(self.update_fault_state, data)
     
+    def velocity_scaling_update(self, data):
+        if rospy.has_param(self.elfin_basic_api_ns+'velocity_scaling'):
+            current_velocity_scaling=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling')
+            self.velocity_setting.SetValue(int(current_velocity_scaling*100))
+            wx.CallAfter(self.update_velocity_scaling_show, current_velocity_scaling)
+    
     def listen(self):
         rospy.Subscriber('joint_states', JointState, self.js_call_back)
         rospy.Subscriber(self.elfin_driver_ns+'enable_state', Bool, self.servo_state_cb)
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
+        rospy.Subscriber(self.elfin_basic_api_ns+'gui_velocity_scaling_update', Empty, self.velocity_scaling_update)
   
 if __name__=='__main__':  
     rospy.init_node('elfin_gui')
