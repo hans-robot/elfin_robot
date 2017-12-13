@@ -95,10 +95,14 @@ private:
 
     double joint_step_;
     double joint_duration_ns_;
+
     double joint_speed_limit_;
     double velocity_scaling_;
     double joint_speed_default_;
     double cart_duration_default_;
+    double resolution_angle_;
+    double resolution_linear_;
+
     double joint_speed_;
     double cart_duration_; // in second
     std::string teleop_link_;

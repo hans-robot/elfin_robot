@@ -61,6 +61,8 @@ ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std
     joint_speed_limit_=1.57;
     joint_speed_default_=joint_speed_limit_;
     cart_duration_default_=0.02;
+    resolution_angle_=0.02;
+    resolution_linear_=0.005;
 
     dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinTeleopAPI::dynamicReconfigureCallback, this, _1, _2));
 
@@ -170,8 +172,8 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
     tf::Vector3 x_axis(1, 0, 0);
     tf::Vector3 y_axis(0, 1, 0);
     tf::Vector3 z_axis(0, 0, 1);
-    double resolution_alpha=0.02;
-    double resolution_delta=0.005;
+    double resolution_alpha=resolution_angle_;
+    double resolution_delta=resolution_linear_;
 
     robot_state::RobotStatePtr kinematic_state_ptr=group_->getCurrentState();
     robot_state::RobotState kinematic_state=*kinematic_state_ptr;
@@ -339,7 +341,6 @@ void ElfinTeleopAPI::PoseStampedRotation(geometry_msgs::PoseStamped &pose_stampe
     tf::Quaternion q_2(axis, angle);
     tf::Matrix3x3 m(q_1);
     tf::Matrix3x3 m_2(q_2);
-//    m.operator *=(m_2);
     m_2.operator *=(m);
     double r, p, y;
     m_2.getRPY(r,p,y);

@@ -53,11 +53,12 @@ from sensor_msgs.msg import JointState
 from actionlib import SimpleActionClient
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 import threading
+import dynamic_reconfigure.client
 
 class MyFrame(wx.Frame):  
   
     def __init__(self,parent,id):  
-        the_size=(700, 470)
+        the_size=(700, 520)
         wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100),size=the_size) 
         self.SetMinSize(the_size)
         self.SetMaxSize(the_size)
@@ -89,7 +90,7 @@ class MyFrame(wx.Frame):
         self.display_init()
         self.key=[]
                                 
-        btn_height=330
+        btn_height=380
                 
         self.power_on_btn=wx.Button(self.panel, label='Servo On', name='Servo On',
                                     pos=(20, btn_height), size=(90,40))
@@ -122,6 +123,28 @@ class MyFrame(wx.Frame):
                                            pos=(20, btn_height+60))
         self.reply_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
                                     value='', size=(550, 30), pos=(20, btn_height+80))
+        
+        # the variables about velocity scaling
+        self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns)
+        velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
+                                              default=20)
+        default_velocity_scaling=str(velocity_scaling_init)
+        self.velocity_setting_label=wx.StaticText(self.panel, label='Velocity Scaling',
+                                                  pos=(20, btn_height-70))
+        self.velocity_setting=wx.Slider(self.panel, value=velocity_scaling_init,
+                                        minValue=1, maxValue=100,
+                                        style = wx.SL_HORIZONTAL,
+                                        size=(500, 30),
+                                        pos=(45, btn_height-50))
+        self.velocity_setting_txt_lower=wx.StaticText(self.panel, label='1%',
+                                                    pos=(20, btn_height-45))
+        self.velocity_setting_txt_upper=wx.StaticText(self.panel, label='100%',
+                                                    pos=(550, btn_height-45))
+        self.velocity_setting_show=wx.TextCtrl(self.panel, 
+                                               style=(wx.TE_CENTER|wx.TE_READONLY), 
+                                                value=default_velocity_scaling+'%',
+                                                pos=(600, btn_height-55))
+        self.velocity_setting.Bind(wx.EVT_SLIDER, self.velocity_setting_cb)
         
         self.dlg=wx.Dialog(self.panel, title='messag', size=(200, 50))
         self.dlg.Bind(wx.EVT_CLOSE, self.closewindow)
@@ -260,7 +283,12 @@ class MyFrame(wx.Frame):
                                    lambda evt, mark=i+1 : self.teleop_pcs(evt, mark) )
             self.pp_button[i].Bind(wx.EVT_LEFT_UP,
                                    lambda evt, mark=i+1 : self.release_button(evt, mark) )
-        
+    
+    def velocity_setting_cb(self, event):
+        current_velocity_scaling=self.velocity_setting.GetValue()
+        self.teleop_api_dynamic_reconfig_client.update_configuration({'velocity_scaling': current_velocity_scaling})
+        wx.CallAfter(self.update_velocity_scaling_show, current_velocity_scaling)
+    
     def action_stop(self):
         self.action_client.wait_for_server()
         self.action_goal.trajectory.header.stamp.secs=0
@@ -361,6 +389,9 @@ class MyFrame(wx.Frame):
         else:
             self.fault_state_show.SetBackgroundColour(wx.Colour(200, 225, 200))
             self.fault_state_show.SetValue('No Fault')
+        
+    def update_velocity_scaling_show(self, msg):
+        self.velocity_setting_show.SetValue(str(msg)+'%')
     
     
     def js_call_back(self, data):
