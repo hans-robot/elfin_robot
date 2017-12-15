@@ -127,7 +127,7 @@ class MyFrame(wx.Frame):
         # the variables about velocity scaling
         self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns)
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
-                                              default=0.2)
+                                              default=0.4)
         default_velocity_scaling=str(round(velocity_scaling_init, 2))
         self.velocity_setting_label=wx.StaticText(self.panel, label='Velocity Scaling',
                                                   pos=(20, btn_height-70))

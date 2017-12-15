@@ -48,34 +48,23 @@ ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std
     goal_.trajectory.header.stamp.nsec=0;
     sub_teleop_joint_command_no_limit_=root_nh_.subscribe("elfin_teleop_joint_cmd_no_limit", 1,  &ElfinTeleopAPI::teleopJointCmdNoLimitCB, this);
 
-    gui_velocity_scaling_update_pub_=teleop_nh_.advertise<std_msgs::Empty>("gui_velocity_scaling_update", 1);
-
     joint_teleop_server_=teleop_nh_.advertiseService("joint_teleop", &ElfinTeleopAPI::jointTeleop_cb, this);
     cart_teleop_server_=teleop_nh_.advertiseService("cart_teleop", &ElfinTeleopAPI::cartTeleop_cb, this);
     home_teleop_server_=teleop_nh_.advertiseService("home_teleop", &ElfinTeleopAPI::homeTeleop_cb, this);
     teleop_stop_server_=teleop_nh_.advertiseService("stop_teleop", &ElfinTeleopAPI::teleopStop_cb, this);
-    set_velocity_scaling_server_=teleop_nh_.advertiseService("set_velocity_scaling", &ElfinTeleopAPI::setVelocityScaling_cb, this);
-    update_velocity_scaling_server_=teleop_nh_.advertiseService("update_velocity_scaling", &ElfinTeleopAPI::updateVelocityScaling_cb, this);
 
     // parameter for teleop no limit
     joint_step_=M_PI/100;
     joint_duration_ns_=1e+8;
 
     // parameter for normal teleop
-    joint_speed_limit_=1.57;
-    joint_speed_default_=joint_speed_limit_;
-    cart_duration_default_=0.02;
+    joint_speed_limit_=JOINT_SPEED_LIMIT_CONST;
+    joint_speed_default_=JOINT_SPEED_DEFAULT_CONST;
+    cart_duration_default_=CART_DURATION_DEFAULT_CONST;
     resolution_angle_=0.02;
     resolution_linear_=0.005;
 
-    dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinTeleopAPI::dynamicReconfigureCallback, this, _1, _2));
-
     teleop_link_=group_->getEndEffectorLink();
-}
-
-void ElfinTeleopAPI::dynamicReconfigureCallback(ElfinTeleopAPIDynamicReconfigureConfig &config, uint32_t level)
-{
-    setVelocityScaling(config.velocity_scaling);
 }
 
 void ElfinTeleopAPI::setVelocityScaling(double data)
@@ -335,30 +324,6 @@ bool ElfinTeleopAPI::teleopStop_cb(std_srvs::SetBool::Request &req, std_srvs::Se
 
     resp.success=true;
     resp.message="stop moving";
-    return true;
-}
-
-bool ElfinTeleopAPI::setVelocityScaling_cb(elfin_robot_msgs::SetFloat64::Request &req, elfin_robot_msgs::SetFloat64::Response &resp)
-{
-    if(req.data<0.01 || req.data>1)
-    {
-        resp.success=false;
-        resp.message="the data of the request should be in range [0.01, 1.0]";
-        return true;
-    }
-    setVelocityScaling(req.data);
-    teleop_nh_.setParam("velocity_scaling", req.data);
-    gui_velocity_scaling_update_pub_.publish(empty_msg_);
-    resp.success=true;
-    resp.message="set velocity scaling successfully";
-    return true;
-}
-
-bool ElfinTeleopAPI::updateVelocityScaling_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
-{
-    teleop_nh_.setParam("velocity_scaling", velocity_scaling_);
-    resp.success=true;
-    resp.message="the ros parameter "+teleop_nh_.getNamespace()+"/velocity_scaling is updated";
     return true;
 }
 

@@ -38,15 +38,13 @@ Created on Thurs Nov 16 09:36:10 2017
 // author: Cong Liu
 
 #include "elfin_basic_api/elfin_basic_api_node.h"
-#include "elfin_basic_api/elfin_motion_api.h"
 
 int main(int argc, char** argv)
 {
     ros::init(argc,argv,"elfin_basic_api", ros::init_options::AnonymousName);
     moveit::planning_interface::MoveGroup move_group("elfin_arm");
     move_group.getCurrentJointValues();
-    elfin_basic_api::ElfinTeleopAPI elfin_teleop_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
-    elfin_basic_api::ElfinMotionAPI elfin_motion_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
+    elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
     ros::spin();
 }
 

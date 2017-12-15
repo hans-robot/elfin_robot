@@ -94,7 +94,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 # Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/ElfinTeleopAPIDynamicReconfigure.cfg
+  cfg/ElfinBasicAPIDynamicReconfigure.cfg
 )
 
 ###################################
@@ -127,8 +127,11 @@ include_directories(
 
 # Declare a C++ library
 add_library(elfin_basic_api
+  src/elfin_basic_api.cpp
   src/elfin_teleop_api.cpp
   src/elfin_motion_api.cpp
+  include/${PROJECT_NAME}/elfin_basic_api.h
+  include/${PROJECT_NAME}/elfin_basic_api_const.h
   include/${PROJECT_NAME}/elfin_teleop_api.h
   include/${PROJECT_NAME}/elfin_motion_api.h
 )
@@ -141,6 +144,7 @@ add_dependencies(elfin_basic_api ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 # Declare a C++ executable
 add_executable(elfin_basic_api_node
 src/elfin_basic_api_node.cpp
+src/elfin_basic_api.cpp
 src/elfin_teleop_api.cpp
 src/elfin_motion_api.cpp)
 

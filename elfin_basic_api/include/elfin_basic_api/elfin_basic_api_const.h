@@ -1,5 +1,5 @@
 /*
-Created on Mon Nov 27 14:24:30 2017
+Created on Mon Dec 15 10:20:30 2017
 
 @author: Cong Liu
 
@@ -37,51 +37,13 @@ Created on Mon Nov 27 14:24:30 2017
 */
 // author: Cong Liu
 
-#ifndef ELFIN_MOTION_API_H
-#define ELFIN_MOTION_API_H
-
-#include <ros/ros.h>
-#include <vector>
-#include <sensor_msgs/JointState.h>
-#include <std_srvs/SetBool.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <moveit/move_group_interface/move_group.h>
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <moveit/robot_state/conversions.h>
-#include <actionlib/client/simple_action_client.h>
-#include <control_msgs/FollowJointTrajectoryAction.h>
-#include <trajectory_msgs/JointTrajectoryPoint.h>
-#include <elfin_basic_api/elfin_basic_api_const.h>
+#ifndef ELFIN_BASIC_API_CONST_H
+#define ELFIN_BASIC_API_CONST_H
 
 namespace elfin_basic_api {
-
-class ElfinMotionAPI
-{
-public:
-    ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
-    void jointGoalCB(const sensor_msgs::JointStateConstPtr &msg);
-    void cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg);
-    bool getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
-    bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
-
-private:
-    moveit::planning_interface::MoveGroup *group_;
-    moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
-    ros::NodeHandle root_nh_, motion_nh_;
-
-    actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
-    control_msgs::FollowJointTrajectoryGoal goal_;
-
-    ros::Subscriber joint_goal_sub_;
-    ros::Subscriber cart_goal_sub_;
-
-    std::string motion_link_;
-
-    ros::ServiceServer get_reference_link_server_;
-    ros::ServiceServer get_end_link_server_;
-
-};
-
+const double JOINT_SPEED_LIMIT_CONST=1.57; // rad per second
+const double JOINT_SPEED_DEFAULT_CONST=0.78; // rad per second
+const double CART_DURATION_DEFAULT_CONST=0.04; // second
 }
 
 #endif

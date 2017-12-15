@@ -54,8 +54,7 @@ Created on Mon Nov 13 15:20:10 2017
 #include <std_srvs/SetBool.h>
 #include <std_msgs/Int64.h>
 #include <std_msgs/Empty.h>
-#include "elfin_basic_api/ElfinTeleopAPIDynamicReconfigureConfig.h"
-#include <dynamic_reconfigure/server.h>
+#include <elfin_basic_api/elfin_basic_api_const.h>
 
 namespace elfin_basic_api {
 
@@ -69,15 +68,12 @@ public:
     void teleopCartCmdCB(const std_msgs::Int64ConstPtr &msg);
     void teleopStopCB(const std_msgs::EmptyConstPtr &msg);
 
-    void dynamicReconfigureCallback(ElfinTeleopAPIDynamicReconfigureConfig &config, uint32_t level);
     void setVelocityScaling(double data);
 
     bool jointTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
     bool cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
     bool homeTeleop_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool teleopStop_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
-    bool setVelocityScaling_cb(elfin_robot_msgs::SetFloat64::Request &req, elfin_robot_msgs::SetFloat64::Response &resp);
-    bool updateVelocityScaling_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
     void PoseStampedRotation(geometry_msgs::PoseStamped &pose_stamped, const tf::Vector3 &axis, double angle);
 
@@ -86,22 +82,14 @@ private:
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
     ros::NodeHandle root_nh_, teleop_nh_;
 
-    std_msgs::Empty empty_msg_;
-
     actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
     control_msgs::FollowJointTrajectoryGoal goal_;
     ros::Subscriber sub_teleop_joint_command_no_limit_;
-
-    ros::Publisher gui_velocity_scaling_update_pub_;
 
     ros::ServiceServer joint_teleop_server_;
     ros::ServiceServer cart_teleop_server_;
     ros::ServiceServer home_teleop_server_;
     ros::ServiceServer teleop_stop_server_;
-    ros::ServiceServer set_velocity_scaling_server_;
-    ros::ServiceServer update_velocity_scaling_server_;
-
-    dynamic_reconfigure::Server<ElfinTeleopAPIDynamicReconfigureConfig> dynamic_reconfigure_server_;
 
     double joint_step_;
     double joint_duration_ns_;
