@@ -58,6 +58,12 @@ true: 有报错  / false: 无报错
 * **elfin_basic_api/stop_teleop (std_srvs/SetBool)**  
 呼叫本服务会令机械臂停止运动
 
+* **elfin_basic_api/set_velocity_scaling (elfin_robot_msgs/SetFloat64)**  
+设置elfin_basic_api的速度缩放比例。
+
+* **elfin_basic_api/update_velocity_scaling (std_srvs/SetBool)**  
+更新ros参数*elfin_basic_api/velocity_scaling*
+
 * **elfin_ros_control/elfin/get_txpdo (std_srvs/SetBool)**  
 呼叫本服务得到的反馈信息中会包含机械臂上从站的txpdo信息
 
@@ -78,7 +84,7 @@ true: 有报错  / false: 无报错
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 呼叫本服务可使机械臂清除报错状态。  
 
-* **elfin_basic_api/joint_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 呼叫本服务后，机械臂的特定关节会向一个方向一直移动，直到运动到极限位置或用户调用elfin_basic_api/stop_teleop，请慎用。
 
 消息内容含义如下：
@@ -98,7 +104,7 @@ true: 有报错  / false: 无报错
 | 6 | elfin_joint6 | ccw |
 | -6 | elfin_joint6 | cw |
 
-* **elfin_basic_api/cart_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/cart_teleop (elfin_robot_msgs/SetInt16)**  
 呼叫本服务后，机械臂会沿着一个空间方向一直移动，直到运动到极限位置或用户调用elfin_basic_api/stop_teleop，请慎用。
 
 消息内容含义如下：
@@ -118,5 +124,5 @@ true: 有报错  / false: 无报错
 | 6 | Rz | ccw |
 | -6 | Rz | cw |
 
-* **elfin_basic_api/home_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/home_teleop (std_srvs/SetBool)**  
 呼叫本服务后，机械臂会一直运动，直到回到零位置或用户调用elfin_basic_api/stop_teleop，请慎用。

@@ -68,6 +68,12 @@ You can get the content of RxPDOs from the response of this service.
 * **elfin_ros_control/elfin/get_current_position (std_srvs/SetBool)**  
 You can get the count values of the current joint positions from the response of this service.
 
+* **elfin_basic_api/set_velocity_scaling (elfin_robot_msgs/SetFloat64)**  
+Set the velocity scaling of elfin basic api
+
+* **elfin_basic_api/update_velocity_scaling (std_srvs/SetBool)**  
+Update the ros param *elfin_basic_api/velocity_scaling*
+
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
 
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  
@@ -79,7 +85,7 @@ Disable the robot.
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 Clear fault.  
 
-* **elfin_basic_api/joint_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 When this service is called, a particular joint will move in a direction and will NOT stop until it reach the limit position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
 
 Meaning of the data in the service:
@@ -99,7 +105,7 @@ Meaning of the data in the service:
 | 6 | elfin_joint6 | ccw |
 | -6 | elfin_joint6 | cw |
 
-* **elfin_basic_api/cart_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/cart_teleop (elfin_robot_msgs/SetInt16)**  
 When this service is called, the end link of the robot will move in a direction in cartsian coordination system and will NOT stop until it reach the limit position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
 
 Meaning of the data in the service:
@@ -119,5 +125,5 @@ Meaning of the data in the service:
 | 6 | Rz | ccw |
 | -6 | Rz | cw |
 
-* **elfin_basic_api/home_teleop (elfin_robot_msgs::SetInt16)**  
+* **elfin_basic_api/home_teleop (std_srvs/SetBool)**  
 When this service is called, the robot will move to home position and will NOT stop until it reach the home position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
