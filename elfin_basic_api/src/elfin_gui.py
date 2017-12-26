@@ -125,7 +125,6 @@ class MyFrame(wx.Frame):
                                     value='', size=(550, 30), pos=(20, btn_height+80))
         
         # the variables about velocity scaling
-        self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns)
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
                                               default=0.4)
         default_velocity_scaling=str(round(velocity_scaling_init, 2))
@@ -145,6 +144,8 @@ class MyFrame(wx.Frame):
                                                 value=default_velocity_scaling,
                                                 pos=(600, btn_height-55))
         self.velocity_setting.Bind(wx.EVT_SLIDER, self.velocity_setting_cb)
+        self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns,
+                                                                                  config_callback=self.basic_api_reconfigure_cb)
         
         self.dlg=wx.Dialog(self.panel, title='messag', size=(200, 50))
         self.dlg.Bind(wx.EVT_CLOSE, self.closewindow)
@@ -289,6 +290,12 @@ class MyFrame(wx.Frame):
         self.teleop_api_dynamic_reconfig_client.update_configuration({'velocity_scaling': current_velocity_scaling})
         wx.CallAfter(self.update_velocity_scaling_show, current_velocity_scaling)
     
+    def basic_api_reconfigure_cb(self, config):
+        if self.velocity_setting_show.GetValue()!=config.velocity_scaling:
+            self.velocity_setting.SetValue(int(config.velocity_scaling*100))
+            wx.CallAfter(self.update_velocity_scaling_show, config.velocity_scaling)
+            
+    
     def action_stop(self):
         self.action_client.wait_for_server()
         self.action_goal.trajectory.header.stamp.secs=0
@@ -429,18 +436,11 @@ class MyFrame(wx.Frame):
     def fault_state_cb(self, data):
         self.fault_state=data.data
         wx.CallAfter(self.update_fault_state, data)
-    
-    def velocity_scaling_update(self, data):
-        if rospy.has_param(self.elfin_basic_api_ns+'velocity_scaling'):
-            current_velocity_scaling=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling')
-            self.velocity_setting.SetValue(int(current_velocity_scaling*100))
-            wx.CallAfter(self.update_velocity_scaling_show, current_velocity_scaling)
-    
+        
     def listen(self):
         rospy.Subscriber('joint_states', JointState, self.js_call_back)
         rospy.Subscriber(self.elfin_driver_ns+'enable_state', Bool, self.servo_state_cb)
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
-        rospy.Subscriber(self.elfin_basic_api_ns+'gui_velocity_scaling_update', Empty, self.velocity_scaling_update)
   
 if __name__=='__main__':  
     rospy.init_node('elfin_gui')

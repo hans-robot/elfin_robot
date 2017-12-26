@@ -68,15 +68,8 @@ private:
     ElfinTeleopAPI *teleop_api_;
     ElfinMotionAPI *motion_api_;
 
-    std_msgs::Empty empty_msg_;
-
-    ros::Publisher gui_velocity_scaling_update_pub_;
-
     actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
     control_msgs::FollowJointTrajectoryGoal goal_;
-
-    ros::ServiceServer set_velocity_scaling_server_;
-    ros::ServiceServer update_velocity_scaling_server_;
 
     dynamic_reconfigure::Server<ElfinBasicAPIDynamicReconfigureConfig> dynamic_reconfigure_server_;
 

@@ -1,5 +1,7 @@
-/*
-Created on Mon Dec 15 10:58:42 2017
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Dec 16 19:59:24 2017
 
 @author: Cong Liu
 
@@ -34,39 +36,35 @@ Created on Mon Dec 15 10:58:42 2017
  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
-*/
-// author: Cong Liu
 
-#include <elfin_basic_api/elfin_basic_api.h>
+"""
 
-namespace elfin_basic_api {
+# author: Cong Liu
+import rospy
+from dynamic_reconfigure.srv import Reconfigure, ReconfigureRequest
+from dynamic_reconfigure.msg import DoubleParameter, Config
 
-ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::string action_name):
-    group_(group), action_client_(action_name, true), local_nh_("~")
-{
-    teleop_api_=new ElfinTeleopAPI(group, action_name);
-    motion_api_=new ElfinMotionAPI(group, action_name);
+class SetVelocityScaling(object):
+    def __init__(self):
+        self.request=ReconfigureRequest()
+        self.velocity_scaling_goal=0.6
+        self.elfin_basic_api_ns='elfin_basic_api/'
+        self.set_parameters_client=rospy.ServiceProxy(self.elfin_basic_api_ns+'set_parameters',
+                                                      Reconfigure)
+    
+    def set_parameters(self):
+        config_empty=Config()
+        
+        velocity_scaling_param_tmp=DoubleParameter()
+        velocity_scaling_param_tmp.name='velocity_scaling'
+        velocity_scaling_param_tmp.value=self.velocity_scaling_goal
+        self.request.config.doubles.append(velocity_scaling_param_tmp)
+        self.set_parameters_client.call(self.request)
+        self.request.config=config_empty
+    
+if __name__ == "__main__":
+    rospy.init_node('set_velocity_scaling', anonymous=True)
+    svc=SetVelocityScaling()
+    svc.set_parameters()
+    rospy.spin()
 
-    dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinBasicAPI::dynamicReconfigureCallback, this, _1, _2));
-}
-
-ElfinBasicAPI::~ElfinBasicAPI()
-{
-    if(teleop_api_ != NULL)
-        delete teleop_api_;
-    if(motion_api_ != NULL)
-        delete motion_api_;
-}
-
-void ElfinBasicAPI::dynamicReconfigureCallback(ElfinBasicAPIDynamicReconfigureConfig &config, uint32_t level)
-{
-    setVelocityScaling(config.velocity_scaling);
-}
-
-void ElfinBasicAPI::setVelocityScaling(double data)
-{
-    velocity_scaling_=data;
-    teleop_api_->setVelocityScaling(velocity_scaling_);
-}
-
-}
