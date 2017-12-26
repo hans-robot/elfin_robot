@@ -16,22 +16,22 @@ This topic contain a trajectory. When you publish this topic, the robot will mov
 * **elfin_teleop_joint_cmd_no_limit (std_msgs/Int64)**  
 This is a topic for developer, customers are not suggested to use it. A particular joint will move a little distance after subscribing this topic for once.
 
-Meaning of the data in the topic:
+	Meaning of the data in the topic:
 
-| data | joint       | direction |
-| ------- | ------------| -------------- |
-| 1 | elfin_joint1| ccw |
-| -1 | elfin_joint1 | cw |
-| 2 | elfin_joint2 | ccw |
-| -2 | elfin_joint2 | cw |
-| 3 | elfin_joint3| ccw |
-| -3 | elfin_joint3 | cw |
-| 4 | elfin_joint4 | ccw |
-| -4 | elfin_joint4 | cw |
-| 5 | elfin_joint5| ccw |
-| -5 | elfin_joint5 | cw |
-| 6 | elfin_joint6 | ccw |
-| -6 | elfin_joint6 | cw |
+	| data | joint       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | elfin_joint1| ccw |
+	| -1 | elfin_joint1 | cw |
+	| 2 | elfin_joint2 | ccw |
+	| -2 | elfin_joint2 | cw |
+	| 3 | elfin_joint3| ccw |
+	| -3 | elfin_joint3 | cw |
+	| 4 | elfin_joint4 | ccw |
+	| -4 | elfin_joint4 | cw |
+	| 5 | elfin_joint5| ccw |
+	| -5 | elfin_joint5 | cw |
+	| 6 | elfin_joint6 | ccw |
+	| -6 | elfin_joint6 | cw |
 
 ------
 ### Published Topics:
@@ -88,42 +88,42 @@ Clear fault.
 * **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 When this service is called, a particular joint will move in a direction and will NOT stop until it reach the limit position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
 
-Meaning of the data in the service:
+	Meaning of the data in the service:
 
-| data | joint       | direction |
-| ------- | ------------| -------------- |
-| 1 | elfin_joint1| ccw |
-| -1 | elfin_joint1 | cw |
-| 2 | elfin_joint2 | ccw |
-| -2 | elfin_joint2 | cw |
-| 3 | elfin_joint3| ccw |
-| -3 | elfin_joint3 | cw |
-| 4 | elfin_joint4 | ccw |
-| -4 | elfin_joint4 | cw |
-| 5 | elfin_joint5| ccw |
-| -5 | elfin_joint5 | cw |
-| 6 | elfin_joint6 | ccw |
-| -6 | elfin_joint6 | cw |
+	| data | joint       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | elfin_joint1| ccw |
+	| -1 | elfin_joint1 | cw |
+	| 2 | elfin_joint2 | ccw |
+	| -2 | elfin_joint2 | cw |
+	| 3 | elfin_joint3| ccw |
+	| -3 | elfin_joint3 | cw |
+	| 4 | elfin_joint4 | ccw |
+	| -4 | elfin_joint4 | cw |
+	| 5 | elfin_joint5| ccw |
+	| -5 | elfin_joint5 | cw |
+	| 6 | elfin_joint6 | ccw |
+	| -6 | elfin_joint6 | cw |
 
 * **elfin_basic_api/cart_teleop (elfin_robot_msgs/SetInt16)**  
 When this service is called, the end link of the robot will move in a direction in cartsian coordination system and will NOT stop until it reach the limit position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
 
-Meaning of the data in the service:
+	Meaning of the data in the service:
 
-| data | axis       | direction |
-| ------- | ------------| -------------- |
-| 1 | X | positive |
-| -1 | X | negative |
-| 2 | Y | positive |
-| -2 | Y | negative |
-| 3 | Z | positive |
-| -3 | Z | negative |
-| 4 | Rx | ccw |
-| -4 | Rx | cw |
-| 5 | Ry | ccw |
-| -5 | Ry | cw |
-| 6 | Rz | ccw |
-| -6 | Rz | cw |
+	| data | axis       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | X | positive |
+	| -1 | X | negative |
+	| 2 | Y | positive |
+	| -2 | Y | negative |
+	| 3 | Z | positive |
+	| -3 | Z | negative |
+	| 4 | Rx | ccw |
+	| -4 | Rx | cw |
+	| 5 | Ry | ccw |
+	| -5 | Ry | cw |
+	| 6 | Rz | ccw |
+	| -6 | Rz | cw |
 
 * **elfin_basic_api/home_teleop (std_srvs/SetBool)**  
 When this service is called, the robot will move to home position and will NOT stop until it reach the home position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.

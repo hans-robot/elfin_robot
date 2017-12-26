@@ -17,20 +17,20 @@ example: function_pub_cart_xxx() in elfin_robot_bringup/script/cmd_pub.py
 本指令为调试机器时使用的指令，不建议客户使用。发送本指令后，机械臂的特定关节会向一个方向移动一点距离，连续发送就会连续运动。  
 消息内容含义如下：
 
-| data | joint       | direction |
-| ------- | ------------| -------------- |
-| 1 | elfin_joint1| ccw |
-| -1 | elfin_joint1 | cw |
-| 2 | elfin_joint2 | ccw |
-| -2 | elfin_joint2 | cw |
-| 3 | elfin_joint3| ccw |
-| -3 | elfin_joint3 | cw |
-| 4 | elfin_joint4 | ccw |
-| -4 | elfin_joint4 | cw |
-| 5 | elfin_joint5| ccw |
-| -5 | elfin_joint5 | cw |
-| 6 | elfin_joint6 | ccw |
-| -6 | elfin_joint6 | cw |
+	| data | joint       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | elfin_joint1| ccw |
+	| -1 | elfin_joint1 | cw |
+	| 2 | elfin_joint2 | ccw |
+	| -2 | elfin_joint2 | cw |
+	| 3 | elfin_joint3| ccw |
+	| -3 | elfin_joint3 | cw |
+	| 4 | elfin_joint4 | ccw |
+	| -4 | elfin_joint4 | cw |
+	| 5 | elfin_joint5| ccw |
+	| -5 | elfin_joint5 | cw |
+	| 6 | elfin_joint6 | ccw |
+	| -6 | elfin_joint6 | cw |
 
 ------
 ### Published Topics:
@@ -87,42 +87,42 @@ true: 有报错  / false: 无报错
 * **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 呼叫本服务后，机械臂的特定关节会向一个方向一直移动，直到运动到极限位置或用户调用elfin_basic_api/stop_teleop，请慎用。
 
-消息内容含义如下：
+	消息内容含义如下：
 
-| data | joint       | direction |
-| ------- | ------------| -------------- |
-| 1 | elfin_joint1| ccw |
-| -1 | elfin_joint1 | cw |
-| 2 | elfin_joint2 | ccw |
-| -2 | elfin_joint2 | cw |
-| 3 | elfin_joint3| ccw |
-| -3 | elfin_joint3 | cw |
-| 4 | elfin_joint4 | ccw |
-| -4 | elfin_joint4 | cw |
-| 5 | elfin_joint5| ccw |
-| -5 | elfin_joint5 | cw |
-| 6 | elfin_joint6 | ccw |
-| -6 | elfin_joint6 | cw |
+	| data | joint       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | elfin_joint1| ccw |
+	| -1 | elfin_joint1 | cw |
+	| 2 | elfin_joint2 | ccw |
+	| -2 | elfin_joint2 | cw |
+	| 3 | elfin_joint3| ccw |
+	| -3 | elfin_joint3 | cw |
+	| 4 | elfin_joint4 | ccw |
+	| -4 | elfin_joint4 | cw |
+	| 5 | elfin_joint5| ccw |
+	| -5 | elfin_joint5 | cw |
+	| 6 | elfin_joint6 | ccw |
+	| -6 | elfin_joint6 | cw |
 
 * **elfin_basic_api/cart_teleop (elfin_robot_msgs/SetInt16)**  
 呼叫本服务后，机械臂会沿着一个空间方向一直移动，直到运动到极限位置或用户调用elfin_basic_api/stop_teleop，请慎用。
 
-消息内容含义如下：
+	消息内容含义如下：
 
-| data | axis       | direction |
-| ------- | ------------| -------------- |
-| 1 | X | positive |
-| -1 | X | negative |
-| 2 | Y | positive |
-| -2 | Y | negative |
-| 3 | Z | positive |
-| -3 | Z | negative |
-| 4 | Rx | ccw |
-| -4 | Rx | cw |
-| 5 | Ry | ccw |
-| -5 | Ry | cw |
-| 6 | Rz | ccw |
-| -6 | Rz | cw |
+	| data | axis       | direction |
+	| ------- | ------------| -------------- |
+	| 1 | X | positive |
+	| -1 | X | negative |
+	| 2 | Y | positive |
+	| -2 | Y | negative |
+	| 3 | Z | positive |
+	| -3 | Z | negative |
+	| 4 | Rx | ccw |
+	| -4 | Rx | cw |
+	| 5 | Ry | ccw |
+	| -5 | Ry | cw |
+	| 6 | Rz | ccw |
+	| -6 | Rz | cw |
 
 * **elfin_basic_api/home_teleop (std_srvs/SetBool)**  
 呼叫本服务后，机械臂会一直运动，直到回到零位置或用户调用elfin_basic_api/stop_teleop，请慎用。
