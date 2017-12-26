@@ -47,6 +47,9 @@ true: enabled / false: disabled
 The fault status of the robot.  
 true: warning / false: no fault
 
+* **elfin_basic_api/parameter_updates (dynamic_reconfigure/Config)**  
+The value of the dynamic parameters of elfin_basic_api, e.g. velocity scaling.
+
 ------
 ### Services:
 
@@ -68,11 +71,9 @@ You can get the content of RxPDOs from the response of this service.
 * **elfin_ros_control/elfin/get_current_position (std_srvs/SetBool)**  
 You can get the count values of the current joint positions from the response of this service.
 
-* **elfin_basic_api/set_velocity_scaling (elfin_robot_msgs/SetFloat64)**  
-Set the velocity scaling of elfin basic api
-
-* **elfin_basic_api/update_velocity_scaling (std_srvs/SetBool)**  
-Update the ros param *elfin_basic_api/velocity_scaling*
+* **elfin_basic_api/set_parameters (dynamic_reconfigure/Reconfigure)**  
+Set the dynamic parameters of elfin_basic_api, e.g. velocity scaling  
+example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
 

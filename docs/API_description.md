@@ -46,6 +46,9 @@ true: 使能  / false: 未使能
 反映此时Elfin机械臂上电机的报错状态。  
 true: 有报错  / false: 无报错
 
+* **elfin_basic_api/parameter_updates (dynamic_reconfigure/Config)**  
+反映elfin_basic_api相关的动态参数，例如: velocity scaling 。
+
 ------
 ### Services:
 
@@ -58,11 +61,9 @@ true: 有报错  / false: 无报错
 * **elfin_basic_api/stop_teleop (std_srvs/SetBool)**  
 呼叫本服务会令机械臂停止运动
 
-* **elfin_basic_api/set_velocity_scaling (elfin_robot_msgs/SetFloat64)**  
-设置elfin_basic_api的速度缩放比例。
-
-* **elfin_basic_api/update_velocity_scaling (std_srvs/SetBool)**  
-更新ros参数*elfin_basic_api/velocity_scaling*
+* **elfin_basic_api/set_parameters (dynamic_reconfigure/Reconfigure)**  
+设置elfin_basic_api相关的动态参数，例如: velocity scaling  
+example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 
 * **elfin_ros_control/elfin/get_txpdo (std_srvs/SetBool)**  
 呼叫本服务得到的反馈信息中会包含机械臂上从站的txpdo信息
