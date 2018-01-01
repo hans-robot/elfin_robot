@@ -85,6 +85,11 @@ ElfinEtherCATClient::ElfinEtherCATClient(EtherCatManager *manager, int slave_no)
     }
 }
 
+ElfinEtherCATClient::~ElfinEtherCATClient()
+{
+
+}
+
 int32_t ElfinEtherCATClient::readInput_unit(int n)
 {
     if(n<0 || n>=pdo_input.size())

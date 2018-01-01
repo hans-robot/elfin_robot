@@ -48,6 +48,7 @@ class ElfinEtherCATDriver
 {
 public:
     ElfinEtherCATDriver(EtherCatManager *manager, std::string driver_name, const ros::NodeHandle &nh=ros::NodeHandle("~"));
+    ~ElfinEtherCATDriver();
 
     bool getEnableState();
     bool getFaultState();

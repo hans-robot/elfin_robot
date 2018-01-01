@@ -112,6 +112,7 @@ private:
 
 public:
     ElfinEtherCATClient(EtherCatManager* manager, int slave_no);
+    ~ElfinEtherCATClient();
     int32_t readInput_unit(int n);
     int32_t readOutput_unit(int n);
     void writeOutput_unit(int n, int32_t val);

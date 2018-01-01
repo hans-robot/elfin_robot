@@ -89,6 +89,7 @@ class ElfinHWInterface : public hardware_interface::RobotHW
 {
 public:
     ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manager, const ros::NodeHandle &nh=ros::NodeHandle("~"));
+    ~ElfinHWInterface();
     void read_init();
     void read_update(const ros::Time &time_now);
     void write_update();

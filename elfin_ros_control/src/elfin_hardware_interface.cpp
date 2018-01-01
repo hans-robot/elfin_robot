@@ -115,6 +115,15 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
     registerInterface(&jnt_cmd_interface);
 }
 
+ElfinHWInterface::~ElfinHWInterface()
+{
+    for(int i=0; i<ethercat_drivers_.size(); i++)
+    {
+        if(ethercat_drivers_[i]!=NULL)
+            delete ethercat_drivers_[i];
+    }
+}
+
 void ElfinHWInterface::read_init()
 {
     struct timespec read_update_tick;

@@ -137,6 +137,15 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     status_timer_.start();
 }
 
+ElfinEtherCATDriver::~ElfinEtherCATDriver()
+{
+    for(int i=0; i<ethercat_clients_.size(); i++)
+    {
+        if(ethercat_clients_[i]!=NULL)
+            delete ethercat_clients_[i];
+    }
+}
+
 bool ElfinEtherCATDriver::getEnableState()
 {
     bool enable_flag_tmp=true;
