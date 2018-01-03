@@ -224,6 +224,9 @@ void* update_loop(void* threadarg)
     ros::Duration d(0.001);
     struct timespec tick;
     clock_gettime(CLOCK_REALTIME, &tick);
+    //time for checking overrun
+    struct timespec before;
+    double overrun_time;
     while(ros::ok())
     {
         ros::Time this_moment(tick.tv_sec, tick.tv_nsec);
@@ -231,6 +234,15 @@ void* update_loop(void* threadarg)
         manager->update(this_moment, d);
         interface->write_update();
         timespecInc(tick, d.nsec);
+        // check overrun
+        clock_gettime(CLOCK_REALTIME, &before);
+        overrun_time = (before.tv_sec + double(before.tv_nsec)/1e+9) -  (tick.tv_sec + double(tick.tv_nsec)/1e+9);
+        if(overrun_time > 0.0)
+        {
+            tick.tv_sec=before.tv_sec;
+            tick.tv_nsec=before.tv_nsec;
+        }
+
         clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &tick, NULL);
     }
 }

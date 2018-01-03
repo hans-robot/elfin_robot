@@ -126,10 +126,13 @@ void cycleWorker(boost::mutex& mutex, bool& stop_flag)
 {
   // 1ms in nanoseconds
   double period = THREAD_SLEEP_TIME * 1000;
-  // get curren ttime
+  // get current time
   struct timespec tick;
   clock_gettime(CLOCK_REALTIME, &tick);
   timespecInc(tick, period);
+  // time for checking overrun
+  struct timespec before;
+  double overrun_time;
   while (!stop_flag) 
   {
     int expected_wkc = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
@@ -146,17 +149,15 @@ void cycleWorker(boost::mutex& mutex, bool& stop_flag)
     }
 
     // check overrun
-    struct timespec before;
     clock_gettime(CLOCK_REALTIME, &before);
-    double overrun_time = (before.tv_sec + double(before.tv_nsec)/NSEC_PER_SECOND) -  (tick.tv_sec + double(tick.tv_nsec)/NSEC_PER_SECOND);
+    overrun_time = (before.tv_sec + double(before.tv_nsec)/NSEC_PER_SECOND) -  (tick.tv_sec + double(tick.tv_nsec)/NSEC_PER_SECOND);
     if (overrun_time > 0.0)
-      {
-	fprintf(stderr, "  overrun: %f\n", overrun_time);
-      }
-    //usleep(THREAD_SLEEP_TIME);
+    {
+      tick.tv_sec=before.tv_sec;
+      tick.tv_nsec=before.tv_nsec;
+    }
     clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &tick, NULL);
     timespecInc(tick, period);
-    //printf("%24.12f %14.10f [msec] %02x %02x %02x %02x\n", tick.tv_sec+double(tick.tv_nsec)/NSEC_PER_SECOND, overrun_time*1000, ec_slave[1].outputs[24], ec_slave[1].outputs[23], ec_slave[1].outputs[22], ec_slave[1].outputs[21]);
   }
 }
 
