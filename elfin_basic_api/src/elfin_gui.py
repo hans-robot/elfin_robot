@@ -92,22 +92,41 @@ class MyFrame(wx.Frame):
         self.key=[]
                                 
         btn_height=390
-        
+        btn_lengths=[]
                 
         self.power_on_btn=wx.Button(self.panel, label=' Servo On ', name='Servo On',
-                                    pos=(20, btn_height), size=(100, 40))
+                                    pos=(20, btn_height))
+        btn_lengths.append(self.power_on_btn.GetSize()[0])
+        btn_total_length=btn_lengths[0]
         
-        self.power_off_btn=wx.Button(self.panel, label=' Servo Off ', name='Servo Off',
-                                    pos=(130, btn_height), size=(100, 40))
+        self.power_off_btn=wx.Button(self.panel, label=' Servo Off ', name='Servo Off')
+        btn_lengths.append(self.power_off_btn.GetSize()[0])
+        btn_total_length+=btn_lengths[1]
         
-        self.reset_btn=wx.Button(self.panel, label=' Clear Fault ', 
-                                pos=(240, btn_height), size=(100, 40))
+        self.reset_btn=wx.Button(self.panel, label=' Clear Fault ')
+        btn_lengths.append(self.reset_btn.GetSize()[0])
+        btn_total_length+=btn_lengths[2]
 
-        self.home_btn=wx.Button(self.panel, label='Home', name='home_btn',
-                                pos=(350, btn_height), size=(100, 40))
+        self.home_btn=wx.Button(self.panel, label='Home', name='home_btn')
+        btn_lengths.append(self.home_btn.GetSize()[0])
+        btn_total_length+=btn_lengths[3]
         
-        self.stop_btn=wx.Button(self.panel, label='Stop', name='Stop',
-                                pos=(460, btn_height), size=(100, 40))
+        self.stop_btn=wx.Button(self.panel, label='Stop', name='Stop')
+        btn_lengths.append(self.stop_btn.GetSize()[0])
+        btn_total_length+=btn_lengths[4]
+        
+        btn_interstice=(550-btn_total_length)/4
+        btn_pos_tmp=btn_lengths[0]+btn_interstice+20
+        self.power_off_btn.SetPosition((btn_pos_tmp, btn_height))
+        
+        btn_pos_tmp+=btn_lengths[1]+btn_interstice
+        self.reset_btn.SetPosition((btn_pos_tmp, btn_height))
+        
+        btn_pos_tmp+=btn_lengths[2]+btn_interstice
+        self.home_btn.SetPosition((btn_pos_tmp, btn_height))
+        
+        btn_pos_tmp+=btn_lengths[3]+btn_interstice
+        self.stop_btn.SetPosition((btn_pos_tmp, btn_height))
         
         self.servo_state_label=wx.StaticText(self.panel, label='Servo state:',
                                               pos=(590, btn_height-10))
