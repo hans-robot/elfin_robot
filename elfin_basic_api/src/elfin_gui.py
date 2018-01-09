@@ -45,7 +45,7 @@ import rospy
 import math
 import tf
 import moveit_commander
-from std_msgs.msg import Bool, Empty
+from std_msgs.msg import Bool
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
 import wx
@@ -59,10 +59,11 @@ class MyFrame(wx.Frame):
   
     def __init__(self,parent,id):  
         the_size=(700, 520)
-        wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100),size=the_size) 
-        self.SetMinSize(the_size)
-        self.SetMaxSize(the_size)
-        self.panel=wx.Panel(self)  
+        wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100)) 
+        self.panel=wx.Panel(self)
+        font=self.panel.GetFont()
+        font.SetPixelSize((12, 24))
+        self.panel.SetFont(font)
         
         self.listener = tf.TransformListener()
         
@@ -90,22 +91,23 @@ class MyFrame(wx.Frame):
         self.display_init()
         self.key=[]
                                 
-        btn_height=380
+        btn_height=390
+        
                 
-        self.power_on_btn=wx.Button(self.panel, label='Servo On', name='Servo On',
-                                    pos=(20, btn_height), size=(90,40))
+        self.power_on_btn=wx.Button(self.panel, label=' Servo On ', name='Servo On',
+                                    pos=(20, btn_height), size=(100, 40))
         
-        self.power_off_btn=wx.Button(self.panel, label='Servo Off', name='Servo Off',
-                                    pos=(130, btn_height), size=(90,40))
+        self.power_off_btn=wx.Button(self.panel, label=' Servo Off ', name='Servo Off',
+                                    pos=(130, btn_height), size=(100, 40))
         
-        self.reset_btn=wx.Button(self.panel, label='Clear Fault', 
-                                pos=(240, btn_height), size=(100,40))
-        
+        self.reset_btn=wx.Button(self.panel, label=' Clear Fault ', 
+                                pos=(240, btn_height), size=(100, 40))
+
         self.home_btn=wx.Button(self.panel, label='Home', name='home_btn',
-                                pos=(360, btn_height), size=(90,40))
+                                pos=(350, btn_height), size=(100, 40))
         
         self.stop_btn=wx.Button(self.panel, label='Stop', name='Stop',
-                                pos=(470, btn_height), size=(90,40))
+                                pos=(460, btn_height), size=(100, 40))
         
         self.servo_state_label=wx.StaticText(self.panel, label='Servo state:',
                                               pos=(590, btn_height-10))
@@ -147,10 +149,10 @@ class MyFrame(wx.Frame):
         self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns,
                                                                                   config_callback=self.basic_api_reconfigure_cb)
         
-        self.dlg=wx.Dialog(self.panel, title='messag', size=(200, 50))
+        self.dlg=wx.Dialog(self.panel, title='messag')
         self.dlg.Bind(wx.EVT_CLOSE, self.closewindow)
         self.dlg_panel=wx.Panel(self.dlg)
-        self.dlg_label=wx.StaticText(self.dlg_panel, label='hello', pos=(20,20))
+        self.dlg_label=wx.StaticText(self.dlg_panel, label='hello', pos=(15, 15))
                         
         self.call_teleop_joint=rospy.ServiceProxy(self.elfin_basic_api_ns+'joint_teleop', 
                                                   SetInt16)
@@ -214,76 +216,99 @@ class MyFrame(wx.Frame):
         self.action_goal=FollowJointTrajectoryGoal()
         self.action_goal.trajectory.joint_names=self.joint_names
         
+        self.SetMinSize(the_size)
+        self.SetMaxSize(the_size)
+        
     def display_init(self):
-        js_pos=[250, 20]
+        js_pos=[20, 20]
+        js_btn_length=[70, 70, 61, 80]
+        js_distances=[10, 20, 10, 26]
         dis_h=50
         for i in xrange(len(self.js_display)):
-            self.js_display[i]=wx.TextCtrl(self.panel, 
-                                           style=(wx.TE_CENTER |wx.TE_READONLY),
-                                           value='', 
-                                           pos=(js_pos[0],
-                                                js_pos[1]+(5-i)*dis_h))
-            self.js_label[i]=wx.StaticText(self.panel, 
-                                           label='J'+str(i+1)+'/deg:',
-                                           pos=(js_pos[0]-60,
-                                                js_pos[1]+5+(5-i)*dis_h))
-            self.jm_button[i]=wx.Button(self.panel,
-                                        label='J'+str(i+1)+' -', 
-                                        pos=(js_pos[0]-150,
-                                             js_pos[1]-5+(5-i)*dis_h),
-                                        size=(70,40))
-                                        
-            self.jm_button[i].Bind(wx.EVT_LEFT_DOWN, 
-                                   lambda evt, mark=-1*(i+1) : self.teleop_joints(evt, mark) )
-            self.jm_button[i].Bind(wx.EVT_LEFT_UP,
-                                   lambda evt, mark=-1*(i+1) : self.release_button(evt, mark) )
-            
             self.jp_button[i]=wx.Button(self.panel,
                                         label='J'+str(i+1)+' +', 
-                                        pos=(js_pos[0]-230,
-                                             js_pos[1]-5+(5-i)*dis_h),
+                                        pos=(js_pos[0],
+                                             js_pos[1]+(5-i)*dis_h),
                                         size=(70,40))
+            dis_tmp=js_btn_length[0]+js_distances[0]
                                         
             self.jp_button[i].Bind(wx.EVT_LEFT_DOWN, 
                                    lambda evt, mark=i+1 : self.teleop_joints(evt, mark) )
             self.jp_button[i].Bind(wx.EVT_LEFT_UP,
                                    lambda evt, mark=i+1 : self.release_button(evt, mark) )
             
-        ps_pos=[600, 20]
+            self.jm_button[i]=wx.Button(self.panel,
+                                        label='J'+str(i+1)+' -', 
+                                        pos=(js_pos[0]+dis_tmp,
+                                             js_pos[1]+(5-i)*dis_h),
+                                        size=(70,40))
+            dis_tmp+=js_btn_length[1]+js_distances[1]
+                                        
+            self.jm_button[i].Bind(wx.EVT_LEFT_DOWN, 
+                                   lambda evt, mark=-1*(i+1) : self.teleop_joints(evt, mark) )
+            self.jm_button[i].Bind(wx.EVT_LEFT_UP,
+                                   lambda evt, mark=-1*(i+1) : self.release_button(evt, mark) )
+            
+            pos_js_label=(js_pos[0]+dis_tmp, js_pos[1]+(5-i)*dis_h)
+            self.js_label[i]=wx.StaticText(self.panel,
+                                           label='J'+str(i+1)+'/deg:',
+                                           pos=pos_js_label)
+            self.js_label[i].SetPosition((pos_js_label[0], pos_js_label[1]+abs(40-self.js_label[i].GetSize()[1])/2))
+            dis_tmp+=js_btn_length[2]+js_distances[2]
+
+            pos_js_display=(js_pos[0]+dis_tmp, js_pos[1]+(5-i)*dis_h)
+            self.js_display[i]=wx.TextCtrl(self.panel, 
+                                           style=(wx.TE_CENTER |wx.TE_READONLY),
+                                           value=' 0000.00 ', 
+                                           pos=pos_js_display)
+            self.js_display[i].SetPosition((pos_js_display[0], pos_js_display[1]+abs(40-self.js_display[i].GetSize()[1])/2))
+            dis_tmp+=js_btn_length[3]+js_distances[3]
+
+        ps_pos=[js_pos[0]+dis_tmp, 20]
+        ps_btn_length=[70, 70, 53, 80]
+        ps_distances=[10, 20, 10, 20]
         pcs_btn_label=['X', 'Y', 'Z', 'Rx', 'Ry', 'Rz']
         pcs_label=['X', 'Y', 'Z', 'R', 'P', 'Y']
         unit_label=['/mm:', '/mm:', '/mm:', '/deg:', '/deg:', '/deg:']
         for i in xrange(len(self.ps_display)):
-            self.ps_display[i]=wx.TextCtrl(self.panel, 
-                                           style=(wx.TE_CENTER |wx.TE_READONLY),
-                                           value='', 
-                                           pos=(ps_pos[0],
-                                                ps_pos[1]+(5-i)*dis_h))
-            self.ps_label[i]=wx.StaticText(self.panel, 
-                                           label=pcs_label[i]+unit_label[i],
-                                           pos=(ps_pos[0]-60,
-                                                ps_pos[1]+5+(5-i)*dis_h))
+            self.pp_button[i]=wx.Button(self.panel,
+                                        label=pcs_btn_label[i]+' +', 
+                                        pos=(ps_pos[0],
+                                             ps_pos[1]+(5-i)*dis_h),
+                                        size=(70,40))
+            dis_tmp=ps_btn_length[0]+ps_distances[0]
+                                        
+            self.pp_button[i].Bind(wx.EVT_LEFT_DOWN, 
+                                   lambda evt, mark=i+1 : self.teleop_pcs(evt, mark) )
+            self.pp_button[i].Bind(wx.EVT_LEFT_UP,
+                                   lambda evt, mark=i+1 : self.release_button(evt, mark) )
+            
             self.pm_button[i]=wx.Button(self.panel,
                                         label=pcs_btn_label[i]+' -', 
-                                        pos=(ps_pos[0]-150,
-                                             ps_pos[1]-5+(5-i)*dis_h),
+                                        pos=(ps_pos[0]+dis_tmp,
+                                             ps_pos[1]+(5-i)*dis_h),
                                         size=(70,40))
+            dis_tmp+=ps_btn_length[1]+ps_distances[1]
                                         
             self.pm_button[i].Bind(wx.EVT_LEFT_DOWN, 
                                    lambda evt, mark=-1*(i+1) : self.teleop_pcs(evt, mark) )
             self.pm_button[i].Bind(wx.EVT_LEFT_UP,
                                    lambda evt, mark=-1*(i+1) : self.release_button(evt, mark) )
             
-            self.pp_button[i]=wx.Button(self.panel,
-                                        label=pcs_btn_label[i]+' +', 
-                                        pos=(ps_pos[0]-230,
-                                             ps_pos[1]-5+(5-i)*dis_h),
-                                        size=(70,40))
-                                        
-            self.pp_button[i].Bind(wx.EVT_LEFT_DOWN, 
-                                   lambda evt, mark=i+1 : self.teleop_pcs(evt, mark) )
-            self.pp_button[i].Bind(wx.EVT_LEFT_UP,
-                                   lambda evt, mark=i+1 : self.release_button(evt, mark) )
+            pos_ps_label=(ps_pos[0]+dis_tmp, ps_pos[1]+(5-i)*dis_h)
+            self.ps_label[i]=wx.StaticText(self.panel, 
+                                           label=pcs_label[i]+unit_label[i],
+                                           pos=pos_ps_label)
+            self.ps_label[i].SetPosition((pos_ps_label[0], pos_ps_label[1]+abs(40-self.ps_label[i].GetSize()[1])/2))
+            dis_tmp+=ps_btn_length[2]+ps_distances[2]
+            
+            pos_ps_display=(ps_pos[0]+dis_tmp, ps_pos[1]+(5-i)*dis_h)
+            self.ps_display[i]=wx.TextCtrl(self.panel, 
+                                           style=(wx.TE_CENTER |wx.TE_READONLY),
+                                           value='', 
+                                           pos=pos_ps_display)
+            self.ps_display[i].SetPosition((pos_ps_display[0], pos_ps_display[1]+abs(40-self.ps_display[i].GetSize()[1])/2))
+            dis_tmp+=ps_btn_length[3]+ps_distances[3]
     
     def velocity_setting_cb(self, event):
         current_velocity_scaling=self.velocity_setting.GetValue()*0.01
@@ -293,8 +318,7 @@ class MyFrame(wx.Frame):
     def basic_api_reconfigure_cb(self, config):
         if self.velocity_setting_show.GetValue()!=config.velocity_scaling:
             self.velocity_setting.SetValue(int(config.velocity_scaling*100))
-            wx.CallAfter(self.update_velocity_scaling_show, config.velocity_scaling)
-            
+            wx.CallAfter(self.update_velocity_scaling_show, config.velocity_scaling)        
     
     def action_stop(self):
         self.action_client.wait_for_server()
@@ -354,6 +378,10 @@ class MyFrame(wx.Frame):
     def show_message_dialog(self, message, cl, rq):
         msg='executing ['+message+']'
         self.dlg_label.SetLabel(msg)
+        lable_size=[]
+        lable_size.append(self.dlg_label.GetSize()[0])
+        lable_size.append(self.dlg_label.GetSize()[1])
+        self.dlg.SetSize((lable_size[0]+30, lable_size[1]+30))
         t=threading.Thread(target=self.thread_bg, args=(cl, rq,))
         t.start()
         
@@ -363,8 +391,7 @@ class MyFrame(wx.Frame):
     def destroy_dialog(self):
         self.dlg.EndModal(0)
         
-    def closewindow(self,event):  
-#        self.Destroy()  
+    def closewindow(self,event):
         pass
     
     def updateDisplay(self, msg):      
