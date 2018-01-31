@@ -150,6 +150,7 @@ ElfinEtherCATDriver::~ElfinEtherCATDriver()
     }
 }
 
+// true: enabled; false: disabled
 bool ElfinEtherCATDriver::getEnableState()
 {
     bool enable_flag_tmp=true;
@@ -160,6 +161,7 @@ bool ElfinEtherCATDriver::getEnableState()
     return enable_flag_tmp;
 }
 
+// true: there is a fault; false: there is no fault
 bool ElfinEtherCATDriver::getFaultState()
 {
     bool fault_flag_tmp=false;
@@ -208,7 +210,7 @@ bool ElfinEtherCATDriver::recognizePosition()
 {
     std_srvs::SetBool::Request request;
     std_srvs::SetBool::Response response;
-    if(!getFaultState())
+    if(getFaultState())
     {
         request.data=true;
         clearFault_cb(request, response);
