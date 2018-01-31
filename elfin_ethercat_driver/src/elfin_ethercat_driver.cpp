@@ -125,6 +125,7 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     enable_robot_=ed_nh_.advertiseService("enable_robot", &ElfinEtherCATDriver::enableRobot_cb, this);
     disable_robot_=ed_nh_.advertiseService("disable_robot", &ElfinEtherCATDriver::disableRobot_cb, this);
     clear_fault_=ed_nh_.advertiseService("clear_fault", &ElfinEtherCATDriver::clearFault_cb, this);
+    recognize_position_=ed_nh_.advertiseService("recognize_position", &ElfinEtherCATDriver::recognizePosition_cb, this);
 
     // Initialize ros publisher
     enable_state_pub_=ed_nh_.advertise<std_msgs::Bool>("enable_state", 1);
@@ -236,7 +237,7 @@ bool ElfinEtherCATDriver::recognizePosition()
     }
     else
     {
-        ROS_WARN("there are some faults, position can't be recognized");
+        ROS_WARN("there are some faults, positions can't be recognized");
         return false;
     }
     return true;
@@ -490,6 +491,37 @@ bool ElfinEtherCATDriver::clearFault_cb(std_srvs::SetBool::Request &req, std_srv
         }
         usleep(100000);
         clock_gettime(CLOCK_REALTIME, &tick);
+    }
+}
+
+bool ElfinEtherCATDriver::recognizePosition_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="require's data is false";
+        return true;
+    }
+    if(ethercat_clients_.size()==0)
+    {
+        resp.success=false;
+        resp.message="there is no ethercat client";
+        return true;
+    }
+
+    bool flag_tmp=recognizePosition();
+
+    if(flag_tmp)
+    {
+        resp.success=true;
+        resp.message="positions are recognized";
+        return true;
+    }
+    else
+    {
+        resp.success=false;
+        resp.message="position recognition failed";
+        return true;
     }
 }
 

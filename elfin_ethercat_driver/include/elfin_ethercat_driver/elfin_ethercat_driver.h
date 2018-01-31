@@ -68,6 +68,7 @@ public:
     bool enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool disableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool clearFault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool recognizePosition_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
     static int32_t getIntFromStr(std::string str);
 
@@ -87,6 +88,7 @@ private:
         ros::ServiceServer enable_robot_;
         ros::ServiceServer disable_robot_;
         ros::ServiceServer clear_fault_;
+        ros::ServiceServer recognize_position_;
 
         std_msgs::Bool enable_state_msg_;
         std_msgs::Bool fault_state_msg_;
