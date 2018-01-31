@@ -219,6 +219,80 @@ void ElfinEtherCATClient::pubOutput()
     rxpdo_msg_.data.clear();
 }
 
+void ElfinEtherCATClient::clearPoseFault()
+{
+    // channel1
+    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x011f);
+    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
+    usleep(100000);
+    // channel2
+    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x011f);
+    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
+    usleep(100000);
+}
+
+bool ElfinEtherCATClient::recognizePose()
+{
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
+        //channel1
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x201f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
+        struct timespec before, tick;
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
+            {
+                ROS_WARN("recognizePose failed while pose recognition in slave %i, channel 1", slave_no_);
+                return false;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+
+        //channel2
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x201f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
+
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
+            {
+                ROS_WARN("recognizePose failed while pose recognition in slave %i, channel 2", slave_no_);
+                return false;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+    }
+    else
+    {
+        ROS_WARN("recognizePose failed while clearing the power-down fault in slave %i", slave_no_);
+        return false;
+    }
+    return true;
+}
+
 bool ElfinEtherCATClient::isEnabled()
 {
     if(readInput_unit(elfin_txpdo::AXIS1_STATUSWORD)==0x8237
@@ -234,74 +308,9 @@ void *ElfinEtherCATClient::setEnable(void* threadarg)
     ElfinEtherCATClient *pthis=(ElfinEtherCATClient *)threadarg;
     if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x6666)
     {
-        // clear the fault
-        // channel1
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x011f);
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-        pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
-        usleep(100000);
-        // channel2
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x011f);
-        pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
-        usleep(100000);
-
-        // pose recognition
-        if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
-        {
-            //channel1
-            pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x201f);
-            pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-            pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
-            struct timespec before, tick;
-            clock_gettime(CLOCK_REALTIME, &before);
-            clock_gettime(CLOCK_REALTIME, &tick);
-            while(ros::ok())
-            {
-                if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
-                {
-                    pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                    usleep(100000);
-                    break;
-                }
-                if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
-                {
-                    ROS_WARN("setEnable failed while pose recognition in slave %i", pthis->slave_no_);
-                    return (void *)0;
-                }
-                usleep(100000);
-                clock_gettime(CLOCK_REALTIME, &tick);
-            }
-
-            //channel2
-            pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-            pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x201f);
-            pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
-
-            clock_gettime(CLOCK_REALTIME, &before);
-            clock_gettime(CLOCK_REALTIME, &tick);
-            while(ros::ok())
-            {
-                if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
-                {
-                    pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                    usleep(100000);
-                    break;
-                }
-                if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
-                {
-                    ROS_WARN("setEnable failed while pose recognition in slave %i", pthis->slave_no_);
-                    return (void *)0;
-                }
-                usleep(100000);
-                clock_gettime(CLOCK_REALTIME, &tick);
-            }
-        }
-        else
-        {
-            ROS_WARN("setEnable failed while clearing the power-down fault in slave %i", pthis->slave_no_);
+        pthis->clearPoseFault();
+        if(!pthis->recognizePose())
             return (void *)0;
-        }
     }
 
     // enable
@@ -336,6 +345,22 @@ void *ElfinEtherCATClient::setDisable(void *threadarg)
     {
         return (void *)0;
     }
+}
+
+void *ElfinEtherCATClient::recognizePoseCmd(void *threadarg)
+{
+    ElfinEtherCATClient *pthis=(ElfinEtherCATClient *)threadarg;
+
+    if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x6666)
+    {
+        pthis->clearPoseFault();
+    }
+
+    if(!pthis->recognizePose())
+    {
+            return (void *)0;
+    }
+
 }
 
 bool ElfinEtherCATClient::isWarning()

@@ -60,6 +60,8 @@ public:
     double getReductionRatio(size_t n);
     int32_t getCountZero(size_t n);
 
+    bool recognizePosition();
+
     bool getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getCurrentPosition_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);

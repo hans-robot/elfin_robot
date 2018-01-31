@@ -124,9 +124,12 @@ public:
     std::string getCurrentPosition();
     void pubInput();
     void pubOutput();
+    void clearPoseFault();
+    bool recognizePose();
     bool isEnabled();
     static void *setEnable(void *threadarg);
     static void *setDisable(void *threadarg);
+    static void *recognizePoseCmd(void *threadarg);
     bool isWarning();
     void resetFault();
     bool enable_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);

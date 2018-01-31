@@ -135,6 +135,9 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     status_update_period_.nsec=1e+8;
     status_timer_=ed_nh_.createTimer(status_update_period_, &ElfinEtherCATDriver::updateStatus, this);
     status_timer_.start();
+
+    // Recognize the Positions
+    recognizePosition();
 }
 
 ElfinEtherCATDriver::~ElfinEtherCATDriver()
@@ -198,6 +201,45 @@ double ElfinEtherCATDriver::getReductionRatio(size_t n)
 int32_t ElfinEtherCATDriver::getCountZero(size_t n)
 {
     return count_zeros_[n];
+}
+
+bool ElfinEtherCATDriver::recognizePosition()
+{
+    std_srvs::SetBool::Request request;
+    std_srvs::SetBool::Response response;
+    if(!getFaultState())
+    {
+        request.data=true;
+        clearFault_cb(request, response);
+    }
+    else
+    {
+        response.success=true;
+    }
+
+    if(response.success)
+    {
+        std::vector<pthread_t> tids;
+        tids.resize(ethercat_clients_.size());
+
+        std::vector<int> threads;
+        threads.resize(ethercat_clients_.size());
+
+        for(int i=0; i<ethercat_clients_.size(); i++)
+        {
+            threads[i]=pthread_create(&tids[i], NULL, ethercat_clients_[i]->recognizePoseCmd, (void *)ethercat_clients_[i]);
+        }
+        for(int i=0; i<ethercat_clients_.size(); i++)
+        {
+            pthread_join(tids[i], NULL);
+        }
+    }
+    else
+    {
+        ROS_WARN("there are some faults, position can't be recognized");
+        return false;
+    }
+    return true;
 }
 
 bool ElfinEtherCATDriver::getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
