@@ -138,11 +138,16 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     status_timer_.start();
 
     // Recognize the Positions
-    printf("recognizing joint positions, please wait a few minutes\n");
-    if(recognizePosition())
-        ROS_INFO("positions are recognized automatically");
-    else
-        ROS_INFO("positions aren't recognized automatically");
+    bool recognize_flag;
+    ed_nh_.param<bool>("automatic_recognition", recognize_flag, true);
+    if(recognize_flag)
+    {
+        printf("recognizing joint positions, please wait a few minutes\n");
+        if(recognizePosition())
+            ROS_INFO("positions are recognized automatically");
+        else
+            ROS_INFO("positions aren't recognized automatically");
+    }
 }
 
 ElfinEtherCATDriver::~ElfinEtherCATDriver()
