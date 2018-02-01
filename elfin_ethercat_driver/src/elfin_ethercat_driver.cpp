@@ -138,7 +138,10 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     status_timer_.start();
 
     // Recognize the Positions
-    recognizePosition();
+    if(recognizePosition())
+        ROS_INFO("positions are recognized automatically");
+    else
+        ROS_INFO("positions aren't recognized automatically");
 }
 
 ElfinEtherCATDriver::~ElfinEtherCATDriver()

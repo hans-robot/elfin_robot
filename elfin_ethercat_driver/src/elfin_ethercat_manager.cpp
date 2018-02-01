@@ -287,6 +287,14 @@ int EtherCatManager::getNumClinets() const
 void EtherCatManager::write(int slave_no, uint8_t channel, uint8_t value)
 {
   boost::mutex::scoped_lock lock(iomap_mutex_);
+  if (slave_no > ec_slavecount) {
+    fprintf(stderr, "ERROR : slave_no(%d) is larger than ec_slavecount(%d)\n", slave_no, ec_slavecount);
+    exit(1);
+  }
+  if (channel*8 >= ec_slave[slave_no].Obits) {
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d)\n", slave_no, channel*8, ec_slave[slave_no].Obits);
+    exit(1);
+  }
   ec_slave[slave_no].outputs[channel] = value;
 }
 
@@ -298,7 +306,7 @@ uint8_t EtherCatManager::readInput(int slave_no, uint8_t channel) const
     exit(1);
   }
   if (channel*8 >= ec_slave[slave_no].Ibits) {
-    fprintf(stderr, "ERROR : channel(%d) is larget thatn Input bits (%d)\n", channel*8, ec_slave[slave_no].Ibits);
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Input bits (%d)\n", slave_no, channel*8, ec_slave[slave_no].Ibits);
     exit(1);
   }
   return ec_slave[slave_no].inputs[channel];
@@ -312,7 +320,7 @@ uint8_t EtherCatManager::readOutput(int slave_no, uint8_t channel) const
     exit(1);
   }
   if (channel*8 >= ec_slave[slave_no].Obits) {
-    fprintf(stderr, "ERROR : channel(%d) is larget thatn Output bits (%d)\n", channel*8, ec_slave[slave_no].Obits);
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d)\n", slave_no, channel*8, ec_slave[slave_no].Obits);
     exit(1);
   }
   return ec_slave[slave_no].outputs[channel];

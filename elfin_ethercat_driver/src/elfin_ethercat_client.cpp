@@ -287,7 +287,7 @@ bool ElfinEtherCATClient::recognizePose()
     }
     else
     {
-        ROS_WARN("recognizePose failed while clearing the power-down fault in slave %i", slave_no_);
+        ROS_WARN("recognizePose failed in slave %i, the reason might be there is a fault or the motor is enabled", slave_no_);
         return false;
     }
     return true;
@@ -327,7 +327,7 @@ void *ElfinEtherCATClient::setEnable(void* threadarg)
     }
     else
     {
-        ROS_WARN("UDM status is not 0x11110000 in slave %i", pthis->slave_no_);
+        ROS_WARN("UDM status is not 0x11110000 in slave %i, the reason might be there is a fault or the motor is enabled", pthis->slave_no_);
         return (void *)0;
     }
 }
