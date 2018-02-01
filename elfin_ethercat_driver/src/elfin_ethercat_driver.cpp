@@ -138,6 +138,7 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     status_timer_.start();
 
     // Recognize the Positions
+    printf("recognizing joint positions, please wait a few minutes\n");
     if(recognizePosition())
         ROS_INFO("positions are recognized automatically");
     else
@@ -223,7 +224,7 @@ bool ElfinEtherCATDriver::recognizePosition()
         response.success=true;
     }
 
-    if(response.success)
+    if(response.success && !getEnableState())
     {
         std::vector<pthread_t> tids;
         tids.resize(ethercat_clients_.size());
@@ -525,7 +526,7 @@ bool ElfinEtherCATDriver::recognizePosition_cb(std_srvs::SetBool::Request &req, 
     else
     {
         resp.success=false;
-        resp.message="position recognition failed";
+        resp.message="position recognition failed, please disable the servos first";
         return true;
     }
 }
@@ -592,15 +593,4 @@ int main(int argc, char** argv)
     elfin_ethercat_driver::ElfinEtherCATDriver ed(&em, "elfin");
 
     ros::spin();
-//    pthread_t tid;
-//    pthread_create(&tid, NULL, update_loop, (void *)&ec);
-//    ros::Rate r(10);
-//    while (ros::ok()) {
-//        ec.readInput();
-//        ec.readOutput();
-//        ec.pubInput();
-//        ec.pubOutput();
-//        ros::spinOnce();
-//        r.sleep();
-//    }
 }
