@@ -9,7 +9,7 @@ This repository provides ROS support for the Elfin Robot. The recommend operatin
 
 **Install some important dependent software packages:**
 ```sh
-$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control
+$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control ros-indigo-ros-control ros-indigo-ros-controllers
 ```
 **Install or upgrade MoveIt!.** 
 

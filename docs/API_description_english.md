@@ -75,6 +75,9 @@ You can get the count values of the current joint positions from the response of
 Set the dynamic parameters of elfin_basic_api, e.g. velocity scaling  
 example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 
+* **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
+Recognize the position of joints.
+
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
 
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  

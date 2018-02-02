@@ -74,6 +74,9 @@ example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 * **elfin_ros_control/elfin/get_current_position (std_srvs/SetBool)**  
 呼叫本服务得到的反馈信息中会包含机械臂各轴的位置的编码器值  
 
+* **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
+呼叫本服务可使机械臂进行原点识别
+
 ***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  

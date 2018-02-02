@@ -11,7 +11,7 @@ If you don't speak chinese, please [click here](./README_english.md)
 
 **安装一些重要的依赖包**
 ```sh
-$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control
+$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control ros-indigo-ros-control ros-indigo-ros-controllers
 ```
 **安装和升级MoveIt!,** 注意因为MoveIt!最新版进行了很多的优化，如果你已经安装了MoveIt!, 也请一定按照以下方法升级到最新版。
 

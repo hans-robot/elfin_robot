@@ -142,7 +142,7 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     ed_nh_.param<bool>("automatic_recognition", recognize_flag, true);
     if(recognize_flag)
     {
-        printf("recognizing joint positions, please wait a few minutes\n");
+        printf("\n recognizing joint positions, please wait a few minutes ... ... \n");
         if(recognizePosition())
             ROS_INFO("positions are recognized automatically");
         else
@@ -218,18 +218,21 @@ int32_t ElfinEtherCATDriver::getCountZero(size_t n)
 bool ElfinEtherCATDriver::recognizePosition()
 {
     std_srvs::SetBool::Request request;
-    std_srvs::SetBool::Response response;
+    request.data=true;
+    std_srvs::SetBool::Response response_clear_fault;
+    std_srvs::SetBool::Response response_disable;
     if(getFaultState())
     {
-        request.data=true;
-        clearFault_cb(request, response);
+        clearFault_cb(request, response_clear_fault);
     }
     else
     {
-        response.success=true;
+        response_clear_fault.success=true;
     }
 
-    if(response.success && !getEnableState())
+    disableRobot_cb(request, response_disable);
+
+    if(response_clear_fault.success && response_disable.success)
     {
         std::vector<pthread_t> tids;
         tids.resize(ethercat_clients_.size());
@@ -248,7 +251,7 @@ bool ElfinEtherCATDriver::recognizePosition()
     }
     else
     {
-        ROS_WARN("there are some faults, positions can't be recognized");
+        ROS_WARN("there are some faults or the motors aren't disabled, positions can't be recognized");
         return false;
     }
     return true;
@@ -351,6 +354,12 @@ bool ElfinEtherCATDriver::enableRobot_cb(std_srvs::SetBool::Request &req, std_sr
     {
         resp.success=false;
         resp.message="there is no ethercat client";
+        return true;
+    }
+    if(getFaultState())
+    {
+        resp.success=false;
+        resp.message="please clear fault first";
         return true;
     }
 
