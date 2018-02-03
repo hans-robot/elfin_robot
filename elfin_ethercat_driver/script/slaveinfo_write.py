@@ -76,8 +76,8 @@ class SlaveInfoWrite(object):
         for i in xrange(len(self.slave_no)):
             backup_name=self.esi_path+'/script/slave'+str(self.slave_no[i])+'_backup.esi'
             write_file_name=self.esi_path+'/script/'+self.esi_file
-            print commands.getoutput('eepromtool '+self.eth_name+' '+str(self.slave_no[i])+' -i '+backup_name)
-            print commands.getoutput('eepromtool '+self.eth_name+' '+str(self.slave_no[i])+' -i '+write_file_name)
+            print commands.getoutput('eepromtool '+self.eth_name+' '+str(self.slave_no[i])+' -r '+backup_name)
+            print commands.getoutput('eepromtool '+self.eth_name+' '+str(self.slave_no[i])+' -w '+write_file_name)
 
 if __name__ == '__main__':
     rospy.init_node('slaveinfo_write')
