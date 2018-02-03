@@ -1,0 +1,7 @@
+<launch>
+
+  <node name="slaveinfo_write" pkg="elfin_ethercat_driver" type="slaveinfo_write.py" output="screen">
+    <rosparam file="$(find elfin_ethercat_driver)/config/write_esi.yaml" command="load"/>
+  </node>
+  
+</launch>
