@@ -2,3 +2,4 @@
 *.txt.user
 *.pyc
 elfin_drivers.yaml
+*_backup.esi

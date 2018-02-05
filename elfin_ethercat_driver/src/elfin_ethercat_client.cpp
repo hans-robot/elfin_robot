@@ -248,6 +248,8 @@ bool ElfinEtherCATClient::recognizePose()
         {
             if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
             {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
                 writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
                 usleep(100000);
                 break;
@@ -260,18 +262,28 @@ bool ElfinEtherCATClient::recognizePose()
             usleep(100000);
             clock_gettime(CLOCK_REALTIME, &tick);
         }
+    }
+    else
+    {
+        ROS_WARN("recognizePose failed in slave %i, channel 1, the reason might be there is a fault or the motor is enabled", slave_no_);
+        return false;
+    }
 
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
         //channel2
         writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
         writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x201f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
-
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x3000);
+        struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
             if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
             {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
                 writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
                 usleep(100000);
                 break;
@@ -287,7 +299,7 @@ bool ElfinEtherCATClient::recognizePose()
     }
     else
     {
-        ROS_WARN("recognizePose failed in slave %i, the reason might be there is a fault or the motor is enabled", slave_no_);
+        ROS_WARN("recognizePose failed in slave %i, channel 2, the reason might be there is a fault or the motor is enabled", slave_no_);
         return false;
     }
     return true;
