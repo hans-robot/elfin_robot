@@ -5,7 +5,7 @@ Created on Tues Oct 17 10:35:36 2017
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017, Han's Robot Co., Ltd.
+ Copyright (c) 2017 - 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,8 @@ Created on Tues Oct 17 10:35:36 2017
 #ifndef ELFIN_ETHERCAT_DRIVER_H
 #define ELFIN_ETHERCAT_DRIVER_H
 
-#include "elfin_ethercat_driver/elfin_ethercat_client.h"
+#include <elfin_ethercat_driver/elfin_ethercat_client.h>
+#include <elfin_ethercat_driver/elfin_ethercat_io_client.h>
 
 namespace elfin_ethercat_driver {
 
@@ -73,11 +74,14 @@ public:
     static int32_t getIntFromStr(std::string str);
 
 private:
-        std::vector<elfin_ethercat_driver::ElfinEtherCATClient*> ethercat_clients_;
+        std::vector<ElfinEtherCATClient*> ethercat_clients_;
         std::vector<int> slave_no_;
         std::vector<std::string> joint_names_;
         std::vector<double> reduction_ratios_;
         std::vector<int32_t> count_zeros_;
+
+        std::vector<ElfinEtherCATIOClient*> ethercat_io_clients_;
+        std::vector<int> io_slave_no_;
 
         std::string driver_name_;
         ros::NodeHandle root_nh_, ed_nh_;

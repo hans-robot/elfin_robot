@@ -5,7 +5,7 @@ Created on Tues Oct 17 09:34:50 2017
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017, Han's Robot Co., Ltd.
+ Copyright (c) 2017 - 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ Created on Tues Oct 17 09:34:50 2017
 */
 // author: Cong Liu
 
-#include "elfin_ethercat_driver/elfin_ethercat_driver.h"
+#include <elfin_ethercat_driver/elfin_ethercat_driver.h>
 
 namespace elfin_ethercat_driver {
 
@@ -115,7 +115,29 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     ethercat_clients_.resize(slave_no_.size());
     for(int i=0; i<slave_no_.size(); i++)
     {
-        ethercat_clients_[i]=new elfin_ethercat_driver::ElfinEtherCATClient(manager, slave_no_[i]);
+        ethercat_clients_[i]=new ElfinEtherCATClient(manager, slave_no_[i]);
+    }
+
+    // Initialize io_slave_no_
+    int io_slave_no_array_default[1]={4};
+    std::vector<int> io_slave_no_default;
+    io_slave_no_default.clear();
+    io_slave_no_default.reserve(1);
+    for(int i=0; i<1; i++)
+    {
+        io_slave_no_default.push_back(io_slave_no_array_default[i]);
+    }
+    ed_nh_.param<std::vector<int> >("io_slave_no", io_slave_no_, io_slave_no_default);
+
+    // Initialize ethercat_io_client_
+    ethercat_io_clients_.clear();
+    ethercat_io_clients_.resize(io_slave_no_.size());
+    std::string io_port="io_port";
+    for(int i=0; i<io_slave_no_.size(); i++)
+    {
+        std::string num=boost::lexical_cast<std::string>(i+1);
+        std::string io_port_name=io_port.append(num);
+        ethercat_io_clients_[i]=new ElfinEtherCATIOClient(manager, io_slave_no_[i], ed_nh_, io_port_name);
     }
 
     //Initialize ros service server
@@ -156,6 +178,11 @@ ElfinEtherCATDriver::~ElfinEtherCATDriver()
     {
         if(ethercat_clients_[i]!=NULL)
             delete ethercat_clients_[i];
+    }
+    for(int i=0; i<ethercat_io_clients_.size(); i++)
+    {
+        if(ethercat_io_clients_[i]!=NULL)
+            delete ethercat_io_clients_[i];
     }
 }
 

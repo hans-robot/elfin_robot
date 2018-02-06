@@ -1,0 +1,7 @@
+int32 digital_output
+-----
+int32 digital_input
+int32 analog_input_channel1
+int32 analog_input_channel2
+int32 smart_camera_x
+int32 smart_camera_y

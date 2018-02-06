@@ -41,6 +41,12 @@
 
 namespace elfin_ethercat_driver {
 
+typedef struct {
+    std::string name;
+    int32_t value;
+    uint8_t channel;
+}ElfinPDOunit;
+
 /**
  * \brief EtherCAT exception. Currently this is only thrown in the event
  *        of a failure to construct an EtherCat manager.

@@ -7,6 +7,7 @@ project(elfin_ethercat_driver)
 find_package(catkin REQUIRED COMPONENTS
   controller_manager
   diagnostic_updater
+  elfin_robot_msgs
   hardware_interface
   joint_limits_interface
   roscpp
@@ -135,9 +136,11 @@ include_directories(
 add_library(elfin_ethercat_driver
   src/elfin_ethercat_driver.cpp
   src/elfin_ethercat_client.cpp
+  src/elfin_ethercat_io_client.cpp
   src/elfin_ethercat_manager.cpp
   include/${PROJECT_NAME}/elfin_ethercat_driver.h
   include/${PROJECT_NAME}/elfin_ethercat_client.h
+  include/${PROJECT_NAME}/elfin_ethercat_io_client.h
   include/${PROJECT_NAME}/elfin_ethercat_manager.h
 )
 
@@ -149,6 +152,7 @@ add_dependencies(elfin_ethercat_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${cat
 # Declare a C++ executable
 add_executable(elfin_ethercat_driver_node src/elfin_ethercat_driver.cpp
     src/elfin_ethercat_client.cpp
+    src/elfin_ethercat_io_client.cpp
     src/elfin_ethercat_manager.cpp)
 
 # Add cmake target dependencies of the executable

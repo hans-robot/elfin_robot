@@ -51,6 +51,7 @@
   <build_depend>tf</build_depend>
   <build_depend>trajectory_msgs</build_depend>
   <build_depend>transmission_interface</build_depend>
+  <build_depend>elfin_robot_msgs</build_depend>
   <run_depend>controller_manager</run_depend>
   <run_depend>diagnostic_updater</run_depend>
   <run_depend>hardware_interface</run_depend>
@@ -62,6 +63,7 @@
   <run_depend>tf</run_depend>
   <run_depend>trajectory_msgs</run_depend>
   <run_depend>transmission_interface</run_depend>
+  <run_depend>elfin_robot_msgs</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
