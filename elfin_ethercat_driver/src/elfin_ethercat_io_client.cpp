@@ -97,7 +97,7 @@ int32_t ElfinEtherCATIOClient::readOutput_unit(int n)
     uint8_t map[4];
     for(int i=0; i<4; i++)
     {
-        map[i]=manager_->readInput(slave_no_, pdo_output[n].channel+i);
+        map[i]=manager_->readOutput(slave_no_, pdo_output[n].channel+i);
     }
     int32_t value_tmp=*(int32_t *)(map);
     return value_tmp;
