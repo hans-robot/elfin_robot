@@ -78,6 +78,13 @@ example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 * **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
 Recognize the position of joints.
 
+* **elfin_ros_control/elfin/io_port1/io_service (elfin_robot_msgs/ElfinIO)**  
+The service for the IO port  
+example:  
+	```
+	rosservice call /elfin_ros_control/elfin/io_port1/io_service "digital_output: 0x001b"
+	```
+
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
 
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  

@@ -75,7 +75,14 @@ example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 呼叫本服务得到的反馈信息中会包含机械臂各轴的位置的编码器值  
 
 * **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
-呼叫本服务可使机械臂进行原点识别
+呼叫本服务可使机械臂进行姿态识别
+
+* **elfin_ros_control/elfin/io_port1/io_service (elfin_robot_msgs/ElfinIO)**  
+与机械臂的IO口通信  
+example:  
+	```
+	rosservice call /elfin_ros_control/elfin/io_port1/io_service "digital_output: 0x001b"
+	```
 
 ***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 
