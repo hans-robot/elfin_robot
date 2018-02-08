@@ -69,6 +69,9 @@ ElfinEtherCATIOClient::ElfinEtherCATIOClient(EtherCatManager *manager, int slave
 
     // Initialize services
     io_server_=io_nh_.advertiseService("io_service", &ElfinEtherCATIOClient::ioService_cb, this);
+    read_di_=io_nh_.advertiseService("read_di", &ElfinEtherCATIOClient::readDI_cb, this);
+    get_txpdo_server_=io_nh_.advertiseService("get_txpdo", &ElfinEtherCATIOClient::getTxPDO_cb, this);
+    get_rxpdo_server_=io_nh_.advertiseService("get_rxpdo", &ElfinEtherCATIOClient::getRxPDO_cb, this);
 
 }
 
@@ -115,6 +118,48 @@ void ElfinEtherCATIOClient::writeOutput_unit(int n, int32_t val)
     }
 }
 
+std::string ElfinEtherCATIOClient::getTxPDO()
+{
+    int length=20;
+    uint8_t map[length];
+    char temp[8];
+    std::string result="slave";
+    result.reserve(160); // the size of result is actually 115
+    std::string slave_num=boost::lexical_cast<std::string>(slave_no_);
+    result.append(slave_num);
+    result.append("_txpdo:\n");
+    for (unsigned i = 0; i < length; ++i)
+    {
+        map[i] = manager_->readInput(slave_no_, i);
+        sprintf(temp,"0x%.2x",(uint8_t)map[i]);
+        result.append(temp, 4);
+        result.append(":");
+    }
+    result.append("\n");
+    return result;
+}
+
+std::string ElfinEtherCATIOClient::getRxPDO()
+{
+    int length=4;
+    uint8_t map[length];
+    char temp[8];
+    std::string result="slave";
+    result.reserve(160); // the size of result is actually 35
+    std::string slave_num=boost::lexical_cast<std::string>(slave_no_);
+    result.append(slave_num);
+    result.append("_rxpdo:\n");
+    for (unsigned i = 0; i < length; ++i)
+    {
+        map[i] = manager_->readOutput(slave_no_, i);
+        sprintf(temp,"0x%.2x",(uint8_t)map[i]);
+        result.append(temp, 4);
+        result.append(":");
+    }
+    result.append("\n");
+    return result;
+}
+
 bool ElfinEtherCATIOClient::ioService_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp)
 {
     writeOutput_unit(elfin_io_rxpdo::DIGITAL_OUTPUT, req.digital_output);
@@ -124,6 +169,47 @@ bool ElfinEtherCATIOClient::ioService_cb(elfin_robot_msgs::ElfinIO::Request &req
     resp.analog_input_channel2=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL2);
     resp.smart_camera_x=readInput_unit(elfin_io_txpdo::SMART_CAMERA_X);
     resp.smart_camera_y=readInput_unit(elfin_io_txpdo::SMART_CAMERA_Y);
+
+    return true;
+}
+
+bool ElfinEtherCATIOClient::readDI_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp)
+{
+    resp.digital_input=readInput_unit(elfin_io_txpdo::DIGITAL_INPUT);
+    resp.analog_input_channel1=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL1);
+    resp.analog_input_channel2=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL2);
+    resp.smart_camera_x=readInput_unit(elfin_io_txpdo::SMART_CAMERA_X);
+    resp.smart_camera_y=readInput_unit(elfin_io_txpdo::SMART_CAMERA_Y);
+
+    return true;
+}
+
+bool ElfinEtherCATIOClient::getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="require's data is false";
+        return true;
+    }
+
+    resp.success=true;
+    resp.message=getTxPDO();
+
+    return true;
+}
+
+bool ElfinEtherCATIOClient::getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="require's data is false";
+        return true;
+    }
+
+    resp.success=true;
+    resp.message=getRxPDO();
 
     return true;
 }

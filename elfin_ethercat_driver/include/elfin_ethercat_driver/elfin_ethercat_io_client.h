@@ -44,6 +44,7 @@ Created on Tue Jan 16 11:34 2018
 #include <vector>
 #include <elfin_ethercat_driver/elfin_ethercat_manager.h>
 #include <elfin_robot_msgs/ElfinIO.h>
+#include <std_srvs/SetBool.h>
 
 #include <pthread.h>
 #include <time.h>
@@ -80,6 +81,9 @@ private:
     int slave_no_;
 
     ros::ServiceServer io_server_;
+    ros::ServiceServer read_di_;
+    ros::ServiceServer get_txpdo_server_;
+    ros::ServiceServer get_rxpdo_server_;
 
 public:
     ElfinEtherCATIOClient(EtherCatManager* manager, int slave_no, const ros::NodeHandle& nh, std::string io_port_name);
@@ -88,7 +92,13 @@ public:
     int32_t readOutput_unit(int n);
     void writeOutput_unit(int n, int32_t val);
 
+    std::string getTxPDO();
+    std::string getRxPDO();
+
     bool ioService_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp);
+    bool readDI_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp);
+    bool getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
 };
 
