@@ -78,12 +78,25 @@ example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 * **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
 Recognize the position of joints.
 
-* **elfin_ros_control/elfin/io_port1/io_service (elfin_robot_msgs/ElfinIO)**  
-The service for the IO port  
+* **elfin_ros_control/elfin/io_port1/write_do (elfin_robot_msgs/ElfinIODWrite)**  
+Write a value into DO  
 example:  
 	```
-	rosservice call /elfin_ros_control/elfin/io_port1/io_service "digital_output: 0x001b"
+	rosservice call /elfin_ros_control/elfin/io_port1/write_do "digital_output: 0x001b"
 	```
+
+* **elfin_ros_control/elfin/io_port1/read_di (elfin_robot_msgs/ElfinIODRead)**  
+Read the value from DI  
+example:  
+	```
+	rosservice call /elfin_ros_control/elfin/io_port1/read_di "data: true"
+	```
+
+* **elfin_ros_control/elfin/io_port1/get_txpdo (std_srvs/SetBool)**  
+You can get the content of TxPDOs from the response of this service.
+
+* **elfin_ros_control/elfin/io_port1/get_rxpdo (std_srvs/SetBool)**  
+You can get the content of RxPDOs from the response of this service.
 
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
 

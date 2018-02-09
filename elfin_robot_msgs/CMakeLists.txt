@@ -55,7 +55,8 @@ add_service_files(
   FILES
   SetInt16.srv
   SetFloat64.srv
-  ElfinIO.srv
+  ElfinIODRead.srv
+  ElfinIODWrite.srv
 )
 
 ## Generate actions in the 'action' folder

@@ -43,7 +43,8 @@ Created on Tue Jan 16 11:34 2018
 #include <ros/ros.h>
 #include <vector>
 #include <elfin_ethercat_driver/elfin_ethercat_manager.h>
-#include <elfin_robot_msgs/ElfinIO.h>
+#include <elfin_robot_msgs/ElfinIODRead.h>
+#include <elfin_robot_msgs/ElfinIODWrite.h>
 #include <std_srvs/SetBool.h>
 
 #include <pthread.h>
@@ -80,7 +81,7 @@ private:
     std::vector<ElfinPDOunit> pdo_output; //rxpdo
     int slave_no_;
 
-    ros::ServiceServer io_server_;
+    ros::ServiceServer write_do_;
     ros::ServiceServer read_di_;
     ros::ServiceServer get_txpdo_server_;
     ros::ServiceServer get_rxpdo_server_;
@@ -95,8 +96,8 @@ public:
     std::string getTxPDO();
     std::string getRxPDO();
 
-    bool ioService_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp);
-    bool readDI_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp);
+    bool writeDO_cb(elfin_robot_msgs::ElfinIODWrite::Request &req, elfin_robot_msgs::ElfinIODWrite::Response &resp);
+    bool readDI_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp);
     bool getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 

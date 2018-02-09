@@ -77,12 +77,26 @@ example: set_parameters() in elfin_robot_bringup/script/set_velocity_scaling.py
 * **elfin_ros_control/elfin/recognize_position (std_srvs/SetBool)**  
 呼叫本服务可使机械臂进行姿态识别
 
-* **elfin_ros_control/elfin/io_port1/io_service (elfin_robot_msgs/ElfinIO)**  
-与机械臂的IO口通信  
+* **elfin_ros_control/elfin/io_port1/write_do (elfin_robot_msgs/ElfinIODWrite)**  
+向DO中写入内容  
 example:  
 	```
-	rosservice call /elfin_ros_control/elfin/io_port1/io_service "digital_output: 0x001b"
+	rosservice call /elfin_ros_control/elfin/io_port1/write_do "digital_output: 0x001b"
 	```
+
+* **elfin_ros_control/elfin/io_port1/read_di (elfin_robot_msgs/ElfinIODRead)**  
+从DI中读取内容  
+example:  
+	```
+	rosservice call /elfin_ros_control/elfin/io_port1/read_di "data: true"
+	```
+
+* **elfin_ros_control/elfin/io_port1/get_txpdo (std_srvs/SetBool)**  
+呼叫本服务得到的反馈信息中会包含IO从站的txpdo信息
+
+* **elfin_ros_control/elfin/io_port1/get_rxpdo (std_srvs/SetBool)**  
+呼叫本服务得到的反馈信息中会包含IO从站的rxpdo信息
+
 
 ***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 

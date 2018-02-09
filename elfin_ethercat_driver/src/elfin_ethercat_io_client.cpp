@@ -68,7 +68,7 @@ ElfinEtherCATIOClient::ElfinEtherCATIOClient(EtherCatManager *manager, int slave
     }
 
     // Initialize services
-    io_server_=io_nh_.advertiseService("io_service", &ElfinEtherCATIOClient::ioService_cb, this);
+    write_do_=io_nh_.advertiseService("write_do", &ElfinEtherCATIOClient::writeDO_cb, this);
     read_di_=io_nh_.advertiseService("read_di", &ElfinEtherCATIOClient::readDI_cb, this);
     get_txpdo_server_=io_nh_.advertiseService("get_txpdo", &ElfinEtherCATIOClient::getTxPDO_cb, this);
     get_rxpdo_server_=io_nh_.advertiseService("get_rxpdo", &ElfinEtherCATIOClient::getRxPDO_cb, this);
@@ -160,27 +160,16 @@ std::string ElfinEtherCATIOClient::getRxPDO()
     return result;
 }
 
-bool ElfinEtherCATIOClient::ioService_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp)
+bool ElfinEtherCATIOClient::writeDO_cb(elfin_robot_msgs::ElfinIODWrite::Request &req, elfin_robot_msgs::ElfinIODWrite::Response &resp)
 {
     writeOutput_unit(elfin_io_rxpdo::DIGITAL_OUTPUT, req.digital_output);
-    usleep(10000);
-    resp.digital_input=readInput_unit(elfin_io_txpdo::DIGITAL_INPUT);
-    resp.analog_input_channel1=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL1);
-    resp.analog_input_channel2=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL2);
-    resp.smart_camera_x=readInput_unit(elfin_io_txpdo::SMART_CAMERA_X);
-    resp.smart_camera_y=readInput_unit(elfin_io_txpdo::SMART_CAMERA_Y);
-
+    resp.success=true;
     return true;
 }
 
-bool ElfinEtherCATIOClient::readDI_cb(elfin_robot_msgs::ElfinIO::Request &req, elfin_robot_msgs::ElfinIO::Response &resp)
+bool ElfinEtherCATIOClient::readDI_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp)
 {
     resp.digital_input=readInput_unit(elfin_io_txpdo::DIGITAL_INPUT);
-    resp.analog_input_channel1=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL1);
-    resp.analog_input_channel2=readInput_unit(elfin_io_txpdo::ANALOG_INPUT_CHANNEL2);
-    resp.smart_camera_x=readInput_unit(elfin_io_txpdo::SMART_CAMERA_X);
-    resp.smart_camera_y=readInput_unit(elfin_io_txpdo::SMART_CAMERA_Y);
-
     return true;
 }
 
@@ -195,7 +184,6 @@ bool ElfinEtherCATIOClient::getTxPDO_cb(std_srvs::SetBool::Request &req, std_srv
 
     resp.success=true;
     resp.message=getTxPDO();
-
     return true;
 }
 
@@ -210,7 +198,6 @@ bool ElfinEtherCATIOClient::getRxPDO_cb(std_srvs::SetBool::Request &req, std_srv
 
     resp.success=true;
     resp.message=getRxPDO();
-
     return true;
 }
 
