@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   control_msgs
   control_toolbox
   controller_manager
+  elfin_robot_msgs
   elfin_ethercat_driver
   hardware_interface
   joint_limits_interface
