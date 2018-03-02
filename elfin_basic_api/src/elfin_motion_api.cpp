@@ -50,6 +50,7 @@ ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std
 
     joint_goal_sub_=motion_nh_.subscribe("joint_goal", 1, &ElfinMotionAPI::jointGoalCB, this);
     cart_goal_sub_=motion_nh_.subscribe("cart_goal", 1, &ElfinMotionAPI::cartGoalCB, this);
+    cart_path_goal_sub_=motion_nh_.subscribe("cart_path_goal", 1, &ElfinMotionAPI::cartPathGoalCB, this);
 
     get_reference_link_server_=motion_nh_.advertiseService("get_reference_link", &ElfinMotionAPI::getRefLink_cb, this);
     get_end_link_server_=motion_nh_.advertiseService("get_end_link", &ElfinMotionAPI::getEndLink_cb, this);
@@ -78,6 +79,30 @@ void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
     else
     {
         ROS_WARN("the robot cannot execute that motion");
+    }
+}
+
+void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
+{
+    moveit_msgs::RobotTrajectory cart_path;
+    moveit::planning_interface::MoveGroup::Plan cart_plan;
+    double fraction=group_->computeCartesianPath(msg->poses, 0.01, 0.0, cart_path);
+
+    if(fraction==-1)
+    {
+        ROS_WARN("there is an error while computing the cartesian path");
+        return;
+    }
+
+    if(fraction==1)
+    {
+        ROS_INFO("the cartesian path can be %.2f%% acheived", fraction * 100.0);
+        cart_plan.trajectory_=cart_path;
+        group_->asyncExecute(cart_plan);
+    }
+    else
+    {
+        ROS_INFO("the cartesian path can only be %.2f%% acheived and it will not be executed", fraction * 100.0);
     }
 }
 

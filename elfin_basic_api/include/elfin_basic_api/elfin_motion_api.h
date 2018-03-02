@@ -45,9 +45,11 @@ Created on Mon Nov 27 14:24:30 2017
 #include <sensor_msgs/JointState.h>
 #include <std_srvs/SetBool.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/robot_state/conversions.h>
+#include <moveit/ompl_interface/ompl_interface.h>
 #include <actionlib/client/simple_action_client.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
@@ -61,6 +63,7 @@ public:
     ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
     void jointGoalCB(const sensor_msgs::JointStateConstPtr &msg);
     void cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg);
+    void cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg);
     bool getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
@@ -74,6 +77,7 @@ private:
 
     ros::Subscriber joint_goal_sub_;
     ros::Subscriber cart_goal_sub_;
+    ros::Subscriber cart_path_goal_sub_;
 
     std::string motion_link_;
 

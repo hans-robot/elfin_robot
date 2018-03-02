@@ -6,6 +6,7 @@ project(elfin_basic_api)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   moveit_core
+  moveit_planners_ompl
   moveit_ros_planning
   moveit_ros_planning_interface
   actionlib

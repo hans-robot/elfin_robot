@@ -45,6 +45,7 @@ Created on Mon Nov 13 15:20:10 2017
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/robot_state/conversions.h>
+#include <moveit/ompl_interface/ompl_interface.h>
 #include <actionlib/client/simple_action_client.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
