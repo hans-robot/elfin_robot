@@ -86,7 +86,9 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
 {
     moveit_msgs::RobotTrajectory cart_path;
     moveit::planning_interface::MoveGroup::Plan cart_plan;
+    group_->setPoseReferenceFrame(msg->header.frame_id);
     double fraction=group_->computeCartesianPath(msg->poses, 0.01, 0.0, cart_path);
+    group_->setPoseReferenceFrame(group_->getPlanningFrame());
 
     if(fraction==-1)
     {

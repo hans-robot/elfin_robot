@@ -42,12 +42,13 @@ Created on Mon Nov 27 15:02:10 2017
 # author: Cong Liu
 import rospy
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, PoseArray, Pose
 
 class CmdPub(object):
     def __init__(self):
         self.joints_pub=rospy.Publisher('elfin_basic_api/joint_goal', JointState, queue_size=1)
         self.cart_pub=rospy.Publisher('elfin_basic_api/cart_goal', PoseStamped, queue_size=1)
+        self.cart_path_pub=rospy.Publisher('elfin_basic_api/cart_path_goal', PoseArray, queue_size=1)
     def function_pub_joints(self):
         js=JointState()
         js.name=['elfin_joint1', 'elfin_joint2', 'elfin_joint3',
@@ -69,6 +70,21 @@ class CmdPub(object):
         ps.pose.orientation.w=0.968
         self.cart_pub.publish(ps)
     
+    def function_pub_cart_path_elfin3(self):
+        pa=PoseArray()
+        pa.header.stamp=rospy.get_rostime()
+        pa.header.frame_id='elfin_base_link'
+        ps=Pose()
+        ps.position.x=0.022
+        ps.position.y=0.055
+        ps.position.z=0.851
+        ps.orientation.x=-0.25
+        ps.orientation.y=0
+        ps.orientation.z=0
+        ps.orientation.w=0.968
+        pa.poses.append(ps)
+        self.cart_path_pub.publish(pa)
+    
     def function_pub_cart_elfin5(self):
         ps=PoseStamped()
         ps.header.stamp=rospy.get_rostime()
@@ -81,6 +97,21 @@ class CmdPub(object):
         ps.pose.orientation.z=0
         ps.pose.orientation.w=0.956
         self.cart_pub.publish(ps)
+
+    def function_pub_cart_path_elfin5(self):
+        pa=PoseArray()
+        pa.header.stamp=rospy.get_rostime()
+        pa.header.frame_id='elfin_base_link'
+        ps=Pose()
+        ps.position.x=0.13
+        ps.position.y=-0.1
+        ps.position.z=1.008
+        ps.orientation.x=0.295
+        ps.orientation.y=0
+        ps.orientation.z=0
+        ps.orientation.w=0.956
+        pa.poses.append(ps)
+        self.cart_path_pub.publish(pa)
         
     def function_pub_cart_elfin10(self):
         ps=PoseStamped()
@@ -94,6 +125,21 @@ class CmdPub(object):
         ps.pose.orientation.z=0
         ps.pose.orientation.w=0.948
         self.cart_pub.publish(ps)
+        
+    def function_pub_cart_path_elfin10(self):
+        pa=PoseArray()
+        pa.header.stamp=rospy.get_rostime()
+        pa.header.frame_id='elfin_base_link'
+        ps=Pose()
+        ps.position.x=0.097
+        ps.position.y=-0.124
+        ps.position.z=1.226
+        ps.orientation.x=0.317
+        ps.orientation.y=0
+        ps.orientation.z=0
+        ps.orientation.w=0.948
+        pa.poses.append(ps)
+        self.cart_path_pub.publish(pa)
 
 if __name__=='__main__':
     rospy.init_node('cmd_pub', anonymous=True)
@@ -101,8 +147,11 @@ if __name__=='__main__':
     rospy.sleep(1)
     cp.function_pub_joints()
 #    cp.function_pub_cart_elfin3()
+#    cp.function_pub_cart_path_elfin3()
 #    cp.function_pub_cart_elfin5()
+#    cp.function_pub_cart_path_elfin5()
 #    cp.function_pub_cart_elfin10()
+#    cp.function_pub_cart_path_elfin10()
 
     rospy.spin()
 
