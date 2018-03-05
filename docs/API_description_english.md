@@ -10,6 +10,10 @@ example: function_pub_joints() in elfin_robot_bringup/script/cmd_pub.py
 make the robot move to a position in cartesian coordination system after planning a trajectory.  
 example: function_pub_cart_xxx() in elfin_robot_bringup/script/cmd_pub.py
 
+* **elfin_basic_api/cart_path_goal (geometry_msgs/PoseArray)**  
+make the robot move through the assigned positions in cartesian coordination system after planning a trajectory composed of lines.  
+example: function_pub_cart_path_xxx() in elfin_robot_bringup/script/cmd_pub.py
+
 * **elfin_arm_controller/command (trajectory_msgs/JointTrajectory)**  
 This topic contain a trajectory. When you publish this topic, the robot will move along the trajectory.
 

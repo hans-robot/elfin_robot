@@ -10,6 +10,10 @@ example: function_pub_joints() in elfin_robot_bringup/script/cmd_pub.py
 令机械臂规划到达指定空间位置的路径并执行此路径  
 example: function_pub_cart_xxx() in elfin_robot_bringup/script/cmd_pub.py
 
+* **elfin_basic_api/cart_path_goal (geometry_msgs/PoseArray)**  
+令机械臂规划一条路径，以直线方式依次经过各个指定的点，并执行此路径  
+example: function_pub_cart_path_xxx() in elfin_robot_bringup/script/cmd_pub.py
+
 * **elfin_arm_controller/command (trajectory_msgs/JointTrajectory)**  
 本消息内容为一条轨迹，可令机械臂沿着这条轨迹运动
 
