@@ -61,27 +61,29 @@ class CmdPub(object):
         ps=PoseStamped()
         ps.header.stamp=rospy.get_rostime()
         ps.header.frame_id='elfin_base_link'
-        ps.pose.position.x=0.022
-        ps.pose.position.y=0.055
-        ps.pose.position.z=0.851
-        ps.pose.orientation.x=-0.25
+        ps.pose.position.x=0.161
+        ps.pose.position.y=0.061
+        ps.pose.position.z=0.719
+        ps.pose.orientation.x=0
         ps.pose.orientation.y=0
         ps.pose.orientation.z=0
-        ps.pose.orientation.w=0.968
+        ps.pose.orientation.w=1
         self.cart_pub.publish(ps)
     
+    # You'd better run this function when the robot has finished 
+    # the motion in function_pub_cart_elfin3()
     def function_pub_cart_path_elfin3(self):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
         ps=Pose()
-        ps.position.x=0.022
-        ps.position.y=0.055
-        ps.position.z=0.851
-        ps.orientation.x=-0.25
+        ps.position.x=0.215
+        ps.position.y=0.214
+        ps.position.z=0.719
+        ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
-        ps.orientation.w=0.968
+        ps.orientation.w=1
         pa.poses.append(ps)
         self.cart_path_pub.publish(pa)
     
@@ -89,27 +91,29 @@ class CmdPub(object):
         ps=PoseStamped()
         ps.header.stamp=rospy.get_rostime()
         ps.header.frame_id='elfin_base_link'
-        ps.pose.position.x=0.13
-        ps.pose.position.y=-0.1
-        ps.pose.position.z=1.008
-        ps.pose.orientation.x=0.295
+        ps.pose.position.x=0.258
+        ps.pose.position.y=-0.031
+        ps.pose.position.z=0.927
+        ps.pose.orientation.x=0
         ps.pose.orientation.y=0
         ps.pose.orientation.z=0
-        ps.pose.orientation.w=0.956
+        ps.pose.orientation.w=1
         self.cart_pub.publish(ps)
 
+    # You'd better run this function when the robot has finished 
+    # the motion in function_pub_cart_elfin5()
     def function_pub_cart_path_elfin5(self):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
         ps=Pose()
-        ps.position.x=0.13
-        ps.position.y=-0.1
-        ps.position.z=1.008
-        ps.orientation.x=0.295
+        ps.position.x=0.358
+        ps.position.y=-0.299
+        ps.position.z=0.927
+        ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
-        ps.orientation.w=0.956
+        ps.orientation.w=1
         pa.poses.append(ps)
         self.cart_path_pub.publish(pa)
         
@@ -117,27 +121,29 @@ class CmdPub(object):
         ps=PoseStamped()
         ps.header.stamp=rospy.get_rostime()
         ps.header.frame_id='elfin_base_link'
-        ps.pose.position.x=0.097
-        ps.pose.position.y=-0.124
-        ps.pose.position.z=1.226
-        ps.pose.orientation.x=0.317
+        ps.pose.position.x=0.204
+        ps.pose.position.y=0.005
+        ps.pose.position.z=1.143
+        ps.pose.orientation.x=0
         ps.pose.orientation.y=0
         ps.pose.orientation.z=0
-        ps.pose.orientation.w=0.948
+        ps.pose.orientation.w=1
         self.cart_pub.publish(ps)
         
+    # You'd better run this function when the robot has finished 
+    # the motion in function_pub_cart_elfin10()
     def function_pub_cart_path_elfin10(self):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
         ps=Pose()
-        ps.position.x=0.097
-        ps.position.y=-0.124
-        ps.position.z=1.226
-        ps.orientation.x=0.317
+        ps.position.x=0.305
+        ps.position.y=0.323
+        ps.position.z=1.143
+        ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
-        ps.orientation.w=0.948
+        ps.orientation.w=1
         pa.poses.append(ps)
         self.cart_path_pub.publish(pa)
 
