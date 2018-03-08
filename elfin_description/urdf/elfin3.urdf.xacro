@@ -9,6 +9,8 @@
   
   <xacro:property name="PI" value="3.1415926535897931"/>
   
+  <xacro:property name="density" value="3.09"/>
+  
   <link name="world"/>
   
   <joint name="world_base" type="fixed">
@@ -37,13 +39,13 @@
     name="elfin_base">
     <inertial>
       <origin
-        xyz="-0.0319402056221453 0.427120668618383 -5.39351164605318E-06"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="0.000476057496448 -0.00609847721085 0.0271227961552"
+        rpy="0 0 0"/>
+      <mass value="${0.432503561632*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00107966*density}" ixy="${6.43e-06*density}" ixz="${1.97e-06*density}"
+      iyy="${0.00089216*density}" iyz="${-1.269e-05*density}"
+      izz="${0.00174712*density}"/>
     </inertial>
     <visual>
       <origin
@@ -70,13 +72,13 @@
     name="elfin_link1">
     <inertial>
       <origin
-        xyz="-0.0192918165822649 0.120142940373248 -9.33059379656128E-06"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="-0.0192425632808 0.120157543892 -2.05350524914e-05"
+        rpy="0 0 0"/>
+      <mass value="${1.52001312557*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00523815*density}" ixy="${0.00122593*density}" ixz="${-1.6e-07*density}"
+      iyy="${0.00315471*density}" iyz="${-6.4e-07*density}"
+      izz="${0.00646649*density}"/>
     </inertial>
     <visual>
       <origin
@@ -121,13 +123,13 @@
     name="elfin_link2">
     <inertial>
       <origin
-        xyz="-0.036466516774824 0.121897297057332 -2.81161718183357E-05"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="-0.0363359816546 0.121774838175 -3.84046105722e-05"
+        rpy="0 0 0"/>
+      <mass value="${0.519672255247*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00564813*density}" ixy="${-0.00026473*density}" ixz="${0.0*density}"
+      iyy="${0.00053594*density}" iyz="${1.29e-06*density}"
+      izz="${0.00545618*density}"/>
     </inertial>
     <visual>
       <origin
@@ -172,13 +174,13 @@
     name="elfin_link3">
     <inertial>
       <origin
-        xyz="0.0512991448419209 -0.0377654897323815 -7.04730066125333E-06"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="0.0513625008301 -0.0377418700977 -1.41484011876e-05"
+        rpy="0 0 0"/>
+      <mass value="${1.07514585114*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00296619*density}" ixy="${0.00072021*density}" ixz="${7.3e-07*density}"
+      iyy="${0.00182263*density}" iyz="${-3.7e-07*density}"
+      izz="${0.00372855*density}"/>
     </inertial>
     <visual>
       <origin
@@ -223,13 +225,13 @@
     name="elfin_link4">
     <inertial>
       <origin
-        xyz="-0.0583601900884385 0.100119219162888 -3.33183498268088E-07"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="-0.0580853772834 0.10002233137 -3.45203877103e-06"
+        rpy="0 0 0"/>
+      <mass value="${0.37026646381*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00238279*density}" ixy="${0.00082955*density}" ixz="${1.1e-07*density}"
+      iyy="${0.00095758*density}" iyz="${-3.2e-07*density}"
+      izz="${0.00285161*density}"/>
     </inertial>
     <visual>
       <origin
@@ -274,13 +276,13 @@
     name="elfin_link5">
     <inertial>
       <origin
-        xyz="-0.0159268625326372 -0.0365461558991834 2.29158666616884E-06"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="-0.0158710385319 -0.0365214098995 4.94388107361e-07"
+        rpy="0 0 0"/>
+      <mass value="${0.807027243448*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00193719*density}" ixy="${0.00047145*density}" ixz="${2e-08*density}"
+      iyy="${0.00112857*density}" iyz="${-1.1e-07*density}"
+      izz="${0.00245655*density}"/>
     </inertial>
     <visual>
       <origin
@@ -325,13 +327,13 @@
     name="elfin_link6">
     <inertial>
       <origin
-        xyz="0.0219175619250529 0.461879324434722 -0.0232335370431645"
-        rpy="0 0 0" />
-      <mass value="0.05"/>
+        xyz="-0.000923639476392 -0.0528295663466 -0.000336667608557"
+        rpy="0 0 0"/>
+      <mass value="${0.147312568674*density}"/>
       <inertia
-	  ixx="0.001" ixy="0.0" ixz="0.0"
-	  iyy="0.001" iyz="0.0"
-	  izz="0.001"/>
+      ixx="${0.00057253*density}" ixy="${-2.66e-06*density}" ixz="${-2.89e-06*density}"
+      iyy="${0.00019592*density}" iyz="${-1.2e-06*density}"
+      izz="${0.00057342*density}"/>
     </inertial>
     <visual>
       <origin

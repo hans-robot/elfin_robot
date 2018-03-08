@@ -43,9 +43,9 @@
         rpy="0 0 0" />
       <mass value="${0.690521*density}"/>
       <inertia
-	  ixx="${0.00130611*density}" ixy="${0.0000568*density}" ixz="${0.00000189*density}"
-	  iyy="${0.00134467*density}" iyz="${0.00001095*density}"
-	  izz="${0.00229139*density}"/>
+      ixx="${0.00130611*density}" ixy="${0.0000568*density}" ixz="${0.00000189*density}"
+      iyy="${0.00134467*density}" iyz="${0.00001095*density}"
+      izz="${0.00229139*density}"/>
     </inertial>
     <visual>
       <origin
@@ -76,9 +76,9 @@
         rpy="0 0 0" />
       <mass value="${2.576772*density}"/>
       <inertia
-	  ixx="${0.01298966*density}" ixy="${0.00287966*density}" ixz="${-0.000001*density}"
-	  iyy="${0.00721115*density}" iyz="${-0.00000052*density}"
-	  izz="${0.01532713*density}"/>
+      ixx="${0.01298966*density}" ixy="${0.00287966*density}" ixz="${-0.000001*density}"
+      iyy="${0.00721115*density}" iyz="${-0.00000052*density}"
+      izz="${0.01532713*density}"/>
     </inertial>
     <visual>
       <origin
@@ -127,9 +127,9 @@
         rpy="0 0 0" />
       <mass value="${1.208607*density}"/>
       <inertia
-	  ixx="${0.02975970*density}" ixy="${-0.00126441*density}" ixz="${-0.00000024*density}"
-	  iyy="${0.00168156*density}" iyz="${-0.0000021*density}"
-	  izz="${0.02944694*density}"/>
+      ixx="${0.02975970*density}" ixy="${-0.00126441*density}" ixz="${-0.00000024*density}"
+      iyy="${0.00168156*density}" iyz="${-0.0000021*density}"
+      izz="${0.02944694*density}"/>
     </inertial>
     <visual>
       <origin
@@ -178,9 +178,9 @@
         rpy="0 0 0" />
       <mass value="${1.525883*density}"/>
       <inertia
-	  ixx="${0.00527835*density}" ixy="${0.00124150*density}" ixz="${-0.00000018*density}"
-	  iyy="${0.00317861*density}" iyz="${-0.00000067*density}"
-	  izz="${0.00652527*density}"/>
+      ixx="${0.00527835*density}" ixy="${0.00124150*density}" ixz="${-0.00000018*density}"
+      iyy="${0.00317861*density}" iyz="${-0.00000067*density}"
+      izz="${0.00652527*density}"/>
     </inertial>
     <visual>
       <origin
@@ -229,9 +229,9 @@
         rpy="0 0 0" />
       <mass value="${0.475026*density}"/>
       <inertia
-	  ixx="${0.00542441*density}" ixy="${0.00155092*density}" ixz="${-0.00000053*density}"
-	  iyy="${0.00131780*density}" iyz="${0.00000195*density}"
-	  izz="${0.00607489*density}"/>
+      ixx="${0.00542441*density}" ixy="${0.00155092*density}" ixz="${-0.00000053*density}"
+      iyy="${0.00131780*density}" iyz="${0.00000195*density}"
+      izz="${0.00607489*density}"/>
     </inertial>
     <visual>
       <origin
@@ -280,9 +280,9 @@
         rpy="0 0 0" />
       <mass value="${0.808399*density}"/>
       <inertia
-	  ixx="${0.00194399*density}" ixy="${0.00047414*density}" ixz="${0.00000001*density}"
-	  iyy="${0.00113245*density}" iyz="${-0.00000012*density}"
-	  izz="${0.00246661*density}"/>
+      ixx="${0.00194399*density}" ixy="${0.00047414*density}" ixz="${0.00000001*density}"
+      iyy="${0.00113245*density}" iyz="${-0.00000012*density}"
+      izz="${0.00246661*density}"/>
     </inertial>
     <visual>
       <origin
@@ -331,9 +331,9 @@
         rpy="0 0 0" />
       <mass value="${0.147312*density}"/>
       <inertia
-	  ixx="${0.00045468*density}" ixy="${-0.00006666*density}" ixz="${-0.00000289*density}"
-	  iyy="${0.00019592*density}" iyz="${-0.00002477*density}"
-	  izz="${0.00045557*density}"/>
+      ixx="${0.00045468*density}" ixy="${-0.000005401*density}" ixz="${-0.00000289*density}"
+      iyy="${0.00019592*density}" iyz="${-0.000002430*density}"
+      izz="${0.00045557*density}"/>
     </inertial>
     <visual>
       <origin
