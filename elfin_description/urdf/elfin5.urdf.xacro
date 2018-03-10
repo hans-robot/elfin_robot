@@ -331,9 +331,9 @@
         rpy="0 0 0" />
       <mass value="${0.147312*density}"/>
       <inertia
-      ixx="${0.00045468*density}" ixy="${-0.000005401*density}" ixz="${-0.00000289*density}"
-      iyy="${0.00019592*density}" iyz="${-0.000002430*density}"
-      izz="${0.00045557*density}"/>
+      ixx="${0.00019407*density}" ixy="${1.4e-06*density}" ixz="${-2.89e-06*density}"
+      iyy="${0.00019592*density}" iyz="${5e-08*density}"
+      izz="${0.00019496*density}"/>
     </inertial>
     <visual>
       <origin
