@@ -76,15 +76,27 @@ class CmdPub(object):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
+        
         ps=Pose()
-        ps.position.x=0.215
-        ps.position.y=0.214
+        ps.position.x=0.201
+        ps.position.y=0.141
         ps.position.z=0.719
         ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
         ps.orientation.w=1
+        
+        ps1=Pose()
+        ps1.position.x=0.241
+        ps1.position.y=0.221
+        ps1.position.z=0.719
+        ps1.orientation.x=0
+        ps1.orientation.y=0
+        ps1.orientation.z=0
+        ps1.orientation.w=1
+        
         pa.poses.append(ps)
+        pa.poses.append(ps1)
         self.cart_path_pub.publish(pa)
     
     def function_pub_cart_elfin5(self):
@@ -106,15 +118,27 @@ class CmdPub(object):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
+        
         ps=Pose()
-        ps.position.x=0.358
-        ps.position.y=-0.299
+        ps.position.x=0.308
+        ps.position.y=-0.131
         ps.position.z=0.927
         ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
         ps.orientation.w=1
+        
+        ps1=Pose()
+        ps1.position.x=0.358
+        ps1.position.y=-0.231
+        ps1.position.z=0.927
+        ps1.orientation.x=0
+        ps1.orientation.y=0
+        ps1.orientation.z=0
+        ps1.orientation.w=1
+        
         pa.poses.append(ps)
+        pa.poses.append(ps1)
         self.cart_path_pub.publish(pa)
         
     def function_pub_cart_elfin10(self):
@@ -136,15 +160,27 @@ class CmdPub(object):
         pa=PoseArray()
         pa.header.stamp=rospy.get_rostime()
         pa.header.frame_id='elfin_base_link'
+        
         ps=Pose()
-        ps.position.x=0.305
-        ps.position.y=0.323
+        ps.position.x=0.264
+        ps.position.y=0.125
         ps.position.z=1.143
         ps.orientation.x=0
         ps.orientation.y=0
         ps.orientation.z=0
         ps.orientation.w=1
+        
+        ps1=Pose()
+        ps1.position.x=0.324
+        ps1.position.y=0.245
+        ps1.position.z=1.143
+        ps1.orientation.x=0
+        ps1.orientation.y=0
+        ps1.orientation.z=0
+        ps1.orientation.w=1
+        
         pa.poses.append(ps)
+        pa.poses.append(ps1)
         self.cart_path_pub.publish(pa)
 
 if __name__=='__main__':
