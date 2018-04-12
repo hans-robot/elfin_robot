@@ -292,7 +292,7 @@ void EtherCatManager::write(int slave_no, uint8_t channel, uint8_t value)
     exit(1);
   }
   if (channel*8 >= ec_slave[slave_no].Obits) {
-    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md\n", slave_no, channel*8, ec_slave[slave_no].Obits);
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md with a Markdown editor or on github.com\n", slave_no, channel*8, ec_slave[slave_no].Obits);
     exit(1);
   }
   ec_slave[slave_no].outputs[channel] = value;
@@ -306,7 +306,7 @@ uint8_t EtherCatManager::readInput(int slave_no, uint8_t channel) const
     exit(1);
   }
   if (channel*8 >= ec_slave[slave_no].Ibits) {
-    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Input bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md\n", slave_no, channel*8, ec_slave[slave_no].Ibits);
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Input bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md with a Markdown editor or on github.com\n", slave_no, channel*8, ec_slave[slave_no].Ibits);
     exit(1);
   }
   return ec_slave[slave_no].inputs[channel];
@@ -320,7 +320,7 @@ uint8_t EtherCatManager::readOutput(int slave_no, uint8_t channel) const
     exit(1);
   }
   if (channel*8 >= ec_slave[slave_no].Obits) {
-    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md\n", slave_no, channel*8, ec_slave[slave_no].Obits);
+    fprintf(stderr, "ERROR : slave_no(%d) : channel(%d) is larger than Output bits (%d), you may need to read elfin_robot/docs/Fix_ESI.md or elfin_robot/docs/Fix_ESI_english.md with a Markdown editor or on github.com\n", slave_no, channel*8, ec_slave[slave_no].Obits);
     exit(1);
   }
   return ec_slave[slave_no].outputs[channel];

@@ -12,8 +12,8 @@ Open the elfin_ethercat_driver/config/write_esi.yaml file and configure the para
 
 Then fix ESI with following commands.
 ```sh
-sudo chrt 10 bash
-roslaunch elfin_ethercat_driver elfin_esi_write.launch
+$ sudo chrt 10 bash
+$ roslaunch elfin_ethercat_driver elfin_esi_write.launch
 ```
 
 Finally, restart the robot. Now ESI should be fixed.

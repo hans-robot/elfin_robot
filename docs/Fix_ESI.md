@@ -12,8 +12,8 @@ ERROR: slave_no(1) : channel(352) is larger than Input bits (256)
 
 之后运行以下命令修复ESI
 ```sh
-sudo chrt 10 bash
-roslaunch elfin_ethercat_driver elfin_esi_write.launch
+$ sudo chrt 10 bash
+$ roslaunch elfin_ethercat_driver elfin_esi_write.launch
 ```
 
 最后重启机械臂即可完成修复。
