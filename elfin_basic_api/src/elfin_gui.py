@@ -490,7 +490,7 @@ class MyFrame(wx.Frame):
   
 if __name__=='__main__':  
     rospy.init_node('elfin_gui')
-    app=wx.PySimpleApp()  
+    app=wx.App(False)  
     myframe=MyFrame(parent=None,id=-1)  
     myframe.Show(True)
 

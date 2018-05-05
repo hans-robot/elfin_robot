@@ -50,7 +50,7 @@ namespace elfin_basic_api {
 class ElfinBasicAPI
 {
 public:
-    ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name);
     ~ElfinBasicAPI();
 
     void dynamicReconfigureCallback(ElfinBasicAPIDynamicReconfigureConfig &config, uint32_t level);
@@ -61,7 +61,7 @@ public:
     bool updateVelocityScaling_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
 private:
-    moveit::planning_interface::MoveGroup *group_;
+    moveit::planning_interface::MoveGroupInterface *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
     ros::NodeHandle root_nh_, local_nh_;
 

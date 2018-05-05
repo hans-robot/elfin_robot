@@ -41,7 +41,7 @@ Created on Mon Nov 27 14:22:43 2017
 
 namespace elfin_basic_api {
 
-ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name):
+ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name):
     group_(group), action_client_(action_name, true), motion_nh_("~")
 {
     goal_.trajectory.joint_names=group_->getJointNames();
@@ -85,7 +85,7 @@ void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
 void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
 {
     moveit_msgs::RobotTrajectory cart_path;
-    moveit::planning_interface::MoveGroup::Plan cart_plan;
+    moveit::planning_interface::MoveGroupInterface::Plan cart_plan;
 
     if(!msg->header.frame_id.empty())
         group_->setPoseReferenceFrame(msg->header.frame_id);

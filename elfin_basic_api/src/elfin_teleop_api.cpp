@@ -40,7 +40,7 @@ Created on Mon Nov 13 15:20:10 2017
 #include "elfin_basic_api/elfin_teleop_api.h"
 
 namespace elfin_basic_api {
-ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std::string action_name):
+ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name):
     group_(group), action_client_(action_name, true), teleop_nh_("~")
 {
     goal_.trajectory.joint_names=group_->getJointNames();

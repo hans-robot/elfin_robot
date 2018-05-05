@@ -46,7 +46,7 @@ Created on Mon Nov 27 14:24:30 2017
 #include <std_srvs/SetBool.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
-#include <moveit/move_group_interface/move_group.h>
+#include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/ompl_interface/ompl_interface.h>
@@ -60,7 +60,7 @@ namespace elfin_basic_api {
 class ElfinMotionAPI
 {
 public:
-    ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name);
     void jointGoalCB(const sensor_msgs::JointStateConstPtr &msg);
     void cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg);
     void cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg);
@@ -68,7 +68,7 @@ public:
     bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
 private:
-    moveit::planning_interface::MoveGroup *group_;
+    moveit::planning_interface::MoveGroupInterface *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
     ros::NodeHandle root_nh_, motion_nh_;
 

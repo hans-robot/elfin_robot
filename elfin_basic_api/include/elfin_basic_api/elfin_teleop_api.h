@@ -42,7 +42,7 @@ Created on Mon Nov 13 15:20:10 2017
 
 #include <ros/ros.h>
 #include <vector>
-#include <moveit/move_group_interface/move_group.h>
+#include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/ompl_interface/ompl_interface.h>
@@ -62,7 +62,7 @@ namespace elfin_basic_api {
 class ElfinTeleopAPI
 {
 public:
-    ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinTeleopAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name);
     void teleopJointCmdNoLimitCB(const std_msgs::Int64ConstPtr &msg);
 
     void teleopJointCmdCB(const std_msgs::Int64ConstPtr &msg);
@@ -79,7 +79,7 @@ public:
     void PoseStampedRotation(geometry_msgs::PoseStamped &pose_stamped, const tf::Vector3 &axis, double angle);
 
 private:
-    moveit::planning_interface::MoveGroup *group_;
+    moveit::planning_interface::MoveGroupInterface *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
     ros::NodeHandle root_nh_, teleop_nh_;
 

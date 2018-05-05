@@ -42,9 +42,24 @@ Created on Thurs Nov 16 09:36:10 2017
 int main(int argc, char** argv)
 {
     ros::init(argc,argv,"elfin_basic_api", ros::init_options::AnonymousName);
-    moveit::planning_interface::MoveGroup move_group("elfin_arm");
+
+    ros::AsyncSpinner spinner(2);
+    spinner.start();
+
+    moveit::planning_interface::MoveGroupInterface move_group("elfin_arm");
+    move_group.setPlannerId("ElfinBasicAPI");
+    move_group.startStateMonitor();
+
+    ros::Rate r(100);
+
     move_group.getCurrentJointValues();
+
     elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
-    ros::spin();
+
+    while(ros::ok())
+    {
+      r.sleep();
+    }
+    return 0;
 }
 
