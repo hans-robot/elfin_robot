@@ -475,6 +475,35 @@ class MyFrame(wx.Frame):
         wx.CallAfter(self.updateDisplay, self.key)
         self.key=[]
     
+    def monitor_status(self, evt):
+        self.key=[]
+        
+        current_joint_values=self.group.get_current_joint_values()
+        for i in xrange(len(current_joint_values)):
+            self.key.append(str(round(current_joint_values[i]*180/math.pi, 2)))
+
+        current_pose=self.group.get_current_pose()
+        
+        self.key.append(str(round(current_pose.pose.position.x*1000, 2)))
+        self.key.append(str(round(current_pose.pose.position.y*1000, 2)))
+        self.key.append(str(round(current_pose.pose.position.z*1000, 2)))
+        
+        qua=[]
+        
+        qua.append(current_pose.pose.orientation.x)
+        qua.append(current_pose.pose.orientation.y)
+        qua.append(current_pose.pose.orientation.z)
+        qua.append(current_pose.pose.orientation.w)
+        
+        rpy=tf.transformations.euler_from_quaternion(qua)
+        
+        self.key.append(str(round(rpy[0]*180/math.pi, 2)))
+        self.key.append(str(round(rpy[1]*180/math.pi, 2)))
+        self.key.append(str(round(rpy[2]*180/math.pi, 2)))
+        
+        wx.CallAfter(self.updateDisplay, self.key)
+        self.key=[]
+            
     def servo_state_cb(self, data):
         self.servo_state=data.data
         wx.CallAfter(self.update_servo_state, data)
@@ -484,9 +513,10 @@ class MyFrame(wx.Frame):
         wx.CallAfter(self.update_fault_state, data)
         
     def listen(self):
-        rospy.Subscriber('joint_states', JointState, self.js_call_back)
         rospy.Subscriber(self.elfin_driver_ns+'enable_state', Bool, self.servo_state_cb)
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
+        
+        rospy.Timer(rospy.Duration(nsecs=50000000), self.monitor_status)
   
 if __name__=='__main__':  
     rospy.init_node('elfin_gui')
