@@ -4,7 +4,7 @@
   
   <arg name="gui" default="true" />
   
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find elfin_description)/urdf/$(arg model).urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find elfin_description)/urdf/$(arg model).urdf.xacro'" />
   
   <param name="use_gui" value="$(arg gui)" />
   
