@@ -18,7 +18,7 @@ example: function_pub_cart_path_xxx() in elfin_robot_bringup/script/cmd_pub.py
 This topic contain a trajectory. When you publish this topic, the robot will move along the trajectory.
 
 * **elfin_teleop_joint_cmd_no_limit (std_msgs/Int64)**  
-This is a topic for developer, customers are not suggested to use it. A particular joint will move a little distance after subscribing this topic for once.
+This is a topic for developer, customers are not supposed to use it. A particular joint will move a little distance after subscribing this topic for once.
 
 	Meaning of the data in the topic:
 
@@ -102,7 +102,7 @@ You can get the content of TxPDOs from the response of this service.
 * **elfin_ros_control/elfin/io_port1/get_rxpdo (std_srvs/SetBool)**  
 You can get the content of RxPDOs from the response of this service.
 
-***Following are the services, that support "Elfin Control Panel" interface.  customers are not suggested to use them.***
+***Following are the services, that support "Elfin Control Panel" interface.  customers are not supposed to use them.***
 
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  
 Enable the robot. Please call elfin_basic_api/stop_teleop before calling this service. In this case the enabling process won't be disturbed by the motion commands, that were gaven before enabling.

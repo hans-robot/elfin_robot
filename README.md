@@ -5,9 +5,37 @@ If you don't speak chinese, please [click here](./README_english.md)
 
 ![elfin_robot](docs/images/elfin.png)
 
-本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 14.04 及 ROS Indigo，其他环境下的运行情况没有测试过。
+本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 16.04 + ROS Kinetic 或 Ubuntu 14.04 + ROS Indigo，其他环境下的运行情况没有测试过。
 
 ### 安装软件包
+
+#### Ubuntu 16.04 + ROS Kinetic
+
+**安装一些重要的依赖包**
+```sh
+$ sudo apt-get install ros-kinetic-soem ros-kinetic-gazebo-ros-control ros-kinetic-ros-control ros-kinetic-ros-controllers
+```
+**安装和升级MoveIt!,** 注意因为MoveIt!最新版进行了很多的优化，如果你已经安装了MoveIt!, 也请一定按照以下方法升级到最新版。
+
+安装/升级MoveIt!：
+```sh
+$ sudo apt-get update
+$ sudo apt-get install ros-kinetic-moveit
+```
+
+**安装本软件包**
+
+首先创建catkin工作空间 ([教程](http://wiki.ros.org/catkin/Tutorials))。 然后将本文件夹克隆到src/目录下，之后用catkin_make来编译。  
+假设你的工作空间是~/catkin_ws，你需要运行的命令如下：
+```sh
+$ cd ~/catkin_ws/src
+$ git clone -b kinetic-devel https://github.com/hans-robot/elfin_robot.git
+$ cd ..
+$ catkin_make
+$ source devel/setup.bash
+```
+
+#### Ubuntu 14.04 + ROS Indigo
 
 **安装一些重要的依赖包**
 ```sh
@@ -15,27 +43,22 @@ $ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control ros-indigo-
 ```
 **安装和升级MoveIt!,** 注意因为MoveIt!最新版进行了很多的优化，如果你已经安装了MoveIt!, 也请一定按照以下方法升级到最新版。
 
-安装MoveIt!：
+安装/升级MoveIt!：
 ```sh
+$ sudo apt-get update
 $ sudo apt-get install ros-indigo-moveit
 $ sudo apt-get install ros-indigo-moveit-full-pr2
 $ sudo apt-get install ros-indigo-moveit-kinematics
 $ sudo apt-get install ros-indigo-moveit-ros-move-group
 ```
-升级MoveIt!:
-```sh
-$ sudo apt-get update
-$ sudo apt-get upgrade
-$ sudo apt-get install ros-indigo-moveit-kinematics
-$ sudo apt-get install ros-indigo-moveit-ros-move-group
-```
+
 **安装本软件包**
 
 首先创建catkin工作空间 ([教程](http://wiki.ros.org/catkin/Tutorials))。 然后将本文件夹克隆到src/目录下，之后用catkin_make来编译。  
 假设你的工作空间是~/catkin_ws，你需要运行的命令如下：
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone https://github.com/hans-robot/elfin_robot.git
+$ git clone -b indigo-devel https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash

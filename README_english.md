@@ -3,34 +3,27 @@ Elfin Robot
 
 ![elfin_robot](docs/images/elfin.png)
 
-This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 14.04 with ROS Indigo. So far These packages haven't been tested in other environment.
+This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 16.04 with ROS Kinetic or Ubuntu 14.04 with ROS Indigo. So far These packages haven't been tested in other environment.
 
 ### Installation
 
+#### Ubuntu 16.04 + ROS Kinetic
+
 **Install some important dependent software packages:**
 ```sh
-$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control ros-indigo-ros-control ros-indigo-ros-controllers
+$ sudo apt-get install ros-kinetic-soem ros-kinetic-gazebo-ros-control ros-kinetic-ros-control ros-kinetic-ros-controllers
 ```
 **Install or upgrade MoveIt!.** 
 
 If you have installed MoveIt!, please make sure that it's been upgraded to the latest version.
 
-Install MoveIt!:
-
-```sh
-$ sudo apt-get install ros-indigo-moveit
-$ sudo apt-get install ros-indigo-moveit-full-pr2
-$ sudo apt-get install ros-indigo-moveit-kinematics
-$ sudo apt-get install ros-indigo-moveit-ros-move-group
-```
-Upgrade MoveIt!:
+Install/Upgrade MoveIt!:
 
 ```sh
 $ sudo apt-get update
-$ sudo apt-get upgrade
-$ sudo apt-get install ros-indigo-moveit-kinematics
-$ sudo apt-get install ros-indigo-moveit-ros-move-group
+$ sudo apt-get install ros-kinetic-moveit
 ```
+
 **Install this repository from Source**
 
 First set up a catkin workspace (see [this tutorials](http://wiki.ros.org/catkin/Tutorials)).  
@@ -40,7 +33,42 @@ Make sure to source the correct setup file according to your workspace hierarchy
 Assuming your catkin workspace folder is ~/catkin_ws, you should use the following commands:
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone https://github.com/hans-robot/elfin_robot.git
+$ git clone -b kinetic-devel https://github.com/hans-robot/elfin_robot.git
+$ cd ..
+$ catkin_make
+$ source devel/setup.bash
+```
+
+#### Ubuntu 14.04 + ROS Indigo
+
+**Install some important dependent software packages:**
+```sh
+$ sudo apt-get install ros-indigo-soem ros-indigo-gazebo-ros-control ros-indigo-ros-control ros-indigo-ros-controllers
+```
+**Install or upgrade MoveIt!.** 
+
+If you have installed MoveIt!, please make sure that it's been upgraded to the latest version.
+
+Install/Upgrade MoveIt!:
+
+```sh
+$ sudo apt-get update
+$ sudo apt-get install ros-indigo-moveit
+$ sudo apt-get install ros-indigo-moveit-full-pr2
+$ sudo apt-get install ros-indigo-moveit-kinematics
+$ sudo apt-get install ros-indigo-moveit-ros-move-group
+```
+
+**Install this repository from Source**
+
+First set up a catkin workspace (see [this tutorials](http://wiki.ros.org/catkin/Tutorials)).  
+Then clone the repository into the src/ folder. It should look like /path/to/your/catkin_workspace/src/cute_robot.  
+Make sure to source the correct setup file according to your workspace hierarchy, then use catkin_make to compile.  
+
+Assuming your catkin workspace folder is ~/catkin_ws, you should use the following commands:
+```sh
+$ cd ~/catkin_ws/src
+$ git clone -b indigo-devel https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash
