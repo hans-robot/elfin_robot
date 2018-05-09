@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   hardware_interface
   joint_limits_interface
   roscpp
-  rosparam_shortcuts
   sensor_msgs
   std_msgs
   trajectory_msgs
@@ -115,7 +114,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES elfin_ros_control
-#  CATKIN_DEPENDS actionlib cmake_modules control_msgs control_toolbox controller_manager hardware_interface joint_limits_interface roscpp rosparam_shortcuts sensor_msgs std_msgs trajectory_msgs transmission_interface urdf
+#  CATKIN_DEPENDS actionlib cmake_modules control_msgs control_toolbox controller_manager hardware_interface joint_limits_interface roscpp sensor_msgs std_msgs trajectory_msgs transmission_interface urdf
 #  DEPENDS system_lib
 )
 
