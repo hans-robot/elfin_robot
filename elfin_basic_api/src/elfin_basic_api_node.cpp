@@ -43,23 +43,33 @@ int main(int argc, char** argv)
 {
     ros::init(argc,argv,"elfin_basic_api", ros::init_options::AnonymousName);
 
-    ros::AsyncSpinner spinner(2);
-    spinner.start();
+    ros::CallbackQueue move_group_cb_queue;
 
-    moveit::planning_interface::MoveGroupInterface move_group("elfin_arm");
+    std::string move_group_name="elfin_arm";
+    std::string move_group_desc="robot_description";
+    ros::NodeHandle move_group_nh;
+    move_group_nh.setCallbackQueue(&move_group_cb_queue);
+
+
+    moveit::planning_interface::MoveGroupInterface::Options move_group_options(move_group_name, move_group_desc, move_group_nh);
+
+    moveit::planning_interface::MoveGroupInterface move_group(move_group_options);
+
+    ros::AsyncSpinner move_group_spinner(1, &move_group_cb_queue);
+    move_group_spinner.start();
+
     move_group.setPlannerId("ElfinBasicAPI");
     move_group.startStateMonitor();
 
-    ros::Rate r(100);
-
     move_group.getCurrentJointValues();
+
+    ros::AsyncSpinner common_spinner(1);
+    common_spinner.start();
 
     elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
 
-    while(ros::ok())
-    {
-      r.sleep();
-    }
+    ros::waitForShutdown();
+
     return 0;
 }
 

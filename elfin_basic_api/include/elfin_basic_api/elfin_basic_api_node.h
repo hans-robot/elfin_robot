@@ -41,6 +41,7 @@ Created on Thurs Nov 16 09:42:20 2017
 #define ELFIN_BASIC_API_NODE_H
 
 #include "elfin_basic_api/elfin_basic_api.h"
+#include <ros/callback_queue.h>
 
 
 #endif
