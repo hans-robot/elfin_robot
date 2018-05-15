@@ -44,7 +44,15 @@ int main(int argc, char** argv)
     ros::init(argc,argv,"elfin_basic_api", ros::init_options::AnonymousName);
     moveit::planning_interface::MoveGroup move_group("elfin_arm");
     move_group.getCurrentJointValues();
-    elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
+
+    boost::shared_ptr<tf::Transformer> tf_ptr(new tf::Transformer());
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor(new planning_scene_monitor::PlanningSceneMonitor("robot_description", tf_ptr));
+
+    planning_scene_monitor->startSceneMonitor();
+    planning_scene_monitor->startStateMonitor();
+    planning_scene_monitor->startWorldGeometryMonitor();
+
+    elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory", planning_scene_monitor);
     ros::spin();
 }
 

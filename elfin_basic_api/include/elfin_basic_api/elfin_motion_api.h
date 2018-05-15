@@ -44,12 +44,15 @@ Created on Mon Nov 27 14:24:30 2017
 #include <vector>
 #include <sensor_msgs/JointState.h>
 #include <std_srvs/SetBool.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/ompl_interface/ompl_interface.h>
+#include <moveit/dynamics_solver/dynamics_solver.h>
 #include <actionlib/client/simple_action_client.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
@@ -60,16 +63,19 @@ namespace elfin_basic_api {
 class ElfinMotionAPI
 {
 public:
-    ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor);
     void jointGoalCB(const sensor_msgs::JointStateConstPtr &msg);
     void cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg);
     void cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg);
     bool getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    void torquesPubTimer_cb(const ros::TimerEvent& evt);
 
 private:
     moveit::planning_interface::MoveGroup *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+    dynamics_solver::DynamicsSolverPtr dynamics_solver_;
     ros::NodeHandle root_nh_, motion_nh_;
 
     actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
@@ -83,6 +89,11 @@ private:
 
     ros::ServiceServer get_reference_link_server_;
     ros::ServiceServer get_end_link_server_;
+    ros::ServiceServer get_torques_server_;
+
+    ros::Timer torques_publisher_timer_;
+    ros::Publisher torques_publisher_;
+    std_msgs::Float64MultiArray torques_msg_;
 
 };
 

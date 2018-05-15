@@ -50,7 +50,7 @@ namespace elfin_basic_api {
 class ElfinBasicAPI
 {
 public:
-    ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor);
     ~ElfinBasicAPI();
 
     void dynamicReconfigureCallback(ElfinBasicAPIDynamicReconfigureConfig &config, uint32_t level);
@@ -63,6 +63,7 @@ public:
 private:
     moveit::planning_interface::MoveGroup *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
     ros::NodeHandle root_nh_, local_nh_;
 
     ElfinTeleopAPI *teleop_api_;

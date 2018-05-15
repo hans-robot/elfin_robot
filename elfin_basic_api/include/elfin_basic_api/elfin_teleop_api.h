@@ -46,6 +46,7 @@ Created on Mon Nov 13 15:20:10 2017
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/ompl_interface/ompl_interface.h>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <actionlib/client/simple_action_client.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
@@ -62,7 +63,7 @@ namespace elfin_basic_api {
 class ElfinTeleopAPI
 {
 public:
-    ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std::string action_name);
+    ElfinTeleopAPI(moveit::planning_interface::MoveGroup *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor);
     void teleopJointCmdNoLimitCB(const std_msgs::Int64ConstPtr &msg);
 
     void teleopJointCmdCB(const std_msgs::Int64ConstPtr &msg);
@@ -81,6 +82,7 @@ public:
 private:
     moveit::planning_interface::MoveGroup *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
     ros::NodeHandle root_nh_, teleop_nh_;
 
     actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
