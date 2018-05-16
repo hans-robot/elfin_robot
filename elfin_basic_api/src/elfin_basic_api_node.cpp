@@ -50,7 +50,6 @@ int main(int argc, char** argv)
     ros::NodeHandle move_group_nh;
     move_group_nh.setCallbackQueue(&move_group_cb_queue);
 
-
     moveit::planning_interface::MoveGroupInterface::Options move_group_options(move_group_name, move_group_desc, move_group_nh);
 
     moveit::planning_interface::MoveGroupInterface move_group(move_group_options);
@@ -66,7 +65,14 @@ int main(int argc, char** argv)
     ros::AsyncSpinner common_spinner(1);
     common_spinner.start();
 
-    elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory");
+    boost::shared_ptr<tf::Transformer> tf_ptr(new tf::Transformer());
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor(new planning_scene_monitor::PlanningSceneMonitor("robot_description", tf_ptr));
+
+    planning_scene_monitor->startSceneMonitor();
+    planning_scene_monitor->startStateMonitor();
+    planning_scene_monitor->startWorldGeometryMonitor();
+
+    elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory", planning_scene_monitor);
 
     ros::waitForShutdown();
 

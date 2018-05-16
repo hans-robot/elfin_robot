@@ -40,8 +40,8 @@ Created on Mon Nov 13 15:20:10 2017
 #include "elfin_basic_api/elfin_teleop_api.h"
 
 namespace elfin_basic_api {
-ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name):
-    group_(group), action_client_(action_name, true), teleop_nh_("~")
+ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor):
+    group_(group), action_client_(action_name, true), planning_scene_monitor_(planning_scene_monitor), teleop_nh_("~")
 {
     goal_.trajectory.joint_names=group_->getJointNames();
     goal_.trajectory.header.stamp.sec=0;
@@ -104,24 +104,26 @@ bool ElfinTeleopAPI::jointTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, el
         return true;
     }
     int joint_num=abs(req.data);
-    trajectory_msgs::JointTrajectoryPoint point_tmp;
-    std::vector<double> position_tmp=group_->getCurrentJointValues();
-    double joint_current_position=position_tmp[joint_num-1];
+    std::vector<double> position_current=group_->getCurrentJointValues();
+    std::vector<double> position_goal=position_current;
+    double joint_current_position=position_current[joint_num-1];
     std::string direction=goal_.trajectory.joint_names[joint_num-1];
+    double sign;
     if(joint_num==req.data)
     {
-        position_tmp[joint_num-1]=group_->getRobotModel()->getURDF()->getJoint(goal_.trajectory.joint_names[joint_num-1])->limits->upper;
+        position_goal[joint_num-1]=group_->getRobotModel()->getURDF()->getJoint(goal_.trajectory.joint_names[joint_num-1])->limits->upper;
         direction.append("+");
+        sign=1;
     }
     else
     {
-        position_tmp[joint_num-1]=group_->getRobotModel()->getURDF()->getJoint(goal_.trajectory.joint_names[joint_num-1])->limits->lower;
+        position_goal[joint_num-1]=group_->getRobotModel()->getURDF()->getJoint(goal_.trajectory.joint_names[joint_num-1])->limits->lower;
         direction.append("-");
+        sign=-1;
     }
 
-    point_tmp.positions=position_tmp;
-    double duration_from_speed=fabs(position_tmp[joint_num-1]-joint_current_position)/joint_speed_;
-    if(duration_from_speed<0.1)
+    double duration_from_speed=fabs(position_goal[joint_num-1]-joint_current_position)/joint_speed_;
+    if(duration_from_speed<=0.1)
     {
         resp.success=false;
         std::string result="robot can't move in ";
@@ -130,9 +132,58 @@ bool ElfinTeleopAPI::jointTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, el
         resp.message=result;
         return true;
     }
-    ros::Duration dur(duration_from_speed);
-    point_tmp.time_from_start=dur;
-    goal_.trajectory.points.push_back(point_tmp);
+
+    trajectory_msgs::JointTrajectoryPoint point_tmp;
+
+    robot_state::RobotStatePtr kinematic_state_ptr=group_->getCurrentState();
+    robot_state::RobotState kinematic_state=*kinematic_state_ptr;
+    const robot_state::JointModelGroup* joint_model_group = kinematic_state.getJointModelGroup(group_->getName());
+
+    planning_scene_monitor_->updateFrameTransforms();
+    planning_scene::PlanningSceneConstPtr plan_scene=planning_scene_monitor_->getPlanningScene();
+
+    std::vector<double> position_tmp=position_current;
+    bool collision_flag=false;
+
+    int loop_num=1;
+    while(fabs(position_goal[joint_num-1]-position_tmp[joint_num-1])/joint_speed_>0.1)
+    {
+        position_tmp[joint_num-1]+=joint_speed_*0.1*sign;
+
+        kinematic_state.setJointGroupPositions(joint_model_group, position_tmp);
+        if(plan_scene->isStateColliding(kinematic_state, group_->getName()))
+        {
+            if(loop_num==1)
+            {
+                resp.success=false;
+                std::string result="robot can't move in ";
+                result.append(direction);
+                result.append(" direction any more");
+                resp.message=result;
+                return true;
+            }
+            collision_flag=true;
+            break;
+        }
+
+        point_tmp.time_from_start=ros::Duration(0.1*loop_num);
+        point_tmp.positions=position_tmp;
+        goal_.trajectory.points.push_back(point_tmp);
+        loop_num++;
+    }
+
+    if(!collision_flag)
+    {
+        kinematic_state.setJointGroupPositions(joint_model_group, position_goal);
+        if(!plan_scene->isStateColliding(kinematic_state, group_->getName()))
+        {
+            point_tmp.positions=position_goal;
+            ros::Duration dur(duration_from_speed);
+            point_tmp.time_from_start=dur;
+            goal_.trajectory.points.push_back(point_tmp);
+        }
+    }
+
     action_client_.sendGoal(goal_);
     goal_.trajectory.points.clear();
 
@@ -171,6 +222,9 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
     robot_state::RobotStatePtr kinematic_state_ptr=group_->getCurrentState();
     robot_state::RobotState kinematic_state=*kinematic_state_ptr;
     const robot_state::JointModelGroup* joint_model_group = kinematic_state.getJointModelGroup(group_->getName());
+
+    planning_scene_monitor_->updateFrameTransforms();
+    planning_scene::PlanningSceneConstPtr plan_scene=planning_scene_monitor_->getPlanningScene();
 
     trajectory_msgs::JointTrajectoryPoint point_tmp;
 
@@ -247,7 +301,7 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
                         biggest_shift=shift_tmp;
                 }
             }
-            if(biggest_shift>cart_duration_*joint_speed_limit_)
+            if(biggest_shift>cart_duration_*joint_speed_limit_ || plan_scene->isStateColliding(kinematic_state, group_->getName()))
                 break;
             ros::Duration dur((i+1)*cart_duration_);
             point_tmp.time_from_start=dur;
@@ -281,32 +335,105 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
 
 bool ElfinTeleopAPI::homeTeleop_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
 {
-    trajectory_msgs::JointTrajectoryPoint point_tmp;
-    std::vector<double> position_tmp=group_->getCurrentJointValues();
+    std::vector<double> position_current=group_->getCurrentJointValues();
     std::vector<double> position_goal;
     double biggest_shift=0;
+    int biggest_shift_num;
+    std::vector<double> joint_ratios;
+    joint_ratios.resize(position_current.size());
 
-    if(position_tmp.size()!=goal_.trajectory.joint_names.size())
+    if(position_current.size()!=goal_.trajectory.joint_names.size())
     {
         resp.success=false;
         resp.message="the joints number is wrong";
         return true;
     }
 
-    for(int i=0; i<position_tmp.size(); i++)
+    for(int i=0; i<position_current.size(); i++)
     {
-        if(fabs(position_tmp[i])>biggest_shift)
+        if(fabs(position_current[i])>biggest_shift)
         {
-            biggest_shift=fabs(position_tmp[i]);
+            biggest_shift=fabs(position_current[i]);
+            biggest_shift_num=i;
         }
         position_goal.push_back(0);
     }
 
+    if(biggest_shift<0.001)
+    {
+        resp.success=false;
+        std::string result="Elfin is already in home position";
+        resp.message=result;
+        return true;
+    }
+
+    for(int i=0; i<joint_ratios.size(); i++)
+    {
+        joint_ratios[i]=position_current[i]/position_current[biggest_shift_num];
+    }
+
+    trajectory_msgs::JointTrajectoryPoint point_tmp;
+
+    robot_state::RobotStatePtr kinematic_state_ptr=group_->getCurrentState();
+    robot_state::RobotState kinematic_state=*kinematic_state_ptr;
+    const robot_state::JointModelGroup* joint_model_group = kinematic_state.getJointModelGroup(group_->getName());
+
+    planning_scene_monitor_->updateFrameTransforms();
+    planning_scene::PlanningSceneConstPtr plan_scene=planning_scene_monitor_->getPlanningScene();
+
+    std::vector<double> position_tmp=position_current;
+    bool collision_flag=false;
+
+    int loop_num=1;
+    double sign=biggest_shift/position_tmp[biggest_shift_num];
     double duration_from_speed=biggest_shift/joint_speed_;
-    ros::Duration dur(duration_from_speed);
-    point_tmp.time_from_start=dur;
-    point_tmp.positions=position_goal;
-    goal_.trajectory.points.push_back(point_tmp);
+
+    while(fabs(position_goal[biggest_shift_num]-position_tmp[biggest_shift_num])/joint_speed_>0.1)
+    {
+        for(int i=0; i<position_tmp.size(); i++)
+        {
+            position_tmp[i]-=joint_speed_*0.1*sign*joint_ratios[i];
+        }
+
+        kinematic_state.setJointGroupPositions(joint_model_group, position_tmp);
+        if(plan_scene->isStateColliding(kinematic_state, group_->getName()))
+        {
+            if(loop_num==1)
+            {
+                resp.success=false;
+                std::string result="Stop going to home position";
+                resp.message=result;
+                return true;
+            }
+            collision_flag=true;
+            break;
+        }
+
+        point_tmp.time_from_start=ros::Duration(0.1*loop_num);
+        point_tmp.positions=position_tmp;
+        goal_.trajectory.points.push_back(point_tmp);
+        loop_num++;
+    }
+
+    if(!collision_flag)
+    {
+        kinematic_state.setJointGroupPositions(joint_model_group, position_goal);
+        if(!plan_scene->isStateColliding(kinematic_state, group_->getName()))
+        {
+            point_tmp.positions=position_goal;
+            ros::Duration dur(duration_from_speed);
+            point_tmp.time_from_start=dur;
+            goal_.trajectory.points.push_back(point_tmp);
+        }
+        else if(loop_num==1)
+        {
+            resp.success=false;
+            std::string result="Stop going to home position";
+            resp.message=result;
+            return true;
+        }
+    }
+
     action_client_.sendGoal(goal_);
     goal_.trajectory.points.clear();
 

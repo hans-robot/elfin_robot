@@ -41,9 +41,15 @@ Created on Mon Nov 27 14:22:43 2017
 
 namespace elfin_basic_api {
 
-ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name):
-    group_(group), action_client_(action_name, true), motion_nh_("~")
+ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor):
+    group_(group), action_client_(action_name, true), planning_scene_monitor_(planning_scene_monitor), motion_nh_("~")
 {
+    geometry_msgs::Vector3 gravity_v3;
+    gravity_v3.x=0;
+    gravity_v3.y=0;
+    gravity_v3.z=-9.81;
+    dynamics_solver_.reset(new dynamics_solver::DynamicsSolver(group->getRobotModel(), group->getName(), gravity_v3));
+
     goal_.trajectory.joint_names=group_->getJointNames();
     goal_.trajectory.header.stamp.sec=0;
     goal_.trajectory.header.stamp.nsec=0;
@@ -54,6 +60,15 @@ ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *g
 
     get_reference_link_server_=motion_nh_.advertiseService("get_reference_link", &ElfinMotionAPI::getRefLink_cb, this);
     get_end_link_server_=motion_nh_.advertiseService("get_end_link", &ElfinMotionAPI::getEndLink_cb, this);
+
+    bool torques_publisher_flag=motion_nh_.param<bool>("torques_publish", false);
+    double torques_publisher_period=motion_nh_.param<double>("torques_publish_period", 0.02);
+
+    if(torques_publisher_flag)
+    {
+        torques_publisher_=motion_nh_.advertise<std_msgs::Float64MultiArray>("desired_torques", 1);
+        torques_publisher_timer_=motion_nh_.createTimer(ros::Duration(torques_publisher_period), &ElfinMotionAPI::torquesPubTimer_cb, this);
+    }
 
     motion_link_=group_->getEndEffectorLink();
 }
@@ -125,6 +140,30 @@ bool ElfinMotionAPI::getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::Se
     resp.success=true;
     resp.message=group_->getEndEffectorLink();
     return true;
+}
+
+void ElfinMotionAPI::torquesPubTimer_cb(const ros::TimerEvent& evt)
+{
+    std::vector<double> v_p;
+    std::vector<double> v_v;
+    std::vector<double> v_a;
+    std::vector<geometry_msgs::Wrench> v_w(7);
+    std::vector<double> v_t(6);
+    for(int i=0;i<6; i++)
+    {
+        v_v.push_back(0);
+        v_a.push_back(0);
+    }
+
+    robot_state::RobotStatePtr current_state=group_->getCurrentState();
+    const robot_state::JointModelGroup* jmp=current_state->getJointModelGroup(group_->getName());
+    current_state->copyJointGroupPositions(jmp, v_p);
+
+    dynamics_solver_->getTorques(v_p, v_v, v_a, v_w, v_t);
+
+    torques_msg_.data=v_t;
+
+    torques_publisher_.publish(torques_msg_);
 }
 
 }

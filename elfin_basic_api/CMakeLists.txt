@@ -15,8 +15,10 @@ find_package(catkin REQUIRED COMPONENTS
   control_msgs
   elfin_robot_msgs
   std_srvs
+  std_msgs
   roscpp
   rospy
+  tf
   genmsg
   dynamic_reconfigure
 )
@@ -112,7 +114,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES elfin_basic_api
-  CATKIN_DEPENDS moveit_core moveit_ros_planning moveit_ros_planning_interface roscpp rospy
+  CATKIN_DEPENDS moveit_core moveit_ros_planning moveit_ros_planning_interface roscpp rospy tf
   DEPENDS system_lib
 )
 

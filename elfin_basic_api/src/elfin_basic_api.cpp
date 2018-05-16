@@ -41,11 +41,11 @@ Created on Mon Dec 15 10:58:42 2017
 
 namespace elfin_basic_api {
 
-ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name):
-    group_(group), action_client_(action_name, true), local_nh_("~")
+ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor):
+    group_(group), action_client_(action_name, true), planning_scene_monitor_(planning_scene_monitor), local_nh_("~")
 {
-    teleop_api_=new ElfinTeleopAPI(group, action_name);
-    motion_api_=new ElfinMotionAPI(group, action_name);
+    teleop_api_=new ElfinTeleopAPI(group, action_name, planning_scene_monitor);
+    motion_api_=new ElfinMotionAPI(group, action_name, planning_scene_monitor);
 
     dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinBasicAPI::dynamicReconfigureCallback, this, _1, _2));
 }
