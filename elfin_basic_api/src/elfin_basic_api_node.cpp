@@ -42,8 +42,27 @@ Created on Thurs Nov 16 09:36:10 2017
 int main(int argc, char** argv)
 {
     ros::init(argc,argv,"elfin_basic_api", ros::init_options::AnonymousName);
-    moveit::planning_interface::MoveGroup move_group("elfin_arm");
+
+    ros::CallbackQueue move_group_cb_queue;
+
+    std::string move_group_name="elfin_arm";
+    std::string move_group_desc="robot_description";
+    ros::NodeHandle move_group_nh;
+    move_group_nh.setCallbackQueue(&move_group_cb_queue);
+
+    moveit::planning_interface::MoveGroupInterface::Options move_group_options(move_group_name, move_group_desc, move_group_nh);
+
+    moveit::planning_interface::MoveGroupInterface move_group(move_group_options);
+
+    ros::AsyncSpinner move_group_spinner(1, &move_group_cb_queue);
+    move_group_spinner.start();
+
+    move_group.startStateMonitor();
+
     move_group.getCurrentJointValues();
+
+    ros::AsyncSpinner common_spinner(1);
+    common_spinner.start();
 
     boost::shared_ptr<tf::Transformer> tf_ptr(new tf::Transformer());
     planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor(new planning_scene_monitor::PlanningSceneMonitor("robot_description", tf_ptr));
@@ -53,6 +72,9 @@ int main(int argc, char** argv)
     planning_scene_monitor->startWorldGeometryMonitor();
 
     elfin_basic_api::ElfinBasicAPI basic_api(&move_group, "elfin_arm_controller/follow_joint_trajectory", planning_scene_monitor);
-    ros::spin();
+
+    ros::waitForShutdown();
+
+    return 0;
 }
 

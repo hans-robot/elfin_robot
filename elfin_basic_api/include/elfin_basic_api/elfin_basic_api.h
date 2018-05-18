@@ -44,6 +44,7 @@ Created on Mon Dec 15 10:38:07 2017
 #include <elfin_basic_api/elfin_motion_api.h>
 #include <elfin_basic_api/ElfinBasicAPIDynamicReconfigureConfig.h>
 #include <dynamic_reconfigure/server.h>
+#include <elfin_robot_msgs/SetString.h>
 
 namespace elfin_basic_api {
 
@@ -60,6 +61,9 @@ public:
     bool setVelocityScaling_cb(elfin_robot_msgs::SetFloat64::Request &req, elfin_robot_msgs::SetFloat64::Response &resp);
     bool updateVelocityScaling_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 
+    bool setRefLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp);
+    bool setEndLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp);
+
 private:
     moveit::planning_interface::MoveGroup *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
@@ -75,6 +79,11 @@ private:
     dynamic_reconfigure::Server<ElfinBasicAPIDynamicReconfigureConfig> dynamic_reconfigure_server_;
 
     double velocity_scaling_;
+
+    ros::ServiceServer set_ref_link_server_;
+    ros::ServiceServer set_end_link_server_;
+
+    tf::TransformListener tf_listener_;
 };
 
 }

@@ -70,7 +70,11 @@ ElfinMotionAPI::ElfinMotionAPI(moveit::planning_interface::MoveGroup *group, std
         torques_publisher_timer_=motion_nh_.createTimer(ros::Duration(torques_publisher_period), &ElfinMotionAPI::torquesPubTimer_cb, this);
     }
 
-    motion_link_=group_->getEndEffectorLink();
+    end_link_=group_->getEndEffectorLink();
+    reference_link_=group_->getPlanningFrame();
+
+    default_tip_link_=group_->getEndEffectorLink();
+    root_link_=group->getPlanningFrame();
 }
 
 void ElfinMotionAPI::jointGoalCB(const sensor_msgs::JointStateConstPtr &msg)
@@ -87,7 +91,29 @@ void ElfinMotionAPI::jointGoalCB(const sensor_msgs::JointStateConstPtr &msg)
 
 void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
 {
-    if(group_->setPoseTarget(*msg, motion_link_))
+    std::string reference_link=reference_link_;
+    if(!msg->header.frame_id.empty())
+    {
+        reference_link=msg->header.frame_id;
+    }
+
+    updateTransforms(reference_link);
+
+    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
+    affine_refToRoot=affine_rootToRef.inverse();
+
+    Eigen::Affine3d affine_tipToEnd;
+    tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
+
+    tf::Pose tf_pose_tmp;
+    Eigen::Affine3d affine_pose_tmp;
+    tf::poseMsgToTF(msg->pose, tf_pose_tmp);
+    tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
+
+    Eigen::Affine3d affine_pose_goal=affine_refToRoot * affine_pose_tmp * affine_tipToEnd;
+
+    if(group_->setPoseTarget(affine_pose_goal))
     {
         group_->asyncMove();
     }
@@ -102,13 +128,39 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
     moveit_msgs::RobotTrajectory cart_path;
     moveit::planning_interface::MoveGroup::Plan cart_plan;
 
-    if(!msg->header.frame_id.empty())
-        group_->setPoseReferenceFrame(msg->header.frame_id);
+    std::vector<geometry_msgs::Pose> pose_goal=msg->poses;
 
-    double fraction=group_->computeCartesianPath(msg->poses, 0.01, 1.5, cart_path);
-
+    std::string reference_link=reference_link_;
     if(!msg->header.frame_id.empty())
-        group_->setPoseReferenceFrame(group_->getPlanningFrame());
+    {
+        reference_link=msg->header.frame_id;
+    }
+
+    updateTransforms(reference_link);
+
+    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
+    affine_refToRoot=affine_rootToRef.inverse();
+
+    Eigen::Affine3d affine_tipToEnd;
+    tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
+
+    tf::Pose tf_pose_tmp;
+    Eigen::Affine3d affine_pose_tmp;
+    Eigen::Affine3d affine_goal_tmp;
+
+    for(int i=0; i<pose_goal.size(); i++)
+    {
+        tf::poseMsgToTF(pose_goal[i], tf_pose_tmp);
+        tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
+
+        affine_goal_tmp=affine_refToRoot * affine_pose_tmp * affine_tipToEnd;
+
+        tf::poseEigenToTF(affine_goal_tmp, tf_pose_tmp);
+        tf::poseTFToMsg(tf_pose_tmp, pose_goal[i]);
+    }
+
+    double fraction=group_->computeCartesianPath(pose_goal, 0.01, 1.5, cart_path);
 
     if(fraction==-1)
     {
@@ -164,6 +216,61 @@ void ElfinMotionAPI::torquesPubTimer_cb(const ros::TimerEvent& evt)
     torques_msg_.data=v_t;
 
     torques_publisher_.publish(torques_msg_);
+}
+
+void ElfinMotionAPI::setRefFrames(std::string ref_link)
+{
+    reference_link_=ref_link;
+}
+
+void ElfinMotionAPI::setEndFrames(std::string end_link)
+{
+    end_link_=end_link;
+}
+void ElfinMotionAPI::updateTransforms(std::string ref_link)
+{
+  ros::Rate r(100);
+  int counter=0;
+  while(ros::ok())
+  {
+      try{
+        tf_listener_.waitForTransform(ref_link, root_link_, ros::Time(0), ros::Duration(10.0) );
+        tf_listener_.lookupTransform(ref_link, root_link_, ros::Time(0), transform_rootToRef_);
+        break;
+      }
+      catch (tf::TransformException &ex) {
+        r.sleep();
+        counter++;
+        if(counter>200)
+        {
+          ROS_ERROR("%s",ex.what());
+          ROS_ERROR("Motion planning failed");
+          return;
+        }
+        continue;
+      }
+  }
+
+  counter=0;
+  while(ros::ok())
+  {
+      try{
+        tf_listener_.waitForTransform(end_link_, default_tip_link_, ros::Time(0), ros::Duration(10.0) );
+        tf_listener_.lookupTransform(end_link_, default_tip_link_, ros::Time(0), transform_tipToEnd_);
+        break;
+      }
+      catch (tf::TransformException &ex) {
+        r.sleep();
+        counter++;
+        if(counter>200)
+        {
+          ROS_ERROR("%s",ex.what());
+          ROS_ERROR("Motion planning failed");
+          return;
+        }
+        continue;
+      }
+  }
 }
 
 }
