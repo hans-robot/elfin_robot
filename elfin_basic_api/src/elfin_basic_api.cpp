@@ -48,6 +48,9 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *gro
     motion_api_=new ElfinMotionAPI(group, action_name, planning_scene_monitor);
 
     dynamic_reconfigure_server_.setCallback(boost::bind(&ElfinBasicAPI::dynamicReconfigureCallback, this, _1, _2));
+
+    set_ref_link_server_=local_nh_.advertiseService("set_reference_link", &ElfinBasicAPI::setRefLink_cb, this);
+    set_end_link_server_=local_nh_.advertiseService("set_end_link", &ElfinBasicAPI::setEndLink_cb, this);
 }
 
 ElfinBasicAPI::~ElfinBasicAPI()
@@ -67,6 +70,44 @@ void ElfinBasicAPI::setVelocityScaling(double data)
 {
     velocity_scaling_=data;
     teleop_api_->setVelocityScaling(velocity_scaling_);
+}
+
+bool ElfinBasicAPI::setRefLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp)
+{
+    if(!tf_listener_.frameExists(req.data))
+    {
+        resp.success=false;
+        std::string result="There is no frame named ";
+        result.append(req.data);
+        resp.message=result;
+        return true;
+    }
+
+    teleop_api_->setRefFrames(req.data);
+    motion_api_->setRefFrames(req.data);
+
+    resp.success=true;
+    resp.message="Setting reference link succeed";
+    return true;
+}
+
+bool ElfinBasicAPI::setEndLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp)
+{
+    if(!tf_listener_.frameExists(req.data))
+    {
+        resp.success=false;
+        std::string result="There is no frame named ";
+        result.append(req.data);
+        resp.message=result;
+        return true;
+    }
+
+    teleop_api_->setEndFrames(req.data);
+    motion_api_->setEndFrames(req.data);
+
+    resp.success=true;
+    resp.message="Setting end link succeed";
+    return true;
 }
 
 }

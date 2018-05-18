@@ -57,6 +57,8 @@ Created on Mon Nov 27 14:24:30 2017
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <elfin_basic_api/elfin_basic_api_const.h>
+#include <tf/transform_listener.h>
+#include <tf_conversions/tf_eigen.h>
 
 namespace elfin_basic_api {
 
@@ -70,6 +72,11 @@ public:
     bool getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     void torquesPubTimer_cb(const ros::TimerEvent& evt);
+
+    void setRefFrames(std::string ref_link);
+    void setEndFrames(std::string end_link);
+
+    void updateTransforms(std::string ref_link);
 
 private:
     moveit::planning_interface::MoveGroupInterface *group_;
@@ -85,7 +92,15 @@ private:
     ros::Subscriber cart_goal_sub_;
     ros::Subscriber cart_path_goal_sub_;
 
-    std::string motion_link_;
+    std::string end_link_;
+    std::string reference_link_;
+    std::string default_tip_link_;
+    std::string root_link_;
+
+    tf::TransformListener tf_listener_;
+
+    tf::StampedTransform transform_rootToRef_;
+    tf::StampedTransform transform_tipToEnd_;
 
     ros::ServiceServer get_reference_link_server_;
     ros::ServiceServer get_end_link_server_;

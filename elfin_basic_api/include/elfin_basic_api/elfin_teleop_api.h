@@ -57,6 +57,8 @@ Created on Mon Nov 13 15:20:10 2017
 #include <std_msgs/Int64.h>
 #include <std_msgs/Empty.h>
 #include <elfin_basic_api/elfin_basic_api_const.h>
+#include <tf/transform_listener.h>
+#include <tf_conversions/tf_eigen.h>
 
 namespace elfin_basic_api {
 
@@ -71,6 +73,8 @@ public:
     void teleopStopCB(const std_msgs::EmptyConstPtr &msg);
 
     void setVelocityScaling(double data);
+    void setRefFrames(std::string ref_link);
+    void setEndFrames(std::string end_link);
 
     bool jointTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
     bool cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elfin_robot_msgs::SetInt16::Response &resp);
@@ -106,7 +110,16 @@ private:
 
     double joint_speed_;
     double cart_duration_; // in second
-    std::string teleop_link_;
+
+    std::string end_link_;
+    std::string reference_link_;
+    std::string default_tip_link_;
+    std::string root_link_;
+
+    tf::TransformListener tf_listener_;
+
+    tf::StampedTransform transform_rootToRef_;
+    tf::StampedTransform transform_tipToEnd_;
 };
 
 }

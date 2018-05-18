@@ -53,6 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 # Generate services in the 'srv' folder
 add_service_files(
   FILES
+  SetString.srv
   SetInt16.srv
   SetFloat64.srv
   ElfinIODRead.srv

@@ -64,7 +64,11 @@ ElfinTeleopAPI::ElfinTeleopAPI(moveit::planning_interface::MoveGroupInterface *g
     resolution_angle_=0.02;
     resolution_linear_=0.005;
 
-    teleop_link_=group_->getEndEffectorLink();
+    end_link_=group_->getEndEffectorLink();
+    reference_link_=group_->getPlanningFrame();
+
+    default_tip_link_=group_->getEndEffectorLink();
+    root_link_=group_->getPlanningFrame();
 }
 
 void ElfinTeleopAPI::setVelocityScaling(double data)
@@ -73,6 +77,16 @@ void ElfinTeleopAPI::setVelocityScaling(double data)
     joint_speed_=joint_speed_default_*velocity_scaling_;
     cart_duration_=cart_duration_default_/velocity_scaling_;
     group_->setMaxVelocityScalingFactor(velocity_scaling_);
+}
+
+void ElfinTeleopAPI::setRefFrames(std::string ref_link)
+{
+    reference_link_=ref_link;
+}
+
+void ElfinTeleopAPI::setEndFrames(std::string end_link)
+{
+    end_link_=end_link;
 }
 
 void ElfinTeleopAPI::teleopJointCmdNoLimitCB(const std_msgs::Int64ConstPtr &msg)
@@ -210,7 +224,70 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
     else
         symbol=-1;
 
-    geometry_msgs::PoseStamped current_pose=group_->getCurrentPose(teleop_link_);
+    geometry_msgs::PoseStamped current_pose=group_->getCurrentPose(end_link_);
+
+    ros::Rate r(100);
+    int counter=0;
+    while(ros::ok())
+    {
+        try{
+          tf_listener_.waitForTransform(reference_link_, root_link_, ros::Time(0), ros::Duration(10.0) );
+          tf_listener_.lookupTransform(reference_link_, root_link_, ros::Time(0), transform_rootToRef_);
+          break;
+        }
+        catch (tf::TransformException &ex) {
+          r.sleep();
+          counter++;
+          if(counter>200)
+          {
+            ROS_ERROR("%s",ex.what());
+            resp.success=false;
+            resp.message="can't get pose of reference frame";
+            return true;
+          }
+          continue;
+        }
+    }
+
+    counter=0;
+    while(ros::ok())
+    {
+        try{
+          tf_listener_.waitForTransform(end_link_, default_tip_link_, ros::Time(0), ros::Duration(10.0) );
+          tf_listener_.lookupTransform(end_link_, default_tip_link_, ros::Time(0), transform_tipToEnd_);
+          break;
+        }
+        catch (tf::TransformException &ex) {
+          r.sleep();
+          counter++;
+          if(counter>200)
+          {
+            ROS_ERROR("%s",ex.what());
+            resp.success=false;
+            resp.message="can't get pose of teleop frame";
+            return true;
+          }
+          continue;
+        }
+    }
+
+    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
+    affine_refToRoot=affine_rootToRef.inverse();
+
+    Eigen::Affine3d affine_tipToEnd;
+    tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
+
+    tf::Pose tf_pose_tmp;
+    Eigen::Affine3d affine_pose_tmp;
+    tf::poseMsgToTF(current_pose.pose, tf_pose_tmp);
+    tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
+
+    Eigen::Affine3d affine_current_pose=affine_rootToRef * affine_pose_tmp;
+
+    tf::poseEigenToTF(affine_current_pose, tf_pose_tmp);
+    tf::poseTFToMsg(tf_pose_tmp, current_pose.pose);
+
     std::vector<double> current_joint_states=group_->getCurrentJointValues();
 
     tf::Vector3 x_axis(1, 0, 0);
@@ -279,7 +356,13 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
         default:
             break;
         }
-        ik_have_result=kinematic_state.setFromIK(joint_model_group, current_pose.pose, teleop_link_);
+
+        tf::poseMsgToTF(current_pose.pose, tf_pose_tmp);
+        tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
+
+        affine_current_pose=affine_refToRoot * affine_pose_tmp * affine_tipToEnd;
+
+        ik_have_result=kinematic_state.setFromIK(joint_model_group, affine_current_pose, default_tip_link_);
         if(ik_have_result)
         {
             if(goal_.trajectory.points.size()!=i)

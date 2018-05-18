@@ -57,7 +57,6 @@ int main(int argc, char** argv)
     ros::AsyncSpinner move_group_spinner(1, &move_group_cb_queue);
     move_group_spinner.start();
 
-    move_group.setPlannerId("ElfinBasicAPI");
     move_group.startStateMonitor();
 
     move_group.getCurrentJointValues();

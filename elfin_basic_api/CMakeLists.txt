@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   tf
+  tf_conversions
   genmsg
   dynamic_reconfigure
 )
@@ -114,7 +115,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES elfin_basic_api
-  CATKIN_DEPENDS moveit_core moveit_ros_planning moveit_ros_planning_interface roscpp rospy tf
+  CATKIN_DEPENDS moveit_core moveit_ros_planning moveit_ros_planning_interface roscpp rospy tf tf_conversions
   DEPENDS system_lib
 )
 
