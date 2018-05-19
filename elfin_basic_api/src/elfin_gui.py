@@ -45,7 +45,7 @@ import rospy
 import math
 import tf
 import moveit_commander
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
 import wx
@@ -58,7 +58,7 @@ import dynamic_reconfigure.client
 class MyFrame(wx.Frame):  
   
     def __init__(self,parent,id):  
-        the_size=(700, 520)
+        the_size=(700, 570)
         wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100)) 
         self.panel=wx.Panel(self)
         font=self.panel.GetFont()
@@ -77,6 +77,12 @@ class MyFrame(wx.Frame):
         self.elfin_basic_api_ns='elfin_basic_api/'
         
         self.joint_names=rospy.get_param(self.controller_ns+'joints', [])
+        
+        self.ref_link_name=self.group.get_planning_frame()
+        self.end_link_name=self.group.get_end_effector_link()
+        
+        self.ref_link_lock=threading.Lock()
+        self.end_link_lock=threading.Lock()
                 
         self.js_display=[0]*6 # joint_states
         self.jm_button=[0]*6 # joints_minus
@@ -141,9 +147,28 @@ class MyFrame(wx.Frame):
         self.fault_state=bool()
         
         self.reply_show_label=wx.StaticText(self.panel, label='Result:',
-                                           pos=(20, btn_height+60))
+                                           pos=(20, btn_height+120))
         self.reply_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
-                                    value='', size=(550, 30), pos=(20, btn_height+80))
+                                    value='', size=(670, 30), pos=(20, btn_height+140))
+        
+        link_textctrl_length=(btn_pos_tmp-40)/2
+        
+        self.ref_links_show_label=wx.StaticText(self.panel, label='Ref. link:',
+                                                    pos=(20, btn_height+60))
+        
+        self.ref_link_show=wx.TextCtrl(self.panel, style=(wx.TE_READONLY),
+                                           value=self.ref_link_name, size=(link_textctrl_length, 30),
+                                           pos=(20, btn_height+80))
+        
+        self.end_link_show_label=wx.StaticText(self.panel, label='End link:',
+                                               pos=(link_textctrl_length+30, btn_height+60))
+        
+        self.end_link_show=wx.TextCtrl(self.panel, style=(wx.TE_READONLY),
+                                       value=self.end_link_name, size=(link_textctrl_length, 30),
+                                       pos=(link_textctrl_length+30, btn_height+80))
+        
+        self.set_links_btn=wx.Button(self.panel, label='Set links', name='Set links')
+        self.set_links_btn.SetPosition((btn_pos_tmp, btn_height+77))
         
         # the variables about velocity scaling
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
@@ -419,6 +444,17 @@ class MyFrame(wx.Frame):
         
         for i in xrange(len(self.ps_display)):
             self.ps_display[i].SetValue(msg[i+6])
+            
+        if self.ref_link_lock.acquire():
+            ref_link=self.ref_link_name
+            self.ref_link_lock.release()
+        
+        if self.end_link_lock.acquire():
+            end_link=self.end_link_name
+            self.end_link_lock.release()
+        
+        self.ref_link_show.SetValue(ref_link)
+        self.end_link_show.SetValue(end_link)
     
     def update_reply_show(self,msg):
         if msg.success:
@@ -481,28 +517,34 @@ class MyFrame(wx.Frame):
         current_joint_values=self.group.get_current_joint_values()
         for i in xrange(len(current_joint_values)):
             self.key.append(str(round(current_joint_values[i]*180/math.pi, 2)))
-
-        current_pose=self.group.get_current_pose()
         
-        self.key.append(str(round(current_pose.pose.position.x*1000, 2)))
-        self.key.append(str(round(current_pose.pose.position.y*1000, 2)))
-        self.key.append(str(round(current_pose.pose.position.z*1000, 2)))
+        if self.ref_link_lock.acquire():
+            ref_link=self.ref_link_name
+            self.ref_link_lock.release()
         
-        qua=[]
+        if self.end_link_lock.acquire():
+            end_link=self.end_link_name
+            self.end_link_lock.release()
         
-        qua.append(current_pose.pose.orientation.x)
-        qua.append(current_pose.pose.orientation.y)
-        qua.append(current_pose.pose.orientation.z)
-        qua.append(current_pose.pose.orientation.w)
-        
+        while not rospy.is_shutdown():
+            try:
+                self.listener.waitForTransform(ref_link, end_link, rospy.Time(0), rospy.Duration(100))
+                (xyz,qua) = self.listener.lookupTransform(ref_link, end_link, rospy.Time(0))
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                continue
+            
         rpy=tf.transformations.euler_from_quaternion(qua)
+            
+        self.key.append(str(round(xyz[0]*1000, 2)))
+        self.key.append(str(round(xyz[1]*1000, 2)))
+        self.key.append(str(round(xyz[2]*1000, 2)))
         
         self.key.append(str(round(rpy[0]*180/math.pi, 2)))
         self.key.append(str(round(rpy[1]*180/math.pi, 2)))
         self.key.append(str(round(rpy[2]*180/math.pi, 2)))
         
         wx.CallAfter(self.updateDisplay, self.key)
-        self.key=[]
             
     def servo_state_cb(self, data):
         self.servo_state=data.data
@@ -511,10 +553,22 @@ class MyFrame(wx.Frame):
     def fault_state_cb(self, data):
         self.fault_state=data.data
         wx.CallAfter(self.update_fault_state, data)
+    
+    def ref_link_name_cb(self, data):
+        if self.ref_link_lock.acquire():
+            self.ref_link_name=data.data
+            self.ref_link_lock.release()
+    
+    def end_link_name_cb(self, data):
+        if self.end_link_lock.acquire():
+            self.end_link_name=data.data
+            self.end_link_lock.release()
         
     def listen(self):
         rospy.Subscriber(self.elfin_driver_ns+'enable_state', Bool, self.servo_state_cb)
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
+        rospy.Subscriber(self.elfin_basic_api_ns+'ref_link_name', String, self.ref_link_name_cb)
+        rospy.Subscriber(self.elfin_basic_api_ns+'end_link_name', String, self.end_link_name_cb)
         
         rospy.Timer(rospy.Duration(nsecs=50000000), self.monitor_status)
   
