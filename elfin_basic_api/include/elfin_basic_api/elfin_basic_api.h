@@ -45,6 +45,7 @@ Created on Mon Dec 15 10:38:07 2017
 #include <elfin_basic_api/ElfinBasicAPIDynamicReconfigureConfig.h>
 #include <dynamic_reconfigure/server.h>
 #include <elfin_robot_msgs/SetString.h>
+#include <std_msgs/String.h>
 
 namespace elfin_basic_api {
 
@@ -82,6 +83,12 @@ private:
 
     ros::ServiceServer set_ref_link_server_;
     ros::ServiceServer set_end_link_server_;
+
+    std_msgs::String ref_link_name_msg_;
+    std_msgs::String end_link_name_msg_;
+
+    ros::Publisher ref_link_name_publisher_;
+    ros::Publisher end_link_name_publisher_;
 
     tf::TransformListener tf_listener_;
 };

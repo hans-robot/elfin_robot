@@ -97,7 +97,8 @@ void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
         reference_link=msg->header.frame_id;
     }
 
-    updateTransforms(reference_link);
+    if(!updateTransforms(reference_link))
+        return;
 
     Eigen::Affine3d affine_rootToRef, affine_refToRoot;
     tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
@@ -136,7 +137,8 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
         reference_link=msg->header.frame_id;
     }
 
-    updateTransforms(reference_link);
+    if(!updateTransforms(reference_link))
+        return;
 
     Eigen::Affine3d affine_rootToRef, affine_refToRoot;
     tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
@@ -183,14 +185,14 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
 bool ElfinMotionAPI::getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
 {
     resp.success=true;
-    resp.message=group_->getPlanningFrame();
+    resp.message=reference_link_;
     return true;
 }
 
 bool ElfinMotionAPI::getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
 {
     resp.success=true;
-    resp.message=group_->getEndEffectorLink();
+    resp.message=end_link_;
     return true;
 }
 
@@ -227,7 +229,8 @@ void ElfinMotionAPI::setEndFrames(std::string end_link)
 {
     end_link_=end_link;
 }
-void ElfinMotionAPI::updateTransforms(std::string ref_link)
+
+bool ElfinMotionAPI::updateTransforms(std::string ref_link)
 {
   ros::Rate r(100);
   int counter=0;
@@ -245,7 +248,7 @@ void ElfinMotionAPI::updateTransforms(std::string ref_link)
         {
           ROS_ERROR("%s",ex.what());
           ROS_ERROR("Motion planning failed");
-          return;
+          return false;
         }
         continue;
       }
@@ -266,11 +269,13 @@ void ElfinMotionAPI::updateTransforms(std::string ref_link)
         {
           ROS_ERROR("%s",ex.what());
           ROS_ERROR("Motion planning failed");
-          return;
+          return false;
         }
         continue;
       }
   }
+
+  return true;
 }
 
 }

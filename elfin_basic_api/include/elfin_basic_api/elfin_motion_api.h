@@ -76,7 +76,7 @@ public:
     void setRefFrames(std::string ref_link);
     void setEndFrames(std::string end_link);
 
-    void updateTransforms(std::string ref_link);
+    bool updateTransforms(std::string ref_link);
 
 private:
     moveit::planning_interface::MoveGroup *group_;

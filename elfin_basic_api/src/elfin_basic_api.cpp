@@ -51,6 +51,15 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::
 
     set_ref_link_server_=local_nh_.advertiseService("set_reference_link", &ElfinBasicAPI::setRefLink_cb, this);
     set_end_link_server_=local_nh_.advertiseService("set_end_link", &ElfinBasicAPI::setEndLink_cb, this);
+
+    ref_link_name_publisher_=local_nh_.advertise<std_msgs::String>("ref_link_name", 1, true);
+    end_link_name_publisher_=local_nh_.advertise<std_msgs::String>("end_link_name", 1, true);
+
+    ref_link_name_msg_.data=group_->getPlanningFrame();
+    end_link_name_msg_.data=group_->getEndEffectorLink();
+
+    ref_link_name_publisher_.publish(ref_link_name_msg_);
+    end_link_name_publisher_.publish(end_link_name_msg_);
 }
 
 ElfinBasicAPI::~ElfinBasicAPI()
@@ -86,6 +95,9 @@ bool ElfinBasicAPI::setRefLink_cb(elfin_robot_msgs::SetString::Request &req, elf
     teleop_api_->setRefFrames(req.data);
     motion_api_->setRefFrames(req.data);
 
+    ref_link_name_msg_.data=req.data;
+    ref_link_name_publisher_.publish(ref_link_name_msg_);
+
     resp.success=true;
     resp.message="Setting reference link succeed";
     return true;
@@ -104,6 +116,9 @@ bool ElfinBasicAPI::setEndLink_cb(elfin_robot_msgs::SetString::Request &req, elf
 
     teleop_api_->setEndFrames(req.data);
     motion_api_->setEndFrames(req.data);
+
+    end_link_name_msg_.data=req.data;
+    end_link_name_publisher_.publish(end_link_name_msg_);
 
     resp.success=true;
     resp.message="Setting end link succeed";
