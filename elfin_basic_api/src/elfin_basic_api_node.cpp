@@ -50,9 +50,9 @@ int main(int argc, char** argv)
     ros::NodeHandle move_group_nh;
     move_group_nh.setCallbackQueue(&move_group_cb_queue);
 
-    moveit::planning_interface::MoveGroupInterface::Options move_group_options(move_group_name, move_group_desc, move_group_nh);
+    moveit::planning_interface::MoveGroup::Options move_group_options(move_group_name, move_group_desc, move_group_nh);
 
-    moveit::planning_interface::MoveGroupInterface move_group(move_group_options);
+    moveit::planning_interface::MoveGroup move_group(move_group_options);
 
     ros::AsyncSpinner move_group_spinner(1, &move_group_cb_queue);
     move_group_spinner.start();
