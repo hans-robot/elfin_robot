@@ -47,6 +47,7 @@ import tf
 import moveit_commander
 from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
+from elfin_robot_msgs.srv import SetString, SetStringRequest, SetStringResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
 import wx
 from sensor_msgs.msg import JointState
@@ -109,7 +110,7 @@ class MyFrame(wx.Frame):
         btn_lengths.append(self.power_off_btn.GetSize()[0])
         btn_total_length+=btn_lengths[1]
         
-        self.reset_btn=wx.Button(self.panel, label=' Clear Fault ')
+        self.reset_btn=wx.Button(self.panel, label=' Clear Fault ', name='Clear Fault')
         btn_lengths.append(self.reset_btn.GetSize()[0])
         btn_total_length+=btn_lengths[2]
 
@@ -168,7 +169,7 @@ class MyFrame(wx.Frame):
                                        pos=(link_textctrl_length+30, btn_height+80))
         
         self.set_links_btn=wx.Button(self.panel, label='Set links', name='Set links')
-        self.set_links_btn.SetPosition((btn_pos_tmp, btn_height+77))
+        self.set_links_btn.SetPosition((btn_pos_tmp, btn_height+75))
         
         # the variables about velocity scaling
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
@@ -197,6 +198,24 @@ class MyFrame(wx.Frame):
         self.dlg.Bind(wx.EVT_CLOSE, self.closewindow)
         self.dlg_panel=wx.Panel(self.dlg)
         self.dlg_label=wx.StaticText(self.dlg_panel, label='hello', pos=(15, 15))
+        
+        self.set_links_dlg=wx.Dialog(self.panel, title='Set links', size=(400, 100))
+        self.set_links_dlg_panel=wx.Panel(self.set_links_dlg)
+        
+        self.sld_ref_link_show=wx.TextCtrl(self.set_links_dlg_panel, style=wx.TE_PROCESS_ENTER,
+                                           value='', pos=(20, 20), size=(link_textctrl_length, 30))
+        self.sld_end_link_show=wx.TextCtrl(self.set_links_dlg_panel, style=wx.TE_PROCESS_ENTER,
+                                           value='', pos=(20, 70), size=(link_textctrl_length, 30))
+        
+        self.sld_set_ref_link_btn=wx.Button(self.set_links_dlg_panel, label='Update ref. link',
+                                            name='Update ref. link')
+        self.sld_set_ref_link_btn.SetPosition((link_textctrl_length+30, 15))
+        self.sld_set_end_link_btn=wx.Button(self.set_links_dlg_panel, label='Update end link',
+                                            name='Update end link')
+        self.sld_set_end_link_btn.SetPosition((link_textctrl_length+30, 65))
+        
+        self.set_links_dlg.SetSize((link_textctrl_length+self.sld_set_ref_link_btn.GetSize()[0]+50, 120))
+        
                         
         self.call_teleop_joint=rospy.ServiceProxy(self.elfin_basic_api_ns+'joint_teleop', 
                                                   SetInt16)
@@ -254,6 +273,16 @@ class MyFrame(wx.Frame):
         self.home_btn.Bind(wx.EVT_LEFT_UP,
                            lambda evt, mark=100:
                            self.release_button(evt, mark) )
+            
+        self.call_set_ref_link=rospy.ServiceProxy(self.elfin_basic_api_ns+'set_reference_link', SetString)
+        self.call_set_end_link=rospy.ServiceProxy(self.elfin_basic_api_ns+'set_end_link', SetString)
+        self.set_links_btn.Bind(wx.EVT_BUTTON, self.show_set_links_dialog)
+        
+        self.sld_set_ref_link_btn.Bind(wx.EVT_BUTTON, self.update_ref_link)
+        self.sld_set_end_link_btn.Bind(wx.EVT_BUTTON, self.update_end_link)
+        
+        self.sld_ref_link_show.Bind(wx.EVT_TEXT_ENTER, self.update_ref_link)
+        self.sld_end_link_show.Bind(wx.EVT_TEXT_ENTER, self.update_end_link)
             
         self.action_client=SimpleActionClient(self.controller_ns+'follow_joint_trajectory',
                                               FollowJointTrajectoryAction)
@@ -391,7 +420,7 @@ class MyFrame(wx.Frame):
     
     def call_set_bool_common(self, event, client, request):
         btn=event.GetEventObject()
-        check_list=['Servo On', 'Servo Off']
+        check_list=['Servo On', 'Servo Off', 'Clear Fault']
         if btn.GetName() in check_list:
             self.show_message_dialog(btn.GetName(), client, request)
         else:
@@ -437,6 +466,27 @@ class MyFrame(wx.Frame):
         
     def closewindow(self,event):
         pass
+    
+    def show_set_links_dialog(self, evt):
+        self.sld_ref_link_show.SetValue(self.ref_link_name)
+        self.sld_end_link_show.SetValue(self.end_link_name)
+        self.set_links_dlg.SetPosition((self.GetPosition()[0]+150,
+                                        self.GetPosition()[1]+250))
+        self.set_links_dlg.ShowModal()
+    
+    def update_ref_link(self, evt):
+        request=SetStringRequest()
+        request.data=self.sld_ref_link_show.GetValue()
+        
+        resp=self.call_set_ref_link.call(request)
+        wx.CallAfter(self.update_reply_show, resp)
+    
+    def update_end_link(self, evt):
+        request=SetStringRequest()
+        request.data=self.sld_end_link_show.GetValue()
+        
+        resp=self.call_set_end_link.call(request)
+        wx.CallAfter(self.update_reply_show, resp)
     
     def updateDisplay(self, msg):      
         for i in xrange(len(self.js_display)):
@@ -567,7 +617,7 @@ class MyFrame(wx.Frame):
     def listen(self):
         rospy.Subscriber(self.elfin_driver_ns+'enable_state', Bool, self.servo_state_cb)
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
-        rospy.Subscriber(self.elfin_basic_api_ns+'ref_link_name', String, self.ref_link_name_cb)
+        rospy.Subscriber(self.elfin_basic_api_ns+'reference_link_name', String, self.ref_link_name_cb)
         rospy.Subscriber(self.elfin_basic_api_ns+'end_link_name', String, self.end_link_name_cb)
         
         rospy.Timer(rospy.Duration(nsecs=50000000), self.monitor_status)

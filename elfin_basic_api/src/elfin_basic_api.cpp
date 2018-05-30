@@ -52,7 +52,7 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *gro
     set_ref_link_server_=local_nh_.advertiseService("set_reference_link", &ElfinBasicAPI::setRefLink_cb, this);
     set_end_link_server_=local_nh_.advertiseService("set_end_link", &ElfinBasicAPI::setEndLink_cb, this);
 
-    ref_link_name_publisher_=local_nh_.advertise<std_msgs::String>("ref_link_name", 1, true);
+    ref_link_name_publisher_=local_nh_.advertise<std_msgs::String>("reference_link_name", 1, true);
     end_link_name_publisher_=local_nh_.advertise<std_msgs::String>("end_link_name", 1, true);
 
     ref_link_name_msg_.data=group_->getPlanningFrame();
