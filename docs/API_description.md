@@ -53,14 +53,20 @@ true: 有报错  / false: 无报错
 * **elfin_basic_api/parameter_updates (dynamic_reconfigure/Config)**  
 反映elfin_basic_api相关的动态参数，例如: velocity scaling 。
 
+* **elfin_basic_api/reference_link_name (std_msgs/String)**  
+elfin_basic_api节点计算时所使用的参考基坐标系的名字
+
+* **elfin_basic_api/end_link_name (std_msgs/String)**  
+elfin_basic_api节点计算时所使用的末端坐标系的名字
+
 ------
 ### Services:
 
 * **elfin_basic_api/get_reference_link (std_srvs/SetBool)**  
-呼叫本服务得到的反馈信息中会包含MoveIt!规划时的基坐标系名
+呼叫本服务得到的反馈信息中会包含elfin_basic_api规划时的参考基坐标系名
 
 * **elfin_basic_api/get_end_link (std_srvs/SetBool)**  
-呼叫本服务得到的反馈信息中会包含MoveIt!规划时的末端坐标系名
+呼叫本服务得到的反馈信息中会包含elfin_basic_api规划时的末端坐标系名
 
 * **elfin_basic_api/stop_teleop (std_srvs/SetBool)**  
 呼叫本服务会令机械臂停止运动
@@ -112,6 +118,12 @@ example:
 
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 呼叫本服务可使机械臂清除报错状态。  
+
+* **elfin_basic_api/set_reference_link (elfin_robot_msgs/SetString)**  
+设置elfin_basic_api节点计算时所使用的参考基坐标系  
+
+* **elfin_basic_api/set_end_link (elfin_robot_msgs/SetString)**  
+设置elfin_basic_api节点计算时所使用的末端坐标系  
 
 * **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 呼叫本服务后，机械臂的特定关节会向一个方向一直移动，直到运动到极限位置或用户调用elfin_basic_api/stop_teleop，请慎用。
