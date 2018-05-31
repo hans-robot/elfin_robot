@@ -54,14 +54,20 @@ true: warning / false: no fault
 * **elfin_basic_api/parameter_updates (dynamic_reconfigure/Config)**  
 The value of the dynamic parameters of elfin_basic_api, e.g. velocity scaling.
 
+* **elfin_basic_api/reference_link_name (std_msgs/String)**  
+The reference link in the calculations of the elfin_basic_api node
+
+* **elfin_basic_api/end_link_name (std_msgs/String)**  
+The end link in the calculations of the elfin_basic_api node
+
 ------
 ### Services:
 
 * **elfin_basic_api/get_reference_link (std_srvs/SetBool)**  
-You can get the reference link name of *MoveIt! Planning* from the response of this service.
+You can get the reference link name of *elfin_basic_api* from the response of this service.
 
 * **elfin_basic_api/get_end_link (std_srvs/SetBool)**  
-You can get the end link name of *MoveIt! Planning* from the response of this service.
+You can get the end link name of *elfin_basic_api* from the response of this service.
 
 * **elfin_basic_api/stop_teleop (std_srvs/SetBool)**  
 Make the robot stop moving.
@@ -112,6 +118,12 @@ Disable the robot.
 
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 Clear fault.  
+
+* **elfin_basic_api/set_reference_link (elfin_robot_msgs/SetString)**  
+Set the reference link in the calculations of the elfin_basic_api node  
+
+* **elfin_basic_api/set_end_link (elfin_robot_msgs/SetString)**  
+Set the end link in the calculations of the elfin_basic_api node  
 
 * **elfin_basic_api/joint_teleop (elfin_robot_msgs/SetInt16)**  
 When this service is called, a particular joint will move in a direction and will NOT stop until it reach the limit position or elfin_basic_api/stop_teleop is called. Please be careful when you call this service.
