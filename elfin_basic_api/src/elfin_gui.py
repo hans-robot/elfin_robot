@@ -459,6 +459,8 @@ class MyFrame(wx.Frame):
         t.start()
         
     def show_dialog(self):
+        self.dlg.SetPosition((self.GetPosition()[0]+250,
+                              self.GetPosition()[1]+250))
         self.dlg.ShowModal()
         
     def destroy_dialog(self):
