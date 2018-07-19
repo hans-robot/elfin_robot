@@ -59,7 +59,7 @@ $ rosservice call /elfin_ros_control/elfin/enable_robot "data: true"
 Control the module:  
 The module is controlled by "elfin_module_controller/follow_joint_trajectory" action. elfin_robot_bringup/script/elfin_module_cmd_pub.py is an example for that.
 ```sh
-$ rosrun rosrun elfin_robot_bringup elfin_module_cmd_pub.py
+$ rosrun elfin_robot_bringup elfin_module_cmd_pub.py
 ```
 
 disable servos:
