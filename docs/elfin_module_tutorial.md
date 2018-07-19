@@ -9,7 +9,7 @@ $ roslaunch elfin_gazebo elfin_module_empty_world.launch model:=module_xx # e.g.
 ```
 利用"elfin_module_controller/follow_joint_trajectory" action 可控制轴转动。elfin_robot_bringup/script/elfin_module_cmd_pub.py 是一个例程，运行它可让轴转动一定角度。
 ```sh
-$ rosrun rosrun elfin_robot_bringup elfin_module_cmd_pub.py
+$ rosrun elfin_robot_bringup elfin_module_cmd_pub.py
 ```
 
 ---
