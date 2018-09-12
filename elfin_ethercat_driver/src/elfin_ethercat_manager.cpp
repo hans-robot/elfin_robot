@@ -171,6 +171,12 @@ EtherCatManager::EtherCatManager(const std::string& ifname)
     num_clients_(0),
     stop_flag_(false)
 {
+  // initialize iomap
+  for(int i=0; i<4096; i++)
+  {
+    iomap_[i]=0;
+  }
+
   if (initSoem(ifname)) 
   {
     cycle_thread_ = boost::thread(cycleWorker, 
