@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning_interface
   actionlib
   control_msgs
+  controller_manager_msgs
   elfin_robot_msgs
   std_srvs
   std_msgs

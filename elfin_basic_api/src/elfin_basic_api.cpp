@@ -51,6 +51,15 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::
 
     set_ref_link_server_=local_nh_.advertiseService("set_reference_link", &ElfinBasicAPI::setRefLink_cb, this);
     set_end_link_server_=local_nh_.advertiseService("set_end_link", &ElfinBasicAPI::setEndLink_cb, this);
+    enable_robot_server_=local_nh_.advertiseService("enable_robot", &ElfinBasicAPI::enableRobot_cb, this);
+    disable_robot_server_=local_nh_.advertiseService("disable_robot", &ElfinBasicAPI::disableRobot_cb, this);
+
+    elfin_controller_name_="elfin_arm_controller";
+
+    switch_controller_client_=root_nh_.serviceClient<controller_manager_msgs::SwitchController>("/controller_manager/switch_controller");
+    list_controllers_client_=root_nh_.serviceClient<controller_manager_msgs::ListControllers>("/controller_manager/list_controllers");
+    raw_enable_robot_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/enable_robot");
+    raw_disable_robot_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/disable_robot");
 
     ref_link_name_publisher_=local_nh_.advertise<std_msgs::String>("reference_link_name", 1, true);
     end_link_name_publisher_=local_nh_.advertise<std_msgs::String>("end_link_name", 1, true);
@@ -122,6 +131,188 @@ bool ElfinBasicAPI::setEndLink_cb(elfin_robot_msgs::SetString::Request &req, elf
 
     resp.success=true;
     resp.message="Setting end link succeed";
+    return true;
+}
+
+bool ElfinBasicAPI::enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    // Check request
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="require's data is false";
+        return true;
+    }
+
+    // Check if there is a real driver
+    if(!raw_enable_robot_client_.exists())
+    {
+        resp.message="there is no real driver running";
+        resp.success=false;
+        return true;
+    }
+
+    std_srvs::SetBool::Response resp_tmp;
+
+    // Stop active controllers
+    if(!stopActCtrlrs(resp_tmp))
+    {
+        resp=resp_tmp;
+        return true;
+    }
+
+    usleep(500000);
+
+    // Start default controller
+    if(!startElfinCtrlr(resp_tmp))
+    {
+        resp=resp_tmp;
+        return true;
+    }
+
+    usleep(2000000);
+
+    // Check enable service
+    if(!raw_enable_robot_client_.exists())
+    {
+        resp.message="there is no real driver running";
+        resp.success=false;
+        return true;
+    }
+
+    // Enable servos
+    raw_enable_robot_request_.data=true;
+    raw_enable_robot_client_.call(raw_enable_robot_request_, raw_enable_robot_response_);
+    resp=raw_enable_robot_response_;
+    return true;
+}
+
+bool ElfinBasicAPI::disableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    // Check request
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="require's data is false";
+        return true;
+    }
+
+    // Check disable service
+    if(!raw_disable_robot_client_.exists())
+    {
+        resp.message="there is no real driver running";
+        resp.success=false;
+        return true;
+    }
+
+    // Disable servos
+    raw_disable_robot_request_.data=true;
+    raw_disable_robot_client_.call(raw_disable_robot_request_, raw_disable_robot_response_);
+    resp=raw_disable_robot_response_;
+
+    std_srvs::SetBool::Response resp_tmp;
+
+    // Stop active controllers
+    if(!stopActCtrlrs(resp_tmp))
+    {
+        resp=resp_tmp;
+        return true;
+    }
+
+    return true;
+}
+
+bool ElfinBasicAPI::stopActCtrlrs(std_srvs::SetBool::Response &resp)
+{
+    // Check list controllers service
+    if(!list_controllers_client_.exists())
+    {
+        resp.message="there is no controller manager";
+        resp.success=false;
+        return false;
+    }
+
+    // Find controllers to stop
+    controller_manager_msgs::ListControllers::Request list_controllers_request;
+    controller_manager_msgs::ListControllers::Response list_controllers_response;
+    list_controllers_client_.call(list_controllers_request, list_controllers_response);
+    std::vector<std::string> controllers_to_stop;
+    controllers_to_stop.clear();
+
+    for(int i=0; i<list_controllers_response.controller.size(); i++)
+    {
+        std::string state_tmp=list_controllers_response.controller[i].state;
+        std::string name_tmp=list_controllers_response.controller[i].name;
+        if(strcmp(state_tmp.c_str(), "running")==0)
+        {
+            bool checked=false;
+            for(int j=0; j<list_controllers_response.controller[i].claimed_resources.size(); j++)
+            {
+                if(!checked && list_controllers_response.controller[i].claimed_resources[j].resources.size()!=0)
+                {
+                    checked=true;
+                    controllers_to_stop.push_back(name_tmp);
+                }
+            }
+        }
+    }
+
+    // Stop active controllers
+    if(controllers_to_stop.size()>0)
+    {
+        // Check switch controller service
+        if(!switch_controller_client_.exists())
+        {
+            resp.message="there is no controller manager";
+            resp.success=false;
+            return false;
+        }
+
+        // Stop active controllers
+        controller_manager_msgs::SwitchController::Request switch_controller_request;
+        controller_manager_msgs::SwitchController::Response switch_controller_response;
+        switch_controller_request.start_controllers.clear();
+        switch_controller_request.stop_controllers=controllers_to_stop;
+        switch_controller_request.strictness=switch_controller_request.BEST_EFFORT;
+
+        switch_controller_client_.call(switch_controller_request, switch_controller_response);
+        if(!switch_controller_response.ok)
+        {
+            resp.message="Failed to stop active controllers";
+            resp.success=false;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool ElfinBasicAPI::startElfinCtrlr(std_srvs::SetBool::Response &resp)
+{
+    // Check switch controller service
+    if(!switch_controller_client_.exists())
+    {
+        resp.message="there is no controller manager";
+        resp.success=false;
+        return false;
+    }
+
+    // Start active controllers
+    controller_manager_msgs::SwitchController::Request switch_controller_request;
+    controller_manager_msgs::SwitchController::Response switch_controller_response;
+    switch_controller_request.start_controllers.clear();
+    switch_controller_request.start_controllers.push_back(elfin_controller_name_);
+    switch_controller_request.stop_controllers.clear();
+    switch_controller_request.strictness=switch_controller_request.BEST_EFFORT;
+
+    switch_controller_client_.call(switch_controller_request, switch_controller_response);
+    if(!switch_controller_response.ok)
+    {
+        resp.message="Failed to start the default controller";
+        resp.success=false;
+        return false;
+    }
+
     return true;
 }
 
