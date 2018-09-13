@@ -4,6 +4,6 @@
     <param name="octomap_resolution" value="0.1"/>
   </node>
   
-  <node name="elfin_gui" pkg="elfin_basic_api" type="elfin_gui.py" output="screen" />
+  <node name="elfin_gui" pkg="elfin_basic_api" type="elfin_gui.py" respawn="true" output="screen" />
 
 </launch>

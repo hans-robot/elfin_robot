@@ -141,6 +141,8 @@ class MyFrame(wx.Frame):
                                     value='', pos=(600, btn_height+10))
         self.servo_state=bool()
         
+        self.servo_state_lock=threading.Lock()
+        
         self.fault_state_label=wx.StaticText(self.panel, label='Fault state:',
                                               pos=(590, btn_height+60))
         self.fault_state_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
@@ -246,7 +248,7 @@ class MyFrame(wx.Frame):
                            rq=self.call_reset_req :
                            self.call_set_bool_common(evt, cl, rq))
                 
-        self.call_power_on=rospy.ServiceProxy(self.elfin_driver_ns+'enable_robot', SetBool)
+        self.call_power_on=rospy.ServiceProxy(self.elfin_basic_api_ns+'enable_robot', SetBool)
         self.call_power_on_req=SetBoolRequest()
         self.call_power_on_req.data=True
         self.power_on_btn.Bind(wx.EVT_BUTTON, 
@@ -254,7 +256,7 @@ class MyFrame(wx.Frame):
                                rq=self.call_power_on_req :
                                self.call_set_bool_common(evt, cl, rq))
         
-        self.call_power_off=rospy.ServiceProxy(self.elfin_driver_ns+'disable_robot', SetBool)
+        self.call_power_off=rospy.ServiceProxy(self.elfin_basic_api_ns+'disable_robot', SetBool)
         self.call_power_off_req=SetBoolRequest()
         self.call_power_off_req.data=True
         self.power_off_btn.Bind(wx.EVT_BUTTON, 
@@ -421,6 +423,22 @@ class MyFrame(wx.Frame):
     def call_set_bool_common(self, event, client, request):
         btn=event.GetEventObject()
         check_list=['Servo On', 'Servo Off', 'Clear Fault']
+        
+        # Check servo state
+        if btn.GetName()=='Servo On':
+            servo_enabled=bool()
+            if self.servo_state_lock.acquire():
+                servo_enabled=self.servo_state
+                self.servo_state_lock.release()
+            if servo_enabled:
+                resp=SetBoolResponse()
+                resp.success=False
+                resp.message='Robot is already enabled'
+                wx.CallAfter(self.update_reply_show, resp)
+                event.Skip()
+                return
+        
+        # Check if the button is in check list
         if btn.GetName() in check_list:
             self.show_message_dialog(btn.GetName(), client, request)
         else:
@@ -434,9 +452,10 @@ class MyFrame(wx.Frame):
                 wx.CallAfter(self.update_reply_show, resp)
         event.Skip()
     
-    def thread_bg(self, client, request):
+    def thread_bg(self, msg, client, request):
         wx.CallAfter(self.show_dialog)
-        self.action_stop()
+        if msg=='Servo Off':
+            self.action_stop()
         rospy.sleep(1)
         try:
             resp=client.call(request)
@@ -455,7 +474,7 @@ class MyFrame(wx.Frame):
         lable_size.append(self.dlg_label.GetSize()[0])
         lable_size.append(self.dlg_label.GetSize()[1])
         self.dlg.SetSize((lable_size[0]+30, lable_size[1]+30))
-        t=threading.Thread(target=self.thread_bg, args=(cl, rq,))
+        t=threading.Thread(target=self.thread_bg, args=(message, cl, rq,))
         t.start()
         
     def show_dialog(self):
@@ -599,7 +618,9 @@ class MyFrame(wx.Frame):
         wx.CallAfter(self.updateDisplay, self.key)
             
     def servo_state_cb(self, data):
-        self.servo_state=data.data
+        if self.servo_state_lock.acquire():
+            self.servo_state=data.data
+            self.servo_state_lock.release()
         wx.CallAfter(self.update_servo_state, data)
     
     def fault_state_cb(self, data):
