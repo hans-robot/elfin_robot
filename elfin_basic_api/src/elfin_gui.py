@@ -149,6 +149,8 @@ class MyFrame(wx.Frame):
                                     value='', pos=(600, btn_height+80))
         self.fault_state=bool()
         
+        self.fault_state_lock=threading.Lock()
+        
         self.reply_show_label=wx.StaticText(self.panel, label='Result:',
                                            pos=(20, btn_height+120))
         self.reply_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
@@ -438,6 +440,20 @@ class MyFrame(wx.Frame):
                 event.Skip()
                 return
         
+        # Check fault state
+        if btn.GetName()=='Clear Fault':
+            fault_flag=bool()
+            if self.fault_state_lock.acquire():
+                fault_flag=self.fault_state
+                self.fault_state_lock.release()
+            if not fault_flag:
+                resp=SetBoolResponse()
+                resp.success=False
+                resp.message='There is no fault now'
+                wx.CallAfter(self.update_reply_show, resp)
+                event.Skip()
+                return
+        
         # Check if the button is in check list
         if btn.GetName() in check_list:
             self.show_message_dialog(btn.GetName(), client, request)
@@ -624,7 +640,9 @@ class MyFrame(wx.Frame):
         wx.CallAfter(self.update_servo_state, data)
     
     def fault_state_cb(self, data):
-        self.fault_state=data.data
+        if self.fault_state_lock.acquire():
+            self.fault_state=data.data
+            self.fault_state_lock.release()
         wx.CallAfter(self.update_fault_state, data)
     
     def ref_link_name_cb(self, data):
