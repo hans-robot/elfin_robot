@@ -110,11 +110,17 @@ example:
 
 ***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 
+* **elfin_basic_api/enable_robot (std_srvs/SetBool)**  
+呼叫本服务可使机械臂使能。
+
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  
-呼叫本服务可使机械臂使能，建议调用本服务前先调用elfin_basic_api/stop_teleop，以免未使能时发出的运动指令影响到使能的过程。  
+推荐使用*elfin_basic_api/enable_robot*服务来使能机械臂。呼叫本服务可直接使机械臂使能，所以需自行处理*controllers*的状态。详见： http://wiki.ros.org/controller_manager 。
+
+* **elfin_basic_api/disable_robot (std_srvs/SetBool)**  
+呼叫本服务可使机械臂去使能。
 
 * **elfin_ros_control/elfin/disable_robot (std_srvs/SetBool)**  
-呼叫本服务可使机械臂去使能。  
+推荐使用*elfin_basic_api/disable_robot*服务来使机械臂去使能。呼叫本服务可直接使机械臂去使能，所以需自行处理*controllers*的状态。详见： http://wiki.ros.org/controller_manager 。  
 
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 呼叫本服务可使机械臂清除报错状态。  
