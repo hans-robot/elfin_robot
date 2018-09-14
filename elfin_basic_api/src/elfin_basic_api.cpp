@@ -243,17 +243,9 @@ bool ElfinBasicAPI::stopActCtrlrs(std_srvs::SetBool::Response &resp)
     {
         std::string state_tmp=list_controllers_response.controller[i].state;
         std::string name_tmp=list_controllers_response.controller[i].name;
-        if(strcmp(state_tmp.c_str(), "running")==0)
+        if(strcmp(state_tmp.c_str(), "running")==0 && list_controllers_response.controller[i].resources.size()>0)
         {
-            bool checked=false;
-            for(int j=0; j<list_controllers_response.controller[i].claimed_resources.size(); j++)
-            {
-                if(!checked && list_controllers_response.controller[i].claimed_resources[j].resources.size()!=0)
-                {
-                    checked=true;
-                    controllers_to_stop.push_back(name_tmp);
-                }
-            }
+            controllers_to_stop.push_back(name_tmp);
         }
     }
 
