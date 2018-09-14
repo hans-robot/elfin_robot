@@ -110,11 +110,17 @@ You can get the content of RxPDOs from the response of this service.
 
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not supposed to use them.***
 
+* **elfin_basic_api/enable_robot (std_srvs/SetBool)**  
+Enable the robot.  
+
 * **elfin_ros_control/elfin/enable_robot (std_srvs/SetBool)**  
-Enable the robot. Please call elfin_basic_api/stop_teleop before calling this service. In this case the enabling process won't be disturbed by the motion commands, that were gaven before enabling.
+The recommand service for enabling the robot is *elfin_basic_api/enable_robot*. The robot will be enabled directly when you call this service. So you may need to deal with the status of controllers by yourself. For details: http://wiki.ros.org/controller_manager .
+
+* **elfin_basic_api/disable_robot (std_srvs/SetBool)**  
+Disable the robot.  
 
 * **elfin_ros_control/elfin/disable_robot (std_srvs/SetBool)**  
-Disable the robot.  
+The recommand service for disabling the robot is *elfin_basic_api/disable_robot*. The robot will be disabled directly when you call this service. So you may need to deal with the status of controllers by yourself. For details: http://wiki.ros.org/controller_manager .
 
 * **elfin_ros_control/elfin/clear_fault (std_srvs/SetBool)**  
 Clear fault.  
