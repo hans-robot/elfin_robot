@@ -146,6 +146,17 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
         exit(0);
     }
 
+    // Initialize count_rad_factors
+    count_rad_factors_.resize(count_zeros_.size());
+    for(int i=0; i<count_rad_factors_.size(); i++)
+    {
+        count_rad_factors_[i]=reduction_ratios_[i]*axis_position_factors_[i]/(2*M_PI);
+    }
+
+    // Initialize motion_threshold_ and pos_align_threshold_
+    motion_threshold_=0.002;
+    pos_align_threshold_=0.002;
+
     // Initialize ethercat_client_
     ethercat_clients_.clear();
     ethercat_clients_.resize(slave_no_.size());
@@ -242,6 +253,76 @@ bool ElfinEtherCATDriver::getFaultState()
         fault_flag_tmp=fault_flag_tmp || ethercat_clients_[i]->isWarning();
     }
     return fault_flag_tmp;
+}
+
+// true: robot is moving; false: robot is not moving
+bool ElfinEtherCATDriver::getMotionState()
+{
+    std::vector<double> previous_pos;
+    std::vector<double> last_pos;
+
+    previous_pos.resize(count_zeros_.size());
+    last_pos.resize(count_zeros_.size());
+
+    int32_t count1, count2;
+    for(int i=0; i<ethercat_clients_.size(); i++)
+    {
+        ethercat_clients_[i]->getActPosCounts(count1, count2);
+        previous_pos[2*i]=count1/count_rad_factors_[2*i];
+        previous_pos[2*i+1]=count2/count_rad_factors_[2*i+1];
+    }
+
+    usleep(10000);
+
+    for(int i=0; i<ethercat_clients_.size(); i++)
+    {
+        ethercat_clients_[i]->getActPosCounts(count1, count2);
+        last_pos[2*i]=count1/count_rad_factors_[2*i];
+        last_pos[2*i+1]=count2/count_rad_factors_[2*i+1];
+    }
+
+    for(int i=0; i<previous_pos.size(); i++)
+    {
+        if(fabs(last_pos[i]-previous_pos[i])>motion_threshold_)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// true: command position counts are aligned with actual position counts
+// false: command position counts aren't aligned with actual position counts
+bool ElfinEtherCATDriver::getPosAlignState()
+{
+    std::vector<double> act_pos;
+    std::vector<double> cmd_pos;
+
+    act_pos.resize(count_zeros_.size());
+    cmd_pos.resize(count_zeros_.size());
+
+    int32_t count1, count2;
+    for(int i=0; i<ethercat_clients_.size(); i++)
+    {
+        ethercat_clients_[i]->getActPosCounts(count1, count2);
+        act_pos[2*i]=count1/count_rad_factors_[2*i];
+        act_pos[2*i+1]=count2/count_rad_factors_[2*i+1];
+
+        ethercat_clients_[i]->getCmdPosCounts(count1, count2);
+        cmd_pos[2*i]=count1/count_rad_factors_[2*i];
+        cmd_pos[2*i+1]=count2/count_rad_factors_[2*i+1];
+    }
+
+    for(int i=0; i<act_pos.size(); i++)
+    {
+        if(fabs(cmd_pos[i]-act_pos[i])>pos_align_threshold_)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void ElfinEtherCATDriver::updateStatus(const ros::TimerEvent &te)
