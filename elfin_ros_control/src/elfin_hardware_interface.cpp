@@ -42,7 +42,7 @@ Created on Wed Oct 25 11:23:42 2017
 namespace elfin_ros_control {
 
 ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manager, const ros::NodeHandle &nh):
-    n_(nh), C2PI_F(131072)
+    n_(nh)
 {
     //Initialize elfin_driver_names_
     std::vector<std::string> elfin_driver_names_default;
@@ -69,10 +69,12 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
 
             module_info_tmp.axis1.name=ethercat_drivers_[i]->getJointName(2*j);
             module_info_tmp.axis1.reduction_ratio=ethercat_drivers_[i]->getReductionRatio(2*j);
+            module_info_tmp.axis1.axis_position_factor=ethercat_drivers_[i]->getAxisPositionFactor(2*j);
             module_info_tmp.axis1.count_zero=ethercat_drivers_[i]->getCountZero(2*j);
 
             module_info_tmp.axis2.name=ethercat_drivers_[i]->getJointName(2*j+1);
             module_info_tmp.axis2.reduction_ratio=ethercat_drivers_[i]->getReductionRatio(2*j+1);
+            module_info_tmp.axis2.axis_position_factor=ethercat_drivers_[i]->getAxisPositionFactor(2*j+1);
             module_info_tmp.axis2.count_zero=ethercat_drivers_[i]->getCountZero(2*j+1);
 
             module_infos_.push_back(module_info_tmp);
@@ -81,8 +83,8 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
 
     for(size_t i=0; i<module_infos_.size(); i++)
     {
-        module_infos_[i].axis1.count_rad_factor=module_infos_[i].axis1.reduction_ratio*C2PI_F/(2*M_PI);
-        module_infos_[i].axis2.count_rad_factor=module_infos_[i].axis2.reduction_ratio*C2PI_F/(2*M_PI);
+        module_infos_[i].axis1.count_rad_factor=module_infos_[i].axis1.reduction_ratio*module_infos_[i].axis1.axis_position_factor/(2*M_PI);
+        module_infos_[i].axis2.count_rad_factor=module_infos_[i].axis2.reduction_ratio*module_infos_[i].axis2.axis_position_factor/(2*M_PI);
     }
 
     // Initialize the state and command interface

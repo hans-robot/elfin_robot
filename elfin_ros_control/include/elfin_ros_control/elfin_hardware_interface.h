@@ -69,6 +69,8 @@ typedef struct{
     double count_rad_factor;
     int32_t count_zero;
 
+    double axis_position_factor;
+
     double position;
     double velocity;
     double effort;
@@ -97,7 +99,6 @@ private:
     std::vector<std::string> elfin_driver_names;
     std::vector<elfin_ethercat_driver::ElfinEtherCATDriver*> ethercat_drivers_;
     std::vector<ModuleInfo> module_infos_;
-    double C2PI_F; // count to 2 pi factor
 
     hardware_interface::JointStateInterface jnt_state_interface;
     hardware_interface::PositionJointInterface jnt_cmd_interface;

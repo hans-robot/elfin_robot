@@ -84,6 +84,37 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     }
     ed_nh_.param<std::vector<double> >("reduction_ratios", reduction_ratios_, reduction_ratios_default);
 
+    // Check the values of reduction ratios
+    for(int i=0; i<reduction_ratios_.size(); i++)
+    {
+        if(reduction_ratios_[i]<1)
+        {
+            ROS_ERROR("reduction_ratios[%i] is too small", i);
+            exit(0);
+        }
+    }
+
+    // Initialize axis_position_factors_
+    std::vector<double> axis_position_factors_default;
+    axis_position_factors_default.clear();
+    axis_position_factors_default.reserve(2*slave_no_.size());
+    for(int i=0; i<slave_no_.size(); i++)
+    {
+        axis_position_factors_default.push_back(131072);
+        axis_position_factors_default.push_back(131072);
+    }
+    ed_nh_.param<std::vector<double> >("axis_position_factors", axis_position_factors_, axis_position_factors_default);
+
+    // Check the values of axis position factors
+    for(int i=0; i<axis_position_factors_.size(); i++)
+    {
+        if(axis_position_factors_[i]<1)
+        {
+            ROS_ERROR("axis_position_factors[%i] is too small", i);
+            exit(0);
+        }
+    }
+
     // Initialize count_zeros_
     if(!ed_nh_.hasParam("count_zeros"))
     {
@@ -93,7 +124,7 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
 
     ed_nh_.getParam("count_zeros", count_zeros_);
 
-    // Check the number of joint names, reduction ratios and count_zeros
+    // Check the number of joint names, reduction ratios, axis position factors and count_zeros
     if(joint_names_.size()!=slave_no_.size()*2)
     {
         ROS_ERROR("the number of joint names is %lu, it should be %lu", joint_names_.size(), slave_no_.size()*2);
@@ -102,6 +133,11 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     if(reduction_ratios_.size()!=slave_no_.size()*2)
     {
         ROS_ERROR("the number of reduction ratios is %lu, it should be %lu", reduction_ratios_.size(), slave_no_.size()*2);
+        exit(0);
+    }
+    if(axis_position_factors_.size()!=slave_no_.size()*2)
+    {
+        ROS_ERROR("the number of axis position factors is %lu, it should be %lu", reduction_ratios_.size(), slave_no_.size()*2);
         exit(0);
     }
     if(count_zeros_.size()!=slave_no_.size()*2)
@@ -235,6 +271,11 @@ std::string ElfinEtherCATDriver::getJointName(size_t n)
 double ElfinEtherCATDriver::getReductionRatio(size_t n)
 {
     return reduction_ratios_[n];
+}
+
+double ElfinEtherCATDriver::getAxisPositionFactor(size_t n)
+{
+    return axis_position_factors_[n];
 }
 
 int32_t ElfinEtherCATDriver::getCountZero(size_t n)
