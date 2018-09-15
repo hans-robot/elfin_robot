@@ -53,6 +53,8 @@ public:
 
     bool getEnableState();
     bool getFaultState();
+    bool getMotionState();
+    bool getPosAlignState();
     void updateStatus(const ros::TimerEvent &te);
 
     size_t getEtherCATClientNumber();
@@ -105,6 +107,9 @@ private:
         ros::Duration status_update_period_;
         ros::Timer status_timer_;
 
+        std::vector<double> count_rad_factors_;
+        double motion_threshold_;
+        double pos_align_threshold_;
 };
 
 }

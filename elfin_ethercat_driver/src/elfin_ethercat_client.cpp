@@ -205,6 +205,18 @@ std::string ElfinEtherCATClient::getCurrentPosition()
     return result;
 }
 
+void ElfinEtherCATClient::getActPosCounts(int32_t &pos_act_count_1, int32_t &pos_act_count_2)
+{
+    pos_act_count_1=readInput_unit(elfin_txpdo::AXIS1_ACTPOSITION);
+    pos_act_count_2=readInput_unit(elfin_txpdo::AXIS2_ACTPOSITION);
+}
+
+void ElfinEtherCATClient::getCmdPosCounts(int32_t &pos_cmd_count_1, int32_t &pos_cmd_count_2)
+{
+    pos_cmd_count_1=readOutput_unit(elfin_rxpdo::AXIS1_TARGET_POSITION);
+    pos_cmd_count_2=readOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION);
+}
+
 void ElfinEtherCATClient::pubInput()
 {
     txpdo_msg_.data=getTxPDO();

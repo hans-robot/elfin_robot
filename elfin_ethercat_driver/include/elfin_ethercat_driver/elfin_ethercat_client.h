@@ -116,6 +116,8 @@ public:
     std::string getTxPDO();
     std::string getRxPDO();
     std::string getCurrentPosition();
+    void getActPosCounts(int32_t &pos_act_count_1, int32_t &pos_act_count_2);
+    void getCmdPosCounts(int32_t &pos_cmd_count_1, int32_t &pos_cmd_count_2);
     void pubInput();
     void pubOutput();
     void clearPoseFault();
