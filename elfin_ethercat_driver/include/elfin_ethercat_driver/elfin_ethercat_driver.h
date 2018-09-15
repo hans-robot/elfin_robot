@@ -59,6 +59,7 @@ public:
     ElfinEtherCATClient* getEtherCATClientPtr(size_t n);
     std::string getJointName(size_t n);
     double getReductionRatio(size_t n);
+    double getAxisPositionFactor(size_t n);
     int32_t getCountZero(size_t n);
 
     bool recognizePosition();
@@ -78,6 +79,7 @@ private:
         std::vector<int> slave_no_;
         std::vector<std::string> joint_names_;
         std::vector<double> reduction_ratios_;
+        std::vector<double> axis_position_factors_;
         std::vector<int32_t> count_zeros_;
 
         std::vector<ElfinEtherCATIOClient*> ethercat_io_clients_;
