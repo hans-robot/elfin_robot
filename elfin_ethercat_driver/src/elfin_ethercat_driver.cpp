@@ -154,8 +154,8 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     }
 
     // Initialize motion_threshold_ and pos_align_threshold_
-    motion_threshold_=0.002;
-    pos_align_threshold_=0.002;
+    motion_threshold_=5e-5;
+    pos_align_threshold_=5e-5;
 
     // Initialize ethercat_client_
     ethercat_clients_.clear();
@@ -191,6 +191,8 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     get_txpdo_server_=ed_nh_.advertiseService("get_txpdo", &ElfinEtherCATDriver::getTxPDO_cb, this);
     get_rxpdo_server_=ed_nh_.advertiseService("get_rxpdo", &ElfinEtherCATDriver::getRxPDO_cb, this);
     get_current_position_server_=ed_nh_.advertiseService("get_current_position", &ElfinEtherCATDriver::getCurrentPosition_cb, this);
+    get_motion_state_server_=ed_nh_.advertiseService("get_motion_state", &ElfinEtherCATDriver::getMotionState_cb, this);
+    get_pos_align_state_server_=ed_nh_.advertiseService("get_pos_align_state", &ElfinEtherCATDriver::getPosAlignState_cb, this);
     enable_robot_=ed_nh_.advertiseService("enable_robot", &ElfinEtherCATDriver::enableRobot_cb, this);
     disable_robot_=ed_nh_.advertiseService("disable_robot", &ElfinEtherCATDriver::disableRobot_cb, this);
     clear_fault_=ed_nh_.advertiseService("clear_fault", &ElfinEtherCATDriver::clearFault_cb, this);
@@ -488,6 +490,32 @@ bool ElfinEtherCATDriver::getCurrentPosition_cb(std_srvs::SetBool::Request &req,
 
     resp.success=true;
     resp.message=result;
+    return true;
+}
+
+bool ElfinEtherCATDriver::getMotionState_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="request's data is false";
+        return true;
+    }
+    resp.message="true: robot is moving; false: robot is not moving";
+    resp.success=getMotionState();
+    return true;
+}
+
+bool ElfinEtherCATDriver::getPosAlignState_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="request's data is false";
+        return true;
+    }
+    resp.message="true: command position counts are aligned with actual position counts; false: command position counts aren't aligned with actual position counts";
+    resp.success=getPosAlignState();
     return true;
 }
 

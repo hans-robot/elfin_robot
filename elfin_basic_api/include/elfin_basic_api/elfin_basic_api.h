@@ -98,6 +98,8 @@ private:
 
     ros::ServiceClient switch_controller_client_;
     ros::ServiceClient list_controllers_client_;
+    ros::ServiceClient get_motion_state_client_;
+    ros::ServiceClient get_pos_align_state_client_;
 
     std_srvs::SetBool::Request raw_enable_robot_request_;
     std_srvs::SetBool::Response raw_enable_robot_response_;

@@ -58,6 +58,8 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::
 
     switch_controller_client_=root_nh_.serviceClient<controller_manager_msgs::SwitchController>("/controller_manager/switch_controller");
     list_controllers_client_=root_nh_.serviceClient<controller_manager_msgs::ListControllers>("/controller_manager/list_controllers");
+    get_motion_state_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/get_motion_state");
+    get_pos_align_state_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/get_pos_align_state");
     raw_enable_robot_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/enable_robot");
     raw_disable_robot_client_=root_nh_.serviceClient<std_srvs::SetBool>("/elfin_ros_control/elfin/disable_robot");
 
@@ -152,6 +154,7 @@ bool ElfinBasicAPI::enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::Se
         return true;
     }
 
+    std_srvs::SetBool::Request req_tmp;
     std_srvs::SetBool::Response resp_tmp;
 
     // Stop active controllers
@@ -170,7 +173,41 @@ bool ElfinBasicAPI::enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::Se
         return true;
     }
 
-    usleep(2000000);
+    usleep(500000);
+
+    // Check motion state
+    if(!get_motion_state_client_.exists())
+    {
+        resp.message="there is no get_motion_state service";
+        resp.success=false;
+        return true;
+    }
+
+    req_tmp.data=true;
+    get_motion_state_client_.call(req_tmp, resp_tmp);
+    if(resp_tmp.success)
+    {
+        resp.message="failed to enable the robot, it's moving";
+        resp.success=false;
+        return true;
+    }
+
+    // Check position alignment state
+    if(!get_pos_align_state_client_.exists())
+    {
+        resp.message="there is no get_pos_align_state service";
+        resp.success=false;
+        return true;
+    }
+
+    req_tmp.data=true;
+    get_pos_align_state_client_.call(req_tmp, resp_tmp);
+    if(!resp_tmp.success)
+    {
+        resp.message="failed to enable the robot, commands aren't aligned with actual positions";
+        resp.success=false;
+        return true;
+    }
 
     // Check enable service
     if(!raw_enable_robot_client_.exists())
@@ -265,7 +302,7 @@ bool ElfinBasicAPI::stopActCtrlrs(std_srvs::SetBool::Response &resp)
         controller_manager_msgs::SwitchController::Response switch_controller_response;
         switch_controller_request.start_controllers.clear();
         switch_controller_request.stop_controllers=controllers_to_stop;
-        switch_controller_request.strictness=switch_controller_request.BEST_EFFORT;
+        switch_controller_request.strictness=switch_controller_request.STRICT;
 
         switch_controller_client_.call(switch_controller_request, switch_controller_response);
         if(!switch_controller_response.ok)
@@ -295,7 +332,7 @@ bool ElfinBasicAPI::startElfinCtrlr(std_srvs::SetBool::Response &resp)
     switch_controller_request.start_controllers.clear();
     switch_controller_request.start_controllers.push_back(elfin_controller_name_);
     switch_controller_request.stop_controllers.clear();
-    switch_controller_request.strictness=switch_controller_request.BEST_EFFORT;
+    switch_controller_request.strictness=switch_controller_request.STRICT;
 
     switch_controller_client_.call(switch_controller_request, switch_controller_response);
     if(!switch_controller_response.ok)

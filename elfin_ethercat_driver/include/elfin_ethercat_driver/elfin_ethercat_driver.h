@@ -69,6 +69,8 @@ public:
     bool getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getCurrentPosition_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool getMotionState_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool getPosAlignState_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool disableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool clearFault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
@@ -93,6 +95,8 @@ private:
         ros::ServiceServer get_txpdo_server_;
         ros::ServiceServer get_rxpdo_server_;
         ros::ServiceServer get_current_position_server_;
+        ros::ServiceServer get_motion_state_server_;
+        ros::ServiceServer get_pos_align_state_server_;
         ros::ServiceServer enable_robot_;
         ros::ServiceServer disable_robot_;
         ros::ServiceServer clear_fault_;
