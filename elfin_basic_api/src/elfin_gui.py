@@ -398,7 +398,7 @@ class MyFrame(wx.Frame):
             wx.CallAfter(self.update_velocity_scaling_show, config.velocity_scaling)        
     
     def action_stop(self):
-        self.action_client.wait_for_server()
+        self.action_client.wait_for_server(timeout=rospy.Duration(secs=0.5))
         self.action_goal.trajectory.header.stamp.secs=0
         self.action_goal.trajectory.header.stamp.nsecs=0
         self.action_goal.trajectory.points=[]
