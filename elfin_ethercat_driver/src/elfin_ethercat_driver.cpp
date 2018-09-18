@@ -514,7 +514,7 @@ bool ElfinEtherCATDriver::getPosAlignState_cb(std_srvs::SetBool::Request &req, s
         resp.message="request's data is false";
         return true;
     }
-    resp.message="true: command position counts are aligned with actual position counts; false: command position counts aren't aligned with actual position counts";
+    resp.message="true: cmd pos aligned with actual pos; false: cmd pos not aligned with actual pos";
     resp.success=getPosAlignState();
     return true;
 }
