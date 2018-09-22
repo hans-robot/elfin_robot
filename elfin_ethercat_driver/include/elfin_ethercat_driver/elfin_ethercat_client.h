@@ -57,12 +57,12 @@ namespace elfin_txpdo
 {
     const int AXIS1_STATUSWORD=0;
     const int AXIS1_ACTPOSITION=1;
-    const int AXIS1_ACTCUR=2;
+    const int AXIS1_ACTCUR_L16=2;
     const int AXIS1_ERRORCODE=3;
 
     const int AXIS2_STATUSWORD=4;
     const int AXIS2_ACTPOSITION=5;
-    const int AXIS2_ACTCUR=6;
+    const int AXIS2_ACTCUR_L16=6;
     const int AXIS2_ERRORCODE=7;
 
     const int UDM_STATUS=8;
@@ -76,12 +76,12 @@ namespace elfin_rxpdo
     const int AXIS1_CONTROLWORD=0;
     const int AXIS1_TARGET_POSITION=1;
     const int AXIS1_ENDATPOS_FLASH=2;
-    const int AXIS1_FEEDFORWARD_CUR=3;
+    const int AXIS1_FEEDFORWARD_CUR_L16=3;
 
     const int AXIS2_CONTROLWORD=4;
     const int AXIS2_TARGET_POSITION=5;
     const int AXIS2_ENDATPOS_FLASH=6;
-    const int AXIS2_FEEDFORWARD_CUR=7;
+    const int AXIS2_FEEDFORWARD_CUR_L16=7;
 
     const int UDM_CMD=8;
 }
@@ -110,6 +110,20 @@ public:
     int32_t readInput_unit(int n);
     int32_t readOutput_unit(int n);
     void writeOutput_unit(int n, int32_t val);
+    int16_t readInput_half_unit(int n, bool high_16);
+    int16_t readOutput_half_unit(int n, bool high_16);
+    void writeOutput_half_unit(int n, int16_t val, bool high_16);
+    int8_t readInput_unit_byte(int n, bool high_16, bool high_8);
+    int8_t readOutput_unit_byte(int n, bool high_16, bool high_8);
+    void writeOutput_unit_byte(int n, int8_t val, bool high_16, bool high_8);
+    int32_t getAxis1PosCnt();
+    int32_t getAxis2PosCnt();
+    void setAxis1PosCnt(int32_t pos_cnt);
+    void setAxis2PosCnt(int32_t pos_cnt);
+    int16_t getAxis1TrqCnt();
+    int16_t getAxis2TrqCnt();
+    void setAxis1TrqCnt(int16_t trq_cnt);
+    void setAxis2TrqCnt(int16_t trq_cnt);
     void readInput();
     void readOutput();
     void writeOutput();
