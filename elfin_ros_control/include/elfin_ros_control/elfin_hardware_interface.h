@@ -67,9 +67,12 @@ typedef struct{
     std::string name;
     double reduction_ratio;
     double count_rad_factor;
+    double count_Nm_factor;
     int32_t count_zero;
 
+    bool has_torque_mode;
     double axis_position_factor;
+    double axis_torque_factor;
 
     double position;
     double velocity;

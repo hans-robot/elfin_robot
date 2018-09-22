@@ -115,6 +115,30 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
         }
     }
 
+    // Initialize axis_torque_factors_
+    if(ed_nh_.hasParam("axis_torque_factors"))
+    {
+        has_torque_mode_=true;
+        ed_nh_.getParam("axis_torque_factors", axis_torque_factors_);
+    }
+    else
+    {
+        has_torque_mode_=false;
+    }
+
+    // Check the values of axis torque factors
+    if(has_torque_mode_)
+    {
+        for(int i=0; i<axis_torque_factors_.size(); i++)
+        {
+            if(axis_torque_factors_[i]<1)
+            {
+                ROS_ERROR("axis_torque_factors[%i] is too small", i);
+                exit(0);
+            }
+        }
+    }
+
     // Initialize count_zeros_
     if(!ed_nh_.hasParam("count_zeros"))
     {
@@ -124,7 +148,8 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
 
     ed_nh_.getParam("count_zeros", count_zeros_);
 
-    // Check the number of joint names, reduction ratios, axis position factors and count_zeros
+    // Check the number of joint names, reduction ratios, axis position factors
+    // axis torque factors and count_zeros
     if(joint_names_.size()!=slave_no_.size()*2)
     {
         ROS_ERROR("the number of joint names is %lu, it should be %lu", joint_names_.size(), slave_no_.size()*2);
@@ -137,7 +162,12 @@ ElfinEtherCATDriver::ElfinEtherCATDriver(EtherCatManager *manager, std::string d
     }
     if(axis_position_factors_.size()!=slave_no_.size()*2)
     {
-        ROS_ERROR("the number of axis position factors is %lu, it should be %lu", reduction_ratios_.size(), slave_no_.size()*2);
+        ROS_ERROR("the number of axis position factors is %lu, it should be %lu", axis_position_factors_.size(), slave_no_.size()*2);
+        exit(0);
+    }
+    if(has_torque_mode_ && axis_torque_factors_.size()!=slave_no_.size()*2)
+    {
+        ROS_ERROR("the number of axis torque factors is %lu, it should be %lu", axis_torque_factors_.size(), slave_no_.size()*2);
         exit(0);
     }
     if(count_zeros_.size()!=slave_no_.size()*2)
@@ -359,6 +389,16 @@ double ElfinEtherCATDriver::getReductionRatio(size_t n)
 double ElfinEtherCATDriver::getAxisPositionFactor(size_t n)
 {
     return axis_position_factors_[n];
+}
+
+bool ElfinEtherCATDriver::hasTorqueMode()
+{
+    return has_torque_mode_;
+}
+
+double ElfinEtherCATDriver::getAxisTorqueFactor(size_t n)
+{
+    return axis_torque_factors_[n];
 }
 
 int32_t ElfinEtherCATDriver::getCountZero(size_t n)

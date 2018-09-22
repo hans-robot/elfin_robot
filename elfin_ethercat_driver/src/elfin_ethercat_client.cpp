@@ -128,6 +128,182 @@ void ElfinEtherCATClient::writeOutput_unit(int n, int32_t val)
     }
 }
 
+int16_t ElfinEtherCATClient::readInput_half_unit(int n, bool high_16)
+{
+    if(n<0 || n>=pdo_input.size())
+        return 0x0000;
+    int offset;
+    if(high_16)
+        offset=2;
+    else
+        offset=0;
+    uint8_t map[2];
+    for(int i=0; i<2; i++)
+    {
+        map[i]=manager_->readInput(slave_no_, pdo_input[n].channel+offset+i);
+    }
+    int16_t value_tmp=*(int16_t *)(map);
+    return value_tmp;
+}
+
+int16_t ElfinEtherCATClient::readOutput_half_unit(int n, bool high_16)
+{
+    if(n<0 || n>=pdo_output.size())
+        return 0x0000;
+    int offset;
+    if(high_16)
+        offset=2;
+    else
+        offset=0;
+    uint8_t map[2];
+    for(int i=0; i<2; i++)
+    {
+        map[i]=manager_->readOutput(slave_no_, pdo_output[n].channel+offset+i);
+    }
+    int16_t value_tmp=*(int16_t *)(map);
+    return value_tmp;
+}
+
+void ElfinEtherCATClient::writeOutput_half_unit(int n, int16_t val, bool high_16)
+{
+    if(n<0 || n>=pdo_output.size())
+        return;
+    int offset;
+    if(high_16)
+        offset=2;
+    else
+        offset=0;
+    uint8_t map_tmp;
+    for(int i=0; i<2; i++)
+    {
+        map_tmp=(val>>8*i) & 0x00ff;
+        manager_->write(slave_no_, pdo_output[n].channel+offset+i, map_tmp);
+    }
+}
+
+int8_t ElfinEtherCATClient::readInput_unit_byte(int n, bool high_16, bool high_8)
+{
+    if(n<0 || n>=pdo_input.size())
+        return 0x0000;
+    int offset;
+    if(high_16)
+    {
+        if(high_8)
+            offset=3;
+        else
+            offset=2;
+    }
+    else
+    {
+        if(high_8)
+            offset=1;
+        else
+            offset=0;
+    }
+    uint8_t map[1];
+    for(int i=0; i<1; i++)
+    {
+        map[i]=manager_->readInput(slave_no_, pdo_input[n].channel+offset+i);
+    }
+    int8_t value_tmp=*(int8_t *)(map);
+    return value_tmp;
+}
+
+int8_t ElfinEtherCATClient::readOutput_unit_byte(int n, bool high_16, bool high_8)
+{
+    if(n<0 || n>=pdo_output.size())
+        return 0x0000;
+    int offset;
+    if(high_16)
+    {
+        if(high_8)
+            offset=3;
+        else
+            offset=2;
+    }
+    else
+    {
+        if(high_8)
+            offset=1;
+        else
+            offset=0;
+    }
+    uint8_t map[1];
+    for(int i=0; i<1; i++)
+    {
+        map[i]=manager_->readOutput(slave_no_, pdo_output[n].channel+offset+i);
+    }
+    int8_t value_tmp=*(int8_t *)(map);
+    return value_tmp;
+}
+
+void ElfinEtherCATClient::writeOutput_unit_byte(int n, int8_t val, bool high_16, bool high_8)
+{
+    if(n<0 || n>=pdo_output.size())
+        return;
+    int offset;
+    if(high_16)
+    {
+        if(high_8)
+            offset=3;
+        else
+            offset=2;
+    }
+    else
+    {
+        if(high_8)
+            offset=1;
+        else
+            offset=0;
+    }
+    uint8_t map_tmp;
+    for(int i=0; i<1; i++)
+    {
+        map_tmp=(val>>8*i) & 0x00ff;
+        manager_->write(slave_no_, pdo_output[n].channel+offset+i, map_tmp);
+    }
+}
+
+int32_t ElfinEtherCATClient::getAxis1PosCnt()
+{
+    return readInput_unit(elfin_txpdo::AXIS1_ACTPOSITION);
+}
+
+int32_t ElfinEtherCATClient::getAxis2PosCnt()
+{
+    return readInput_unit(elfin_txpdo::AXIS2_ACTPOSITION);
+}
+
+void ElfinEtherCATClient::setAxis1PosCnt(int32_t pos_cnt)
+{
+    writeOutput_unit(elfin_rxpdo::AXIS1_TARGET_POSITION, pos_cnt);
+}
+
+void ElfinEtherCATClient::setAxis2PosCnt(int32_t pos_cnt)
+{
+    writeOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION, pos_cnt);
+}
+
+int16_t ElfinEtherCATClient::getAxis1TrqCnt()
+{
+    return readInput_half_unit(elfin_txpdo::AXIS1_ACTCUR_L16, false);
+}
+
+int16_t ElfinEtherCATClient::getAxis2TrqCnt()
+{
+    return readInput_half_unit(elfin_txpdo::AXIS2_ACTCUR_L16, false);
+}
+
+void ElfinEtherCATClient::setAxis1TrqCnt(int16_t trq_cnt)
+{
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_FEEDFORWARD_CUR_L16, trq_cnt, false);
+}
+
+void ElfinEtherCATClient::setAxis2TrqCnt(int16_t trq_cnt)
+{
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_FEEDFORWARD_CUR_L16, trq_cnt, false);
+}
+
 void ElfinEtherCATClient::readInput()
 {
     for(int i=0; i<pdo_input.size(); i++)
