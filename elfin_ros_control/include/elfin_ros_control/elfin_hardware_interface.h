@@ -99,17 +99,18 @@ public:
     void write_update();
 
 private:
-    std::vector<std::string> elfin_driver_names;
+    std::vector<std::string> elfin_driver_names_;
     std::vector<elfin_ethercat_driver::ElfinEtherCATDriver*> ethercat_drivers_;
     std::vector<ModuleInfo> module_infos_;
 
-    hardware_interface::JointStateInterface jnt_state_interface;
-    hardware_interface::PositionJointInterface jnt_cmd_interface;
+    hardware_interface::JointStateInterface jnt_state_interface_;
+    hardware_interface::PositionJointInterface jnt_position_cmd_interface_;
+    hardware_interface::EffortJointInterface jnt_effort_cmd_interface_;
 
     ros::NodeHandle n_;
 
-    ros::Time read_update_time;
-    ros::Duration read_update_dur;
+    ros::Time read_update_time_;
+    ros::Duration read_update_dur_;
 };
 
 }
