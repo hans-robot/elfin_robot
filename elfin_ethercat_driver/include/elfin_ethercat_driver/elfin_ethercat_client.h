@@ -142,6 +142,11 @@ public:
     static void *recognizePoseCmd(void *threadarg);
     bool isWarning();
     void resetFault();
+    bool inPosMode();
+    bool inTrqMode();
+    bool inPosBasedMode();
+    void setPosMode();
+    void setTrqMode();
     bool enable_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool reset_fault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 };
