@@ -585,6 +585,47 @@ void ElfinEtherCATClient::resetFault()
     writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x07);
 }
 
+bool ElfinEtherCATClient::inPosMode()
+{
+    if(readOutput_unit(elfin_rxpdo::UDM_CMD)==0x44
+       && readOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD)==0x801f
+       && readOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD)==0x801f)
+        return true;
+    else
+        return false;
+}
+
+bool ElfinEtherCATClient::inTrqMode()
+{
+    if(readOutput_unit(elfin_rxpdo::UDM_CMD)==0x66
+       && readOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD)==0x081f
+       && readOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD)==0x081f)
+        return true;
+    else
+        return false;
+}
+
+bool ElfinEtherCATClient::inPosBasedMode()
+{
+    return inPosMode();
+}
+
+void ElfinEtherCATClient::setPosMode()
+{
+    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
+    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
+    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x44);
+    usleep(10000);
+}
+
+void ElfinEtherCATClient::setTrqMode()
+{
+    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x081f);
+    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x081f);
+    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x66);
+    usleep(10000);
+}
+
 bool ElfinEtherCATClient::enable_cb(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& resp)
 {
     if(!req.data)

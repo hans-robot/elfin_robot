@@ -45,6 +45,7 @@ Created on Wed Oct 25 11:36:26 2017
 #include <pthread.h>
 #include <time.h>
 #include <math.h>
+#include <string>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -94,6 +95,8 @@ class ElfinHWInterface : public hardware_interface::RobotHW
 public:
     ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manager, const ros::NodeHandle &nh=ros::NodeHandle("~"));
     ~ElfinHWInterface();
+    bool prepareSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
+                       const std::list<hardware_interface::ControllerInfo> &stop_list);
     void read_init();
     void read_update(const ros::Time &time_now);
     void write_update();

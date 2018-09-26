@@ -166,15 +166,6 @@ bool ElfinBasicAPI::enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::Se
 
     usleep(500000);
 
-    // Start default controller
-    if(!startElfinCtrlr(resp_tmp))
-    {
-        resp=resp_tmp;
-        return true;
-    }
-
-    usleep(500000);
-
     // Check motion state
     if(!get_motion_state_client_.exists())
     {
@@ -221,6 +212,14 @@ bool ElfinBasicAPI::enableRobot_cb(std_srvs::SetBool::Request &req, std_srvs::Se
     raw_enable_robot_request_.data=true;
     raw_enable_robot_client_.call(raw_enable_robot_request_, raw_enable_robot_response_);
     resp=raw_enable_robot_response_;
+
+    // Start default controller
+    if(!startElfinCtrlr(resp_tmp))
+    {
+        resp=resp_tmp;
+        return true;
+    }
+
     return true;
 }
 

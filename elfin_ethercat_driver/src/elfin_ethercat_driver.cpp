@@ -604,9 +604,7 @@ bool ElfinEtherCATDriver::enableRobot_cb(std_srvs::SetBool::Request &req, std_sr
         flag_tmp=true;
         for(int i=0; i<ethercat_clients_.size(); i++)
         {
-            flag_tmp=flag_tmp && ethercat_clients_[i]->readInput_unit(elfin_txpdo::AXIS1_STATUSWORD)==0x8237
-                    && ethercat_clients_[i]->readInput_unit(elfin_txpdo::AXIS2_STATUSWORD)==0x8237
-                    && ethercat_clients_[i]->readInput_unit(elfin_txpdo::UDM_STATUS)==0xffff0000;
+            flag_tmp=flag_tmp && ethercat_clients_[i]->isEnabled();
         }
         if(flag_tmp)
         {

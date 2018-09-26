@@ -154,6 +154,54 @@ ElfinHWInterface::~ElfinHWInterface()
     }
 }
 
+bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
+                                     const std::list<hardware_interface::ControllerInfo> &stop_list)
+{
+    std::list<hardware_interface::ControllerInfo>::const_iterator iter;
+
+    if(start_list.empty())
+    return true;
+
+    for(iter=start_list.begin(); iter!=start_list.end(); iter++)
+    {
+        std::vector<hardware_interface::InterfaceResources> resources=iter->claimed_resources;
+        for(int i=0; i<resources.size(); i++)
+        {
+            if(resources[i].resources.find(module_infos_[i].axis1.name)!=resources[i].resources.end()
+               || resources[i].resources.find(module_infos_[i].axis2.name)!=resources[i].resources.end())
+            {
+                if(!module_infos_[i].client_ptr->isEnabled())
+                {
+                    ROS_ERROR("can't start %s, because module[%i] is not enabled", iter->name.c_str(), i);
+                    return false;
+                }
+
+                if(strcmp(resources[i].hardware_interface.c_str(), "hardware_interface::PositionJointInterface"))
+                {
+                    module_infos_[i].client_ptr->setPosMode();
+                    if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inPosMode()))
+                    {
+                        ROS_ERROR("module[%i]: set position mode failed", i);
+                        return false;
+                    }
+                }
+
+                else if(strcmp(resources[i].hardware_interface.c_str(), "hardware_interface::EffortJointInterface"))
+                {
+                    module_infos_[i].client_ptr->setTrqMode();
+                    if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inTrqMode()))
+                    {
+                        ROS_ERROR("module[%i]: set torque mode failed", i);
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 void ElfinHWInterface::read_init()
 {
     struct timespec read_update_tick;
@@ -228,6 +276,11 @@ void ElfinHWInterface::write_update()
 {
     for(size_t i=0; i<module_infos_.size(); i++)
     {
+        if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inPosBasedMode()))
+        {
+            module_infos_[i].axis1.position_cmd=module_infos_[i].axis1.position;
+            module_infos_[i].axis2.position_cmd=module_infos_[i].axis2.position;
+        }
         double position_cmd_count1=-1 * module_infos_[i].axis1.position_cmd * module_infos_[i].axis1.count_rad_factor + module_infos_[i].axis1.count_zero;
         double position_cmd_count2=-1 * module_infos_[i].axis2.position_cmd * module_infos_[i].axis2.count_rad_factor + module_infos_[i].axis2.count_zero;
 
