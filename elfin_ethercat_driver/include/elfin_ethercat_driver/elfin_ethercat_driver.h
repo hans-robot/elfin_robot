@@ -62,7 +62,6 @@ public:
     std::string getJointName(size_t n);
     double getReductionRatio(size_t n);
     double getAxisPositionFactor(size_t n);
-    bool hasTorqueMode();
     double getAxisTorqueFactor(size_t n);
     int32_t getCountZero(size_t n);
 
@@ -88,8 +87,6 @@ private:
         std::vector<double> axis_position_factors_;
         std::vector<double> axis_torque_factors_;
         std::vector<int32_t> count_zeros_;
-
-        bool has_torque_mode_;
 
         std::vector<ElfinEtherCATIOClient*> ethercat_io_clients_;
         std::vector<int> io_slave_no_;
