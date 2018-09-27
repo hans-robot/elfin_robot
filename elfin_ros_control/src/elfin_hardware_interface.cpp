@@ -159,39 +159,75 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
 {
     std::list<hardware_interface::ControllerInfo>::const_iterator iter;
 
+    if(!stop_list.empty())
+    {
+        for(iter=stop_list.begin(); iter!=stop_list.end(); iter++)
+        {
+            std::vector<hardware_interface::InterfaceResources> stop_resrcs=iter->claimed_resources;
+            for(int i=0; i<stop_resrcs.size(); i++)
+            {
+                for(int j=0; j<module_infos_.size(); j++)
+                {
+                    if(stop_resrcs[i].resources.find(module_infos_[j].axis1.name)!=stop_resrcs[i].resources.end()
+                       || stop_resrcs[i].resources.find(module_infos_[j].axis2.name)!=stop_resrcs[i].resources.end())
+                    {
+                        if(module_infos_[j].client_ptr->isEnabled())
+                        {
+                            module_infos_[j].client_ptr->setPosMode();
+                            if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inPosMode()))
+                            {
+                                ROS_ERROR("can't stop %s, module[%i]: set position mode failed", iter->name.c_str(), j);
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if(start_list.empty())
     return true;
 
     for(iter=start_list.begin(); iter!=start_list.end(); iter++)
     {
-        std::vector<hardware_interface::InterfaceResources> resources=iter->claimed_resources;
-        for(int i=0; i<resources.size(); i++)
+        std::vector<hardware_interface::InterfaceResources> start_resrcs=iter->claimed_resources;
+        for(int i=0; i<start_resrcs.size(); i++)
         {
-            if(resources[i].resources.find(module_infos_[i].axis1.name)!=resources[i].resources.end()
-               || resources[i].resources.find(module_infos_[i].axis2.name)!=resources[i].resources.end())
+            for(int j=0; j<module_infos_.size(); j++)
             {
-                if(!module_infos_[i].client_ptr->isEnabled())
+                if(start_resrcs[i].resources.find(module_infos_[j].axis1.name)!=start_resrcs[i].resources.end()
+                   || start_resrcs[i].resources.find(module_infos_[j].axis2.name)!=start_resrcs[i].resources.end())
                 {
-                    ROS_ERROR("can't start %s, because module[%i] is not enabled", iter->name.c_str(), i);
-                    return false;
-                }
-
-                if(strcmp(resources[i].hardware_interface.c_str(), "hardware_interface::PositionJointInterface"))
-                {
-                    module_infos_[i].client_ptr->setPosMode();
-                    if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inPosMode()))
+                    if(!module_infos_[j].client_ptr->isEnabled())
                     {
-                        ROS_ERROR("module[%i]: set position mode failed", i);
+                        ROS_ERROR("can't start %s, because module[%i] is not enabled", iter->name.c_str(), j);
                         return false;
                     }
-                }
 
-                else if(strcmp(resources[i].hardware_interface.c_str(), "hardware_interface::EffortJointInterface"))
-                {
-                    module_infos_[i].client_ptr->setTrqMode();
-                    if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inTrqMode()))
+                    if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::PositionJointInterface")==0)
                     {
-                        ROS_ERROR("module[%i]: set torque mode failed", i);
+                        module_infos_[j].client_ptr->setPosMode();
+                        if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inPosMode()))
+                        {
+                            ROS_ERROR("module[%i]: set position mode failed", j);
+                            return false;
+                        }
+                    }
+
+                    else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::EffortJointInterface")==0)
+                    {
+                        module_infos_[j].client_ptr->setTrqMode();
+                        if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inTrqMode()))
+                        {
+                            ROS_ERROR("module[%i]: set torque mode failed", j);
+                            return false;
+                        }
+                    }
+
+                    else
+                    {
+                        ROS_ERROR("module[%i] doesn't support %s", j, start_resrcs[i].hardware_interface.c_str());
                         return false;
                     }
                 }
