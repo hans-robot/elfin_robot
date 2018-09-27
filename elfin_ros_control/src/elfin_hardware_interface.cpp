@@ -71,17 +71,13 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
             module_info_tmp.axis1.reduction_ratio=ethercat_drivers_[i]->getReductionRatio(2*j);
             module_info_tmp.axis1.axis_position_factor=ethercat_drivers_[i]->getAxisPositionFactor(2*j);
             module_info_tmp.axis1.count_zero=ethercat_drivers_[i]->getCountZero(2*j);
-            module_info_tmp.axis1.has_torque_mode=ethercat_drivers_[i]->hasTorqueMode();
-            if(module_info_tmp.axis1.has_torque_mode)
-                module_info_tmp.axis1.axis_torque_factor=ethercat_drivers_[i]->getAxisTorqueFactor(2*j);
+            module_info_tmp.axis1.axis_torque_factor=ethercat_drivers_[i]->getAxisTorqueFactor(2*j);
 
             module_info_tmp.axis2.name=ethercat_drivers_[i]->getJointName(2*j+1);
             module_info_tmp.axis2.reduction_ratio=ethercat_drivers_[i]->getReductionRatio(2*j+1);
             module_info_tmp.axis2.axis_position_factor=ethercat_drivers_[i]->getAxisPositionFactor(2*j+1);
             module_info_tmp.axis2.count_zero=ethercat_drivers_[i]->getCountZero(2*j+1);
-            module_info_tmp.axis2.has_torque_mode=ethercat_drivers_[i]->hasTorqueMode();
-            if(module_info_tmp.axis2.has_torque_mode)
-                module_info_tmp.axis2.axis_torque_factor=ethercat_drivers_[i]->getAxisTorqueFactor(2*j+1);
+            module_info_tmp.axis2.axis_torque_factor=ethercat_drivers_[i]->getAxisTorqueFactor(2*j+1);
 
             module_infos_.push_back(module_info_tmp);
         }
@@ -90,12 +86,10 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
     for(size_t i=0; i<module_infos_.size(); i++)
     {
         module_infos_[i].axis1.count_rad_factor=module_infos_[i].axis1.reduction_ratio*module_infos_[i].axis1.axis_position_factor/(2*M_PI);
-        if(module_infos_[i].axis1.has_torque_mode)
-            module_infos_[i].axis1.count_Nm_factor=module_infos_[i].axis1.axis_torque_factor/module_infos_[i].axis1.reduction_ratio;
+        module_infos_[i].axis1.count_Nm_factor=module_infos_[i].axis1.axis_torque_factor/module_infos_[i].axis1.reduction_ratio;
 
         module_infos_[i].axis2.count_rad_factor=module_infos_[i].axis2.reduction_ratio*module_infos_[i].axis2.axis_position_factor/(2*M_PI);
-        if(module_infos_[i].axis2.has_torque_mode)
-            module_infos_[i].axis2.count_Nm_factor=module_infos_[i].axis2.axis_torque_factor/module_infos_[i].axis2.reduction_ratio;
+        module_infos_[i].axis2.count_Nm_factor=module_infos_[i].axis2.axis_torque_factor/module_infos_[i].axis2.reduction_ratio;
     }
 
     // Initialize the state and command interface
@@ -129,18 +123,14 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
 
     for(size_t i=0; i<module_infos_.size(); i++)
     {
-        if(module_infos_[i].axis1.has_torque_mode)
-        {
-            hardware_interface::JointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
-                                                            &module_infos_[i].axis1.effort_cmd);
-            jnt_effort_cmd_interface_.registerHandle(jnt_handle_tmp1);
-        }
-        if(module_infos_[i].axis2.has_torque_mode)
-        {
-            hardware_interface::JointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
-                                                            &module_infos_[i].axis2.effort_cmd);
-            jnt_effort_cmd_interface_.registerHandle(jnt_handle_tmp2);
-        }
+        hardware_interface::JointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
+                                                        &module_infos_[i].axis1.effort_cmd);
+        jnt_effort_cmd_interface_.registerHandle(jnt_handle_tmp1);
+
+        hardware_interface::JointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
+                                                        &module_infos_[i].axis2.effort_cmd);
+        jnt_effort_cmd_interface_.registerHandle(jnt_handle_tmp2);
+
     }
     registerInterface(&jnt_effort_cmd_interface_);
 }
@@ -288,10 +278,7 @@ void ElfinHWInterface::read_update(const ros::Time &time_now)
         double position_tmp1=-1*pos_count_diff_1/module_infos_[i].axis1.count_rad_factor;
         module_infos_[i].axis1.velocity=(position_tmp1-module_infos_[i].axis1.position)/read_update_dur_.toSec();
         module_infos_[i].axis1.position=position_tmp1;
-        if(module_infos_[i].axis1.has_torque_mode)
-            module_infos_[i].axis1.effort=-1*trq_count1/module_infos_[i].axis1.count_Nm_factor;
-        else
-            module_infos_[i].axis1.effort=0;
+        module_infos_[i].axis1.effort=-1*trq_count1/module_infos_[i].axis1.count_Nm_factor;
 
         int32_t pos_count2=module_infos_[i].client_ptr->getAxis2PosCnt();
         int16_t trq_count2=module_infos_[i].client_ptr->getAxis2TrqCnt();
@@ -300,10 +287,7 @@ void ElfinHWInterface::read_update(const ros::Time &time_now)
         double position_tmp2=-1*pos_count_diff_2/module_infos_[i].axis2.count_rad_factor;
         module_infos_[i].axis2.velocity=(position_tmp2-module_infos_[i].axis2.position)/read_update_dur_.toSec();
         module_infos_[i].axis2.position=position_tmp2;
-        if(module_infos_[i].axis2.has_torque_mode)
-            module_infos_[i].axis2.effort=-1*trq_count2/module_infos_[i].axis2.count_Nm_factor;
-        else
-            module_infos_[i].axis2.effort=0;
+        module_infos_[i].axis2.effort=-1*trq_count2/module_infos_[i].axis2.count_Nm_factor;
     }
 
 }
@@ -323,17 +307,11 @@ void ElfinHWInterface::write_update()
         module_infos_[i].client_ptr->setAxis1PosCnt(int32_t(position_cmd_count1));
         module_infos_[i].client_ptr->setAxis2PosCnt(int32_t(position_cmd_count2));
 
-        if(module_infos_[i].axis1.has_torque_mode)
-        {
-            double torque_cmd_count1=-1 * module_infos_[i].axis1.effort_cmd * module_infos_[i].axis1.count_Nm_factor;
-            module_infos_[i].client_ptr->setAxis1TrqCnt(int16_t(torque_cmd_count1));
-        }
+        double torque_cmd_count1=-1 * module_infos_[i].axis1.effort_cmd * module_infos_[i].axis1.count_Nm_factor;
+        double torque_cmd_count2=-1 * module_infos_[i].axis2.effort_cmd * module_infos_[i].axis2.count_Nm_factor;
 
-        if(module_infos_[i].axis2.has_torque_mode)
-        {
-            double torque_cmd_count2=-1 * module_infos_[i].axis2.effort_cmd * module_infos_[i].axis2.count_Nm_factor;
-            module_infos_[i].client_ptr->setAxis2TrqCnt(int16_t(torque_cmd_count2));
-        }
+        module_infos_[i].client_ptr->setAxis1TrqCnt(int16_t(torque_cmd_count1));
+        module_infos_[i].client_ptr->setAxis2TrqCnt(int16_t(torque_cmd_count2));
     }
 }
 

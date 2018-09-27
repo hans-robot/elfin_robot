@@ -1,0 +1,25 @@
+## elfin_ethernet_name: network interface card name
+## An Elfin robot has 3 modules and 6 joints.
+## All the parameters about joints should be in order of [J2, J1, J3, J4, J5, J6]
+## reduction_ratios: The reduction ratios of the joints.
+##                   Please refer to the paper attached with the robot.
+## count_zeros: The encoder counts of the joints when they are in home position.
+##              Please refer to the paper attached with the robot.
+## axis_position_factors: The encoder resolution values. They are all 131072 in general.
+## axis_torque_factors: They depend on the robot type.
+##                      Elfin3: [5251.283, 5251.283, 8533.125, 8533.125, 15975.05, 15975.05]
+##                      Elfin5: [2536.224, 2536.224, 5251.283, 5251.283, 15975.05, 15975.05]
+##                      Elfin10: [1365.332, 1365.332, 2536.224, 2536.224, 8533.125, 8533.125]
+
+
+## example for elfin_robot_bringup/config/elfin_drivers.yaml
+
+elfin_ethernet_name: eth0
+
+elfin:
+    slave_no: [1, 2, 3]
+    joint_names: [elfin_joint2, elfin_joint1, elfin_joint3, elfin_joint4, elfin_joint5, elfin_joint6]
+    reduction_ratios: [101, 101, 101, 101, 101, 101]
+    count_zeros: [6703592, 11547377, 13255147, 6522354, 12627817, 10879255]
+    axis_position_factors: [131072, 131072, 131072, 131072, 131072, 131072]
+    axis_torque_factors: [5251.283, 5251.283, 8533.125, 8533.125, 15975.05, 15975.05]
