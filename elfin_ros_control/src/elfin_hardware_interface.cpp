@@ -164,7 +164,7 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
                         if(module_infos_[j].client_ptr->isEnabled())
                         {
                             module_infos_[j].client_ptr->setPosMode();
-                            if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inPosMode()))
+                            if(!module_infos_[j].client_ptr->inPosMode())
                             {
                                 ROS_ERROR("can't stop %s, module[%i]: set position mode failed", iter->name.c_str(), j);
                                 return false;
@@ -198,7 +198,7 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
                     if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::PositionJointInterface")==0)
                     {
                         module_infos_[j].client_ptr->setPosMode();
-                        if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inPosMode()))
+                        if(!module_infos_[j].client_ptr->inPosMode())
                         {
                             ROS_ERROR("module[%i]: set position mode failed", j);
                             return false;
@@ -208,7 +208,7 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
                     else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::EffortJointInterface")==0)
                     {
                         module_infos_[j].client_ptr->setTrqMode();
-                        if(!(module_infos_[j].client_ptr->isEnabled() && module_infos_[j].client_ptr->inTrqMode()))
+                        if(!module_infos_[j].client_ptr->inTrqMode())
                         {
                             ROS_ERROR("module[%i]: set torque mode failed", j);
                             return false;
@@ -296,7 +296,7 @@ void ElfinHWInterface::write_update()
 {
     for(size_t i=0; i<module_infos_.size(); i++)
     {
-        if(!(module_infos_[i].client_ptr->isEnabled() && module_infos_[i].client_ptr->inPosBasedMode()))
+        if(!module_infos_[i].client_ptr->inPosBasedMode())
         {
             module_infos_[i].axis1.position_cmd=module_infos_[i].axis1.position;
             module_infos_[i].axis2.position_cmd=module_infos_[i].axis2.position;
