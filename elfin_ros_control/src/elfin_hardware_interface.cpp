@@ -133,6 +133,20 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
 
     }
     registerInterface(&jnt_effort_cmd_interface_);
+
+    for(size_t i=0; i<module_infos_.size(); i++)
+    {
+        elfin_hardware_interface::PosTrqJointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
+                                                                    &module_infos_[i].axis1.position_cmd,
+                                                                    &module_infos_[i].axis1.effort_cmd);
+        jnt_postrq_cmd_interface_.registerHandle(jnt_handle_tmp1);
+
+        elfin_hardware_interface::PosTrqJointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
+                                                                    &module_infos_[i].axis2.position_cmd,
+                                                                    &module_infos_[i].axis2.effort_cmd);
+        jnt_postrq_cmd_interface_.registerHandle(jnt_handle_tmp2);
+    }
+    registerInterface(&jnt_postrq_cmd_interface_);
 }
 
 ElfinHWInterface::~ElfinHWInterface()
@@ -201,6 +215,16 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
                         if(!module_infos_[j].client_ptr->inPosMode())
                         {
                             ROS_ERROR("module[%i]: set position mode failed", j);
+                            return false;
+                        }
+                    }
+
+                    else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "elfin_hardware_interface::PosTrqJointInterface")==0)
+                    {
+                        module_infos_[j].client_ptr->setPosEffortMode();
+                        if(!module_infos_[j].client_ptr->inPosMode())
+                        {
+                            ROS_ERROR("module[%i]: set position torque mode failed", j);
                             return false;
                         }
                     }

@@ -1,0 +1,11 @@
+<library path="lib/libelfin_postrq_joint_trajectory_controller">
+
+  <class name="elfin_pos_trq_controllers/JointTrajectoryController"
+         type="elfin_pos_trq_controllers::JointTrajectoryController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      joint trajectory controller with position torque interface for elfin.
+    </description>
+  </class>
+
+</library>
