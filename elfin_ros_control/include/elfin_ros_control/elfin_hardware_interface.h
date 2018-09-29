@@ -55,6 +55,7 @@ Created on Wed Oct 25 11:36:26 2017
 
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
+#include <elfin_hardware_interface/postrq_command_interface.h>
 #include <hardware_interface/robot_hw.h>
 
 #include <controller_manager/controller_manager.h>
@@ -108,6 +109,7 @@ private:
     hardware_interface::JointStateInterface jnt_state_interface_;
     hardware_interface::PositionJointInterface jnt_position_cmd_interface_;
     hardware_interface::EffortJointInterface jnt_effort_cmd_interface_;
+    elfin_hardware_interface::PosTrqJointInterface jnt_postrq_cmd_interface_;
 
     ros::NodeHandle n_;
 
