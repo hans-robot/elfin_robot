@@ -611,15 +611,13 @@ void ElfinEtherCATClient::setPosMode()
     writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
     writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
     writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x44);
-    usleep(10000);
 }
 
-void ElfinEtherCATClient::setPosEffortMode()
+void ElfinEtherCATClient::setPosTrqMode()
 {
     writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
     writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
     writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x144);
-    usleep(10000);
 }
 
 void ElfinEtherCATClient::setTrqMode()
@@ -627,7 +625,6 @@ void ElfinEtherCATClient::setTrqMode()
     writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x081f);
     writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x081f);
     writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x66);
-    usleep(10000);
 }
 
 bool ElfinEtherCATClient::enable_cb(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& resp)

@@ -49,6 +49,7 @@ Created on Wed Oct 25 11:36:26 2017
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/JointState.h>
@@ -97,6 +98,10 @@ public:
     ~ElfinHWInterface();
     bool prepareSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
                        const std::list<hardware_interface::ControllerInfo> &stop_list);
+
+    void doSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
+                  const std::list<hardware_interface::ControllerInfo> &stop_list);
+
     void read_init();
     void read_update(const ros::Time &time_now);
     void write_update();
@@ -115,6 +120,12 @@ private:
 
     ros::Time read_update_time_;
     ros::Duration read_update_dur_;
+
+    std::vector<bool> pre_switch_flags_;
+    std::vector<boost::shared_ptr<boost::mutex> > pre_switch_mutex_ptrs_;
+
+    bool isModuleMoving(int module_num);
+    double motion_threshold_;
 };
 
 }

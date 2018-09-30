@@ -146,7 +146,7 @@ public:
     bool inTrqMode();
     bool inPosBasedMode();
     void setPosMode();
-    void setPosEffortMode();
+    void setPosTrqMode();
     void setTrqMode();
     bool enable_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool reset_fault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
