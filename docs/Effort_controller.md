@@ -22,7 +22,7 @@ Elfin机械臂支持力矩环控制，可以通过以下方法开启力矩控制
     -   state_publish_rate:  25
     -   action_monitor_rate: 10
 
-    + elfin_effort_controller:
+    + elfin_arm_controller:
     +   type: effort_controllers/JointTrajectoryController
     +   joints:
     +      - elfin_joint1
