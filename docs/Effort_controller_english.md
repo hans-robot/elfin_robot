@@ -22,7 +22,7 @@ The Elfin robot supports torque loop control. You can control the robot with an 
     -   state_publish_rate:  25
     -   action_monitor_rate: 10
 
-    + elfin_effort_controller:
+    + elfin_arm_controller:
     +   type: effort_controllers/JointTrajectoryController
     +   joints:
     +      - elfin_joint1
@@ -60,7 +60,7 @@ The Elfin robot supports torque loop control. You can control the robot with an 
 
     **Please note： The PID parameters in the above example are not optimal parameters. Please set the PID parameters reasonably, otherwise it may cause dangerous situations.**
 
-2. Start the robot arm normally as described in the [README.md](../README.md)
+2. Start the robot arm normally as described in the [README_english.md](../README_english.md)
 
 3. Now you can control the robot with an effort controller and adjust pid parameters with rqt_reconfigure.
 
