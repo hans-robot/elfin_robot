@@ -448,7 +448,16 @@ void ElfinHWInterface::doSwitch(const std::list<hardware_interface::ControllerIn
     for(size_t i=0; i<pre_switch_flags_.size(); i++)
     {
         boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[i]);
-        pre_switch_flags_[i]=false;
+        if(pre_switch_flags_[i])
+        {
+            module_infos_[i].axis1.velocity_cmd=0;
+            module_infos_[i].axis1.effort_cmd=0;
+
+            module_infos_[i].axis2.velocity_cmd=0;
+            module_infos_[i].axis2.effort_cmd=0;
+
+            pre_switch_flags_[i]=false;
+        }
         pre_switch_flags_lock.unlock();
     }
 }
