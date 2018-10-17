@@ -1,9 +1,9 @@
-Effort controller
+力矩模式硬件接口
 ====
 
-The Elfin robot supports torque loop control. You can control the robot with an effort controller by the following method.
+使用硬件接口*hardware_interface::EffortJointInterface*的控制器可以对Elfin进行力矩模式控制。控制器*effort_controllers/JointTrajectoryController*是一个很好的例子，它的使用方法如下：
 
-1. Change the controller type in the file *elfin_robot_bringup/config/elfin_arm_control.yaml*:
+1. 更改elfin_robot_bringup/config/elfin_arm_control.yaml中的控制器类型:
 
     ```diff
     - elfin_arm_controller:
@@ -21,7 +21,6 @@ The Elfin robot supports torque loop control. You can control the robot with an 
     -   stop_trajectory_duration: 0.05
     -   state_publish_rate:  25
     -   action_monitor_rate: 10
-
     + elfin_arm_controller:
     +   type: effort_controllers/JointTrajectoryController
     +   joints:
@@ -54,15 +53,15 @@ The Elfin robot supports torque loop control. You can control the robot with an 
 
     ```
 
-    gains: PID parameters
+    gains: PID相关参数  
     
-    velocity_ff: velocity related feedforward factor. velocity_ff * desired_velocity = velocity_related_feedforward_torque
+    velocity_ff: 此参数会与相应轴的目标速度相乘，以得到相应轴的与速度相关的前馈力矩。
 
-    **Please note： The PID parameters in the above example are not optimal parameters. Please set the PID parameters reasonably, otherwise it may cause dangerous situations.**
+    **请注意： 上述例子中的PID参数并不是最优参数，请合理设置PID参数，否则可能会造成危险情况**
 
-2. Start the robot arm normally as described in the [README_english.md](../README_english.md)
+2. 按[README.md](../README.md)的说明正常启动机械臂。
 
-3. Now you can control the robot with an effort controller and adjust pid parameters with rqt_reconfigure.
+3. 启动后即可使用力矩环控制器，此时可使用rqt_reconfigure调整pid参数。
 
     ```sh
     rosrun rqt_reconfigure rqt_reconfigure
