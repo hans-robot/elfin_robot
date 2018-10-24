@@ -55,19 +55,23 @@ class SlaveInfoWrite(object):
         if rospy.has_param(self.param_ns+'eth_name'):
             self.eth_name=rospy.get_param(self.param_ns+'eth_name')
         else:
-            print 'please set '+self.param_ns+'eth_name parameter first'
+            rospy.logerr('please set '+self.param_ns+'eth_name parameter first')
             return
         
         if rospy.has_param(self.param_ns+'slave_no'):
             self.slave_no=rospy.get_param(self.param_ns+'slave_no')
         else:
-            print 'please set '+self.param_ns+'slave_no parameter first'
+            rospy.logerr('please set '+self.param_ns+'slave_no parameter first')
             return
         
         if rospy.has_param(self.param_ns+'esi_file'):
             self.esi_file=rospy.get_param(self.param_ns+'esi_file')
         else:
-            print 'please set '+self.param_ns+'esi_file parameter first'
+            rospy.logerr('please set '+self.param_ns+'esi_file parameter first')
+            return
+        
+        if 'backup' in self.esi_file:
+            rospy.logerr("esi file's name should not contain 'backup'")
             return
         
         self.esi_write()
