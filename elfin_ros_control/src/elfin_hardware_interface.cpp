@@ -257,22 +257,39 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
 
         for(int j=0; j<module_infos_.size(); j++)
         {
-            if(iter->resources.find(module_infos_[j].axis1.name)!=iter->resources.end()
-               || iter->resources.find(module_infos_[j].axis2.name)!=iter->resources.end())
+            bool axis1_exist=(iter->resources.find(module_infos_[j].axis1.name)!=iter->resources.end());
+            bool axis2_exist=(iter->resources.find(module_infos_[j].axis2.name)!=iter->resources.end());
+
+            if(axis1_exist || axis2_exist)
             {
-                if(!module_infos_[j].client_ptr->isEnabled())
+                if(axis1_exist && axis2_exist)
                 {
-                    ROS_ERROR("can't start %s, because module[%i] is not enabled", iter->name.c_str(), j);
+                    if(!module_infos_[j].client_ptr->isEnabled())
+                    {
+                        ROS_ERROR("can't start %s, because module[%i] is not enabled", iter->name.c_str(), j);
+                        return false;
+                    }
+
+                    if(isModuleMoving(j))
+                    {
+                        ROS_ERROR("can't start %s, because module[%i] is moving", iter->name.c_str(), j);
+                        return false;
+                    }
+
+                    module_no.push_back(j);
+                }
+                else if(axis1_exist)
+                {
+                    ROS_ERROR("If %s includes %s, it should include %s too", iter->name.c_str(),
+                              module_infos_[j].axis1.name.c_str(), module_infos_[j].axis2.name.c_str());
                     return false;
                 }
-
-                if(isModuleMoving(j))
+                else
                 {
-                    ROS_ERROR("can't start %s, because module[%i] is moving", iter->name.c_str(), j);
+                    ROS_ERROR("If %s includes %s, it should include %s too", iter->name.c_str(),
+                              module_infos_[j].axis2.name.c_str(), module_infos_[j].axis1.name.c_str());
                     return false;
                 }
-
-                module_no.push_back(j);
             }
         }
 
