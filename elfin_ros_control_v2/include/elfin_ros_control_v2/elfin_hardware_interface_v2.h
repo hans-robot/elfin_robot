@@ -58,6 +58,7 @@ Created on Tue Sep 25 10:16 2018
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/posvel_command_interface.h>
 #include <elfin_hardware_interface/postrq_command_interface.h>
+#include <elfin_hardware_interface/posveltrq_command_interface.h>
 #include <hardware_interface/robot_hw.h>
 
 #include <controller_manager/controller_manager.h>
@@ -119,6 +120,7 @@ private:
     hardware_interface::EffortJointInterface jnt_effort_cmd_interface_;
     elfin_hardware_interface::PosTrqJointInterface jnt_postrq_cmd_interface_;
     hardware_interface::PosVelJointInterface jnt_posvel_cmd_interface_;
+    elfin_hardware_interface::PosVelTrqJointInterface jnt_posveltrq_cmd_interface_;
 
     ros::NodeHandle n_;
 

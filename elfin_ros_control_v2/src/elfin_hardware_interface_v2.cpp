@@ -177,6 +177,22 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver_v2::EtherCatManager *ma
     }
     registerInterface(&jnt_posvel_cmd_interface_);
 
+    for(size_t i=0; i<module_infos_.size(); i++)
+    {
+        elfin_hardware_interface::PosVelTrqJointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
+                                                                       &module_infos_[i].axis1.position_cmd,
+                                                                       &module_infos_[i].axis1.vel_ff_cmd,
+                                                                       &module_infos_[i].axis1.effort_cmd);
+        jnt_posveltrq_cmd_interface_.registerHandle(jnt_handle_tmp1);
+
+        elfin_hardware_interface::PosVelTrqJointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
+                                                                       &module_infos_[i].axis2.position_cmd,
+                                                                       &module_infos_[i].axis2.vel_ff_cmd,
+                                                                       &module_infos_[i].axis2.effort_cmd);
+        jnt_posveltrq_cmd_interface_.registerHandle(jnt_handle_tmp2);
+    }
+    registerInterface(&jnt_posveltrq_cmd_interface_);
+
     // Initialize motion_threshold_
     motion_threshold_=5e-5;
 }
