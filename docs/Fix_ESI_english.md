@@ -8,7 +8,7 @@ ERROR: slave_no(1) : channel(352) is larger than Input bits (256)
 
 ### How to fix ESI
 
-Open the elfin_ethercat_driver/config/write_esi.yaml file and configure the parameters.
+Open the elfin_ethercat_driver/config/write_esi.yaml file and configure the parameters(ethernet interface name, slave numbers and esi file name). This repo provides two esi files: elfin_motor.esi and elfin_motor_v2.esi .
 
 Then fix ESI with following commands.
 ```sh

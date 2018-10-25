@@ -8,7 +8,7 @@ ERROR: slave_no(1) : channel(352) is larger than Input bits (256)
 
 ### 修复方法
 
-打开elfin_ethercat_driver/config/write_esi.yaml文件，对网卡名以及希望修复的从站编号进行配置。
+打开elfin_ethercat_driver/config/write_esi.yaml文件，对网卡名，希望修复的从站编号以及写入的esi文件进行配置。本软件包提供了两个esi文件: elfin_motor.esi和elfin_motor_v2.esi 。
 
 之后运行以下命令修复ESI
 ```sh
