@@ -1,0 +1,11 @@
+<library path="lib/libelfin_posvel_joint_trajectory_controller">
+
+  <class name="elfin_pos_vel_controllers/JointTrajectoryController"
+         type="elfin_pos_vel_controllers::JointTrajectoryController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      joint trajectory controller with position velocity interface for elfin.
+    </description>
+  </class>
+
+</library>
