@@ -458,6 +458,16 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
             }
         }
 
+        else if(strcmp(iter->hardware_interface.c_str(), "elfin_hardware_interface::PosVelTrqJointInterface")==0)
+        {
+            std::vector<int> module_no_tmp=module_no;
+
+            if(!setGroupPosMode(module_no_tmp))
+            {
+                return false;
+            }
+        }
+
         else if(strcmp(iter->hardware_interface.c_str(), "hardware_interface::EffortJointInterface")==0)
         {
             std::vector<int> module_no_tmp=module_no;
