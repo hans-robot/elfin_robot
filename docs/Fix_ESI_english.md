@@ -1,7 +1,7 @@
 Fix ESI (EtherCAT Slave Infomation)
 ====
 
-If you got an error info as follows, you may need to fix ESI on the robot.
+If you got an error info as follows, you may need to fix ESI on the robot or just try another launch file(elfin_ros_control.launch/elfin_ros_control_v2.launch).
 ```
 ERROR: slave_no(1) : channel(352) is larger than Input bits (256)
 ```

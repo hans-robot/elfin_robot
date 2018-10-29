@@ -27,10 +27,15 @@ Load module model：
 ```sh
 $ roslaunch elfin_robot_bringup elfin_module_bringup.launch model:=module_xx # e.g. module_14
 ```
-Bring up the hardware. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup).
+Bring up the hardware. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup). There are two versions of elfin EtherCAT slaves. Please bring up the hardware accordingly.
 ```sh
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_module_ros_control.launch 
+```
+or
+```sh
+$ sudo chrt 10 bash
+$ roslaunch elfin_robot_bringup elfin_module_ros_control_v2.launch 
 ```
 Get the status of the model with the following topics:  
 
@@ -48,14 +53,23 @@ $ rosservice call /elfin_ros_control/elfin/clear_fault "data: true"
 ```
 
 Enable servos:  
-First stopping the cotrolling of ros controller
-```
-$ rosrun elfin_robot_bringup elfin_module_stop.py
-```
-Then enable servos
 ```sh
 $ rosservice call /elfin_ros_control/elfin/enable_robot "data: true"
 ```
+
+Start the controller:
+If you haven't installed rqt_controller_manager, please install it first
+```sh
+$ sudo apt-get install ros-<distro>-rqt-controller-manager
+```
+Using the short name of your ROS distribution instead of `<distro>`, for example: indigo, kinetic.
+
+Start the controller with rqt_controller_manager
+```sh
+$ rosrun rqt_controller_manager rqt_controller_manager
+```
+![start_module_controller](images/start_module_controller.png)
+
 Control the module:  
 The module is controlled by "elfin_module_controller/follow_joint_trajectory" action. elfin_robot_bringup/script/elfin_module_cmd_pub.py is an example for that.
 ```sh
@@ -66,3 +80,9 @@ disable servos:
 ```sh
 $ rosservice call /elfin_ros_control/elfin/disable_robot "data: true"
 ```
+
+Stop the controller:
+```sh
+$ rosrun rqt_controller_manager rqt_controller_manager
+```
+![stop_module_controller](images/stop_module_controller.png)
