@@ -95,6 +95,7 @@ private:
     ros::ServiceServer disable_robot_server_;
 
     std::string elfin_controller_name_;
+    std::vector<std::string> controller_joint_names_;
 
     ros::ServiceClient switch_controller_client_;
     ros::ServiceClient list_controllers_client_;
