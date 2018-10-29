@@ -71,7 +71,7 @@ class SlaveInfoWrite(object):
             return
         
         if 'backup' in self.esi_file:
-            rospy.logerr("esi file's name should not contain 'backup'")
+            rospy.logerr("esi file's name should not contain 'backup', please rename it")
             return
         
         self.esi_write()

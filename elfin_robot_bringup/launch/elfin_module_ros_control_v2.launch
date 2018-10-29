@@ -1,6 +1,6 @@
 <launch>    
  
-  <node name="elfin_ros_control" pkg="elfin_ros_control" type="elfin_hardware_interface" output="screen">
+  <node name="elfin_ros_control" pkg="elfin_ros_control_v2" type="elfin_hardware_interface_v2" output="screen">
     <rosparam file="$(find elfin_robot_bringup)/config/elfin_drivers.yaml" command="load"/>
   </node>
  
