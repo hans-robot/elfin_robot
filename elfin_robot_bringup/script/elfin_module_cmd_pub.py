@@ -43,20 +43,30 @@ import rospy
 from trajectory_msgs.msg import JointTrajectoryPoint
 from actionlib import SimpleActionClient
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+from sensor_msgs.msg import JointState
 
 class ElfinModuleCmdPub(object):
     def __init__(self):
         self.action_client=SimpleActionClient('elfin_module_controller/follow_joint_trajectory',
                                               FollowJointTrajectoryAction)
         self.action_goal=FollowJointTrajectoryGoal()
+        self.js_sub=rospy.Subscriber('/joint_states', JointState, self.joint_states_cb)
+        self.joint_pos=[]
         
-        self.action_goal.trajectory.joint_names=['elfin_module_joint1', 'elfin_module_joint2']
+        self.module_joint1_name='elfin_module_joint1'
+        self.module_joint2_name='elfin_module_joint2'
+        
+        self.action_goal.trajectory.joint_names=[self.module_joint1_name, self.module_joint2_name]
         self.action_goal.trajectory.header.stamp.secs=0
         self.action_goal.trajectory.header.stamp.nsecs=0
     
     def cmd_pub(self):
+        if len(self.joint_pos)!=2:
+            rospy.logwarn("Didn't get joint_states of "+self.module_joint1_name+" and "+self.module_joint2_name)
+            return
+        
         point_goal=JointTrajectoryPoint()
-        point_goal.positions=[0.4, -0.5]
+        point_goal.positions=[self.joint_pos[0]+0.4, self.joint_pos[1]-0.5]
         point_goal.velocities=[0, 0]
         point_goal.accelerations=[0, 0]
         point_goal.time_from_start=rospy.Time(secs=2, nsecs=0)
@@ -65,10 +75,23 @@ class ElfinModuleCmdPub(object):
         self.action_client.wait_for_server()
         self.action_client.send_goal(self.action_goal)
         self.action_goal.trajectory.points=[]
+    
+    def joint_states_cb(self, data):
+        if self.module_joint1_name in data.name:
+            joint1_index=data.name.index(self.module_joint1_name)
+            self.joint_pos.append(data.position[joint1_index])
+        
+        if self.module_joint2_name in data.name:
+            joint2_index=data.name.index(self.module_joint2_name)
+            self.joint_pos.append(data.position[joint2_index])
+        
+        self.js_sub.unregister()
+        
 
 if __name__ == "__main__":
     rospy.init_node("elfin_module_cmd_pub", anonymous=True)
     cmd_publisher=ElfinModuleCmdPub()
+    rospy.sleep(3)
     cmd_publisher.cmd_pub()
     rospy.spin()
 
