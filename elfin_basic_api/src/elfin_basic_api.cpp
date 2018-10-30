@@ -54,7 +54,7 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroup *group, std::
     enable_robot_server_=local_nh_.advertiseService("enable_robot", &ElfinBasicAPI::enableRobot_cb, this);
     disable_robot_server_=local_nh_.advertiseService("disable_robot", &ElfinBasicAPI::disableRobot_cb, this);
 
-    elfin_controller_name_="elfin_arm_controller";
+    elfin_controller_name_=local_nh_.param<std::string>("controller_name", "elfin_arm_controller");
 
     switch_controller_client_=root_nh_.serviceClient<controller_manager_msgs::SwitchController>("/controller_manager/switch_controller");
     list_controllers_client_=root_nh_.serviceClient<controller_manager_msgs::ListControllers>("/controller_manager/list_controllers");
@@ -275,13 +275,36 @@ bool ElfinBasicAPI::stopActCtrlrs(std_srvs::SetBool::Response &resp)
     std::vector<std::string> controllers_to_stop;
     controllers_to_stop.clear();
 
+    controller_joint_names_.clear();
+    for(int i=0; i<list_controllers_response.controller.size(); i++)
+    {
+        std::string name_tmp=list_controllers_response.controller[i].name;
+        std::vector<std::string> resrc_tmp=list_controllers_response.controller[i].resources;
+        if(strcmp(name_tmp.c_str(), elfin_controller_name_.c_str())==0)
+        {
+            controller_joint_names_.insert(controller_joint_names_.end(),
+                                           resrc_tmp.begin(),
+                                           resrc_tmp.end());
+            break;
+        }
+    }
+
+
     for(int i=0; i<list_controllers_response.controller.size(); i++)
     {
         std::string state_tmp=list_controllers_response.controller[i].state;
         std::string name_tmp=list_controllers_response.controller[i].name;
-        if(strcmp(state_tmp.c_str(), "running")==0 && list_controllers_response.controller[i].resources.size()>0)
+        std::vector<std::string> resrc_tmp=list_controllers_response.controller[i].resources;
+        if(strcmp(state_tmp.c_str(), "running")==0 && resrc_tmp.size()>0)
         {
-            controllers_to_stop.push_back(name_tmp);
+            for(int k=0; k<controller_joint_names_.size(); k++)
+            {
+                if(std::find(resrc_tmp.begin(), resrc_tmp.end(), controller_joint_names_[k])!=resrc_tmp.end())
+                {
+                    controllers_to_stop.push_back(name_tmp);
+                    break;
+                }
+            }
         }
     }
 
