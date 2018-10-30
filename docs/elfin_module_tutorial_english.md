@@ -57,7 +57,7 @@ Enable servos:
 $ rosservice call /elfin_ros_control/elfin/enable_robot "data: true"
 ```
 
-Start the controller:
+Start the controller:  
 If you haven't installed rqt_controller_manager, please install it first
 ```sh
 $ sudo apt-get install ros-<distro>-rqt-controller-manager
