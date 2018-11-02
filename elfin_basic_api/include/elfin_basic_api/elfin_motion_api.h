@@ -68,11 +68,13 @@ public:
     ElfinMotionAPI(moveit::planning_interface::MoveGroupInterface *group, std::string action_name, planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor);
     void jointGoalCB(const sensor_msgs::JointStateConstPtr &msg);
     void cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg);
+    void trajectoryScaling(moveit_msgs::RobotTrajectory &trajectory, double scale);
     void cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg);
     bool getRefLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getEndLink_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     void torquesPubTimer_cb(const ros::TimerEvent& evt);
 
+    void setVelocityScaling(double data);
     void setRefFrames(std::string ref_link);
     void setEndFrames(std::string end_link);
 
@@ -87,6 +89,8 @@ private:
 
     actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> action_client_;
     control_msgs::FollowJointTrajectoryGoal goal_;
+
+    double velocity_scaling_;
 
     ros::Subscriber joint_goal_sub_;
     ros::Subscriber cart_goal_sub_;

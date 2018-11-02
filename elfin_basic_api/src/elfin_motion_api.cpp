@@ -124,6 +124,26 @@ void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
     }
 }
 
+void ElfinMotionAPI::trajectoryScaling(moveit_msgs::RobotTrajectory &trajectory, double scale)
+{
+    if(scale<=0 || scale>=1)
+    {
+        return;
+    }
+    for(int i=0; i<trajectory.joint_trajectory.points.size(); i++)
+    {
+        trajectory.joint_trajectory.points[i].time_from_start.operator *=(1.0/scale);
+        for(int j=0; j<trajectory.joint_trajectory.points[i].velocities.size(); j++)
+        {
+            trajectory.joint_trajectory.points[i].velocities[j]*=scale;
+        }
+        for(int j=0; j<trajectory.joint_trajectory.points[i].accelerations.size(); j++)
+        {
+            trajectory.joint_trajectory.points[i].accelerations[j]*=(scale*scale);
+        }
+    }
+}
+
 void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
 {
     moveit_msgs::RobotTrajectory cart_path;
@@ -173,6 +193,7 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
     if(fraction==1)
     {
         ROS_INFO("the cartesian path can be %.2f%% acheived", fraction * 100.0);
+        trajectoryScaling(cart_path, velocity_scaling_);
         cart_plan.trajectory_=cart_path;
         group_->asyncExecute(cart_plan);
     }
@@ -218,6 +239,11 @@ void ElfinMotionAPI::torquesPubTimer_cb(const ros::TimerEvent& evt)
     torques_msg_.data=v_t;
 
     torques_publisher_.publish(torques_msg_);
+}
+
+void ElfinMotionAPI::setVelocityScaling(double data)
+{
+    velocity_scaling_=data;
 }
 
 void ElfinMotionAPI::setRefFrames(std::string ref_link)

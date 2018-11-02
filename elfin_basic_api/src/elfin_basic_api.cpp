@@ -90,6 +90,7 @@ void ElfinBasicAPI::setVelocityScaling(double data)
 {
     velocity_scaling_=data;
     teleop_api_->setVelocityScaling(velocity_scaling_);
+    motion_api_->setVelocityScaling(velocity_scaling_);
 }
 
 bool ElfinBasicAPI::setRefLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp)
