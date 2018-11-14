@@ -98,6 +98,8 @@ private:
     ros::Publisher pub_output_;
     ros::ServiceServer server_enable_;
     ros::ServiceServer server_reset_fault_;
+    ros::ServiceServer server_open_brake_;
+    ros::ServiceServer server_close_brake_;
     std_msgs::String txpdo_msg_;
     std_msgs::String rxpdo_msg_;
     std::vector<ElfinPDOunit> pdo_input; // txpdo
@@ -150,6 +152,8 @@ public:
     void setTrqMode();
     bool enable_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool reset_fault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool open_brake_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
+    bool close_brake_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
 };
 }
 #endif
