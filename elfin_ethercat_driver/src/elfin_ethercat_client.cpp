@@ -48,15 +48,24 @@ ElfinEtherCATClient::ElfinEtherCATClient(EtherCatManager *manager, int slave_no)
     std::string info_rx_name="elfin_module_info_rx_slave";
     std::string enable_server_name="elfin_module_enable_slave";
     std::string reset_fault_server_name="elfin_module_reset_fault_slave";
+    std::string open_brake_server_name="elfin_module_open_brake_slave";
+    std::string close_brake_server_name="elfin_module_close_brake_slave";
+
     std::string slave_num=boost::lexical_cast<std::string>(slave_no);
+
     info_tx_name.append(slave_num);
     info_rx_name.append(slave_num);
     enable_server_name.append(slave_num);
     reset_fault_server_name.append(slave_num);
+    open_brake_server_name.append(slave_num);
+    close_brake_server_name.append(slave_num);
+
     pub_input_=n_.advertise<std_msgs::String>(info_tx_name, 1);
     pub_output_=n_.advertise<std_msgs::String>(info_rx_name, 1);
     server_enable_=n_.advertiseService(enable_server_name, &ElfinEtherCATClient::enable_cb, this);
     server_reset_fault_=n_.advertiseService(reset_fault_server_name, &ElfinEtherCATClient::reset_fault_cb, this);
+    server_open_brake_=n_.advertiseService(open_brake_server_name, &ElfinEtherCATClient::open_brake_cb, this);
+    server_close_brake_=n_.advertiseService(close_brake_server_name, &ElfinEtherCATClient::close_brake_cb, this);
 
     // init pdo_input and output
     std::string name_pdo_input[12]={"Axis1_Statusword", "Axis1_ActPosition", "Axis1_ActCur", "Axis1_ErrorCode",
@@ -674,5 +683,178 @@ bool ElfinEtherCATClient::reset_fault_cb(std_srvs::SetBool::Request &req, std_sr
     resp.message="fault is reset";
     return true;
 }
+
+bool ElfinEtherCATClient::open_brake_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="request's data is false";
+        return true;
+    }
+
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
+        //channel1
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x401f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0500);
+        struct timespec before, tick;
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 1 failed";
+                resp.success=false;
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+    }
+    else
+    {
+        resp.message="Channel 1 failed, the reason might be there is a fault or the motor is enabled";
+        resp.success=false;
+        return true;
+    }
+
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
+        //channel2
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x401f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x5000);
+        struct timespec before, tick;
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 2 failed";
+                resp.success=false;
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+    }
+    else
+    {
+        resp.message="Channel 2 failed, the reason might be there is a fault or the motor is enabled";
+        resp.success=false;
+        return true;
+    }
+
+    resp.message="band-type brake is opened";
+    resp.success=true;
+    return true;
+}
+
+bool ElfinEtherCATClient::close_brake_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp)
+{
+    if(!req.data)
+    {
+        resp.success=false;
+        resp.message="request's data is false";
+        return true;
+    }
+
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
+        //channel1
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x401f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0600);
+        struct timespec before, tick;
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 1 failed";
+                resp.success=false;
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+    }
+    else
+    {
+        resp.message="Channel 1 failed, the reason might be there is a fault or the motor is enabled";
+        resp.success=false;
+        return true;
+    }
+
+    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    {
+        //channel2
+        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x401f);
+        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x6000);
+        struct timespec before, tick;
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            {
+                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
+                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
+                usleep(100000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 2 failed";
+                resp.success=false;
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+    }
+    else
+    {
+        resp.message="Channel 2 failed, the reason might be there is a fault or the motor is enabled";
+        resp.success=false;
+        return true;
+    }
+
+    resp.message="band-type brake is closed";
+    resp.success=true;
+    return true;
+}
+
 }
 
