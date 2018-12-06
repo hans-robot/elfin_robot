@@ -107,6 +107,19 @@ example:
 * **elfin_ros_control/elfin/io_port1/get_rxpdo (std_srvs/SetBool)**  
 呼叫本服务得到的反馈信息中会包含IO从站的rxpdo信息
 
+* **elfin_module_open_brake_slaveX(std_srvs/SetBool)**  
+在模组未使能情况下，呼叫本服务可以打开相应模组的抱闸  
+for example:
+	```sh
+	rosservice call elfin_module_open_brake_slave1 "data: true"
+	```
+
+* **elfin_module_close_brake_slaveX(std_srvs/SetBool)**  
+在模组未使能情况下，呼叫本服务可以关闭相应模组的抱闸  
+for example:
+	```sh
+	rosservice call elfin_module_close_brake_slave1 "data: true"
+	```
 
 ***以下Services都会被Elfin Control Panel 界面调用， 不建议客户直接使用***
 
