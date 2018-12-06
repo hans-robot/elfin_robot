@@ -108,6 +108,20 @@ You can get the content of TxPDOs from the response of this service.
 * **elfin_ros_control/elfin/io_port1/get_rxpdo (std_srvs/SetBool)**  
 You can get the content of RxPDOs from the response of this service.
 
+* **elfin_module_open_brake_slaveX(std_srvs/SetBool)**  
+When the module is not enabled, you can open the brake of the corresponding module using this service.  
+for example:
+	```sh
+	rosservice call elfin_module_open_brake_slave1 "data: true"
+	```
+
+* **elfin_module_close_brake_slaveX(std_srvs/SetBool)**  
+When the module is not enabled, you can close the brake of the corresponding module using this service.  
+for example:
+	```sh
+	rosservice call elfin_module_close_brake_slave1 "data: true"
+	```
+
 ***Following are the services, that support "Elfin Control Panel" interface.  customers are not supposed to use them.***
 
 * **elfin_basic_api/enable_robot (std_srvs/SetBool)**  
