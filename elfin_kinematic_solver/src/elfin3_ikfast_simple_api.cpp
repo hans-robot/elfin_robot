@@ -159,6 +159,11 @@ void getSolution(const IkSolutionList<IkReal>& solutions, int i, std::vector<dou
 bool Elfin3KinematicSolver::getPositionIK(const Eigen::Vector3d& trans, const Eigen::Matrix3d& orient, const std::vector<double>& vfree,
                    const std::vector<double>& seed_state, std::vector<double>& solution)
 {
+    if(seed_state.size()!=6)
+    {
+        return false;
+    }
+
     IkSolutionList<IkReal> solutions;
     int numsol = solve(trans, orient, vfree, solutions);
 
@@ -196,6 +201,11 @@ bool Elfin3KinematicSolver::getPositionIK(const Eigen::Vector3d& trans, const Ei
 
 bool Elfin3KinematicSolver::getPositionFK(const std::vector<double>& joint_angles, Eigen::Vector3d& trans, Eigen::Matrix3d& orient)
 {
+    if(joint_angles.size()!=6)
+    {
+        return false;
+    }
+
     IkReal eerot[9], eetrans[3];
     IkReal angles[joint_angles.size()];
     for (unsigned char i = 0; i < joint_angles.size(); i++)
