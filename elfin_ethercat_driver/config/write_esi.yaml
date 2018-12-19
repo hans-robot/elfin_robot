@@ -1,3 +1,3 @@
 eth_name: eth0
 slave_no: [1, 2, 3]
-esi_file: elfin_motor.esi
+esi_file: elfin_module.esi
