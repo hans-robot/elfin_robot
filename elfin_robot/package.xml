@@ -1,0 +1,41 @@
+<package format="2">
+
+  <name>elfin_robot</name>
+  <version>0.0.0</version>
+  <description>
+     metapackage for Elfin robot
+  </description>
+  <author email="liucong.cdhaw@gmail.com">Cong Liu</author>
+  <maintainer email="liucong.cdhaw@gmail.com">Cong Liu</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://wiki.ros.org/Robots/Elfin</url>
+  <url type="bugtracker">https://github.com/hans-robot/elfin_robot/issues</url>
+  <url type="repository">https://github.com/hans-robot/elfin_robot</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>elfin3_moveit_config</exec_depend>
+  <exec_depend>elfin5_moveit_config</exec_depend>
+  <exec_depend>elfin10_moveit_config</exec_depend>
+  <exec_depend>elfin_basic_api</exec_depend>
+  <exec_depend>elfin_description</exec_depend>
+  <exec_depend>elfin_ethercat_driver</exec_depend>
+  <exec_depend>elfin_ethercat_driver_v2</exec_depend>
+  <exec_depend>elfin_gazebo</exec_depend>
+  <exec_depend>elfin3_ikfast_plugin</exec_depend>
+  <exec_depend>elfin5_ikfast_plugin</exec_depend>
+  <exec_depend>elfin10_ikfast_plugin</exec_depend>
+  <exec_depend>elfin_kinematic_solver</exec_depend>
+  <exec_depend>elfin_robot_bringup</exec_depend>
+  <exec_depend>elfin_robot_msgs</exec_depend>
+  <exec_depend>elfin_ros_control</exec_depend>
+  <exec_depend>elfin_ros_control_v2</exec_depend>
+  <exec_depend>elfin_ros_controllers</exec_depend>
+  
+  <export>
+    <metapackage/>
+  </export>
+
+</package>
