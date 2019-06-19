@@ -15,5 +15,6 @@
   <run_depend>controller_manager</run_depend>
   <run_depend>elfin_ros_control</run_depend>
   <run_depend>elfin_ros_control_v2</run_depend>
+  <run_depend>joint_trajectory_controller</run_depend>
   <run_depend>robot_state_publisher</run_depend>
 </package>
