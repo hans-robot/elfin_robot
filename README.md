@@ -132,6 +132,11 @@ $ roslaunch elfin_robot_bringup elfin_ros_control.launch
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control_v2.launch
 ```
+或如果购买的是485末端的机器人
+```sh
+$ sudo chrt 10 bash
+$ roslaunch elfin_robot_bringup elfin_ros_control_v3.launch
+```
 
 运行MoveIt!模块, RViz界面:
 ```sh
