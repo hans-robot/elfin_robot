@@ -147,7 +147,7 @@ or
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control_v2.launch
 ```
-or you bought the 485 end robot
+or you bought the RS485 end robot
 ```sh
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control_v3.launch
