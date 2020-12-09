@@ -70,9 +70,9 @@ ElfinEtherCATIOClient::ElfinEtherCATIOClient(EtherCatManager *manager, int slave
     // Initialize services
     write_do_=io_nh_.advertiseService("write_do", &ElfinEtherCATIOClient::writeDO_cb, this);
     read_di_=io_nh_.advertiseService("read_di", &ElfinEtherCATIOClient::readDI_cb, this);
+    read_do_=io_nh_.advertiseService("read_do", &ElfinEtherCATIOClient::readDO_cb, this); //20201201: add read DO
     get_txpdo_server_=io_nh_.advertiseService("get_txpdo", &ElfinEtherCATIOClient::getTxPDO_cb, this);
     get_rxpdo_server_=io_nh_.advertiseService("get_rxpdo", &ElfinEtherCATIOClient::getRxPDO_cb, this);
-
 }
 
 ElfinEtherCATIOClient::~ElfinEtherCATIOClient()
@@ -170,6 +170,13 @@ bool ElfinEtherCATIOClient::writeDO_cb(elfin_robot_msgs::ElfinIODWrite::Request 
 bool ElfinEtherCATIOClient::readDI_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp)
 {
     resp.digital_input=readInput_unit(elfin_io_txpdo::DIGITAL_INPUT);
+    return true;
+}
+
+// 20201201: add read DO
+bool ElfinEtherCATIOClient::readDO_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp)
+{
+    resp.digital_input=readOutput_unit(elfin_io_txpdo::DIGITAL_INPUT);
     return true;
 }
 
