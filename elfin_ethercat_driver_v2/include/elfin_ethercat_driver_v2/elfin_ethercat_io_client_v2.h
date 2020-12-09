@@ -83,6 +83,7 @@ private:
 
     ros::ServiceServer write_do_;
     ros::ServiceServer read_di_;
+    ros::ServiceServer read_do_; // 20201201: add read DO
     ros::ServiceServer get_txpdo_server_;
     ros::ServiceServer get_rxpdo_server_;
 
@@ -98,9 +99,9 @@ public:
 
     bool writeDO_cb(elfin_robot_msgs::ElfinIODWrite::Request &req, elfin_robot_msgs::ElfinIODWrite::Response &resp);
     bool readDI_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp);
+    bool readDO_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp); // 20201201: add read DO.
     bool getTxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool getRxPDO_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
-
 };
 
 }
