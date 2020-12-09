@@ -43,12 +43,14 @@ Created on Fri Jul 28 12:18:05 2017
 from __future__ import division
 import rospy
 import math
+import os # 20201209: add os path
 import tf
 import moveit_commander
 from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 from elfin_robot_msgs.srv import SetString, SetStringRequest, SetStringResponse
 from elfin_robot_msgs.srv import SetInt16, SetInt16Request
+from elfin_robot_msgs.srv import *
 import wx
 from sensor_msgs.msg import JointState
 from actionlib import SimpleActionClient
@@ -59,7 +61,7 @@ import dynamic_reconfigure.client
 class MyFrame(wx.Frame):  
   
     def __init__(self,parent,id):  
-        the_size=(700, 570)
+        the_size=(700, 700) # height from 550 change to 700
         wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100)) 
         self.panel=wx.Panel(self)
         font=self.panel.GetFont()
@@ -74,6 +76,16 @@ class MyFrame(wx.Frame):
 
         self.controller_ns='elfin_arm_controller/'
         self.elfin_driver_ns='elfin_ros_control/elfin/'
+        self.elfin_IO_ns='elfin_ros_control/elfin/io_port1/' # 20201126: add IO ns
+
+        self.call_read_do_req = ElfinIODReadRequest()
+        self.call_read_di_req = ElfinIODReadRequest()
+        self.call_read_do_req.data = True
+        self.call_read_di_req.data = True
+        self.call_read_do = rospy.ServiceProxy(self.elfin_IO_ns+'read_do',ElfinIODRead)
+        self.call_read_di = rospy.ServiceProxy(self.elfin_IO_ns+'read_di',ElfinIODRead)
+        # 20201126: add service for write_do
+        self.call_write_DO=rospy.ServiceProxy(self.elfin_IO_ns+'write_do',ElfinIODWrite)
         
         self.elfin_basic_api_ns='elfin_basic_api/'
         
@@ -84,6 +96,8 @@ class MyFrame(wx.Frame):
         
         self.ref_link_lock=threading.Lock()
         self.end_link_lock=threading.Lock()
+        self.DO_btn_lock = threading.Lock() # 20201208: add the threading lock
+        self.DI_show_lock = threading.Lock()
                 
         self.js_display=[0]*6 # joint_states
         self.jm_button=[0]*6 # joints_minus
@@ -94,15 +108,26 @@ class MyFrame(wx.Frame):
         self.pm_button=[0]*6 # pcs_minus
         self.pp_button=[0]*6 # pcs_plus
         self.ps_label=[0]*6 # pcs_states
-                      
-        self.display_init()
-        self.key=[]
-                                
-        btn_height=390
+
+        # 20201208: add the button array
+        self.DO_btn_display=[0]*4 # DO states
+        self.DI_display=[0]*4 # DI states
+        self.LED_display=[0]*4 # LED states
+        self.End_btn_display=[0]*4 # end button states
+
+        self.btn_height=370 # 20201126: from 390 change to 370
+        self.btn_path = os.path.dirname(os.path.realpath(__file__)) # 20201209: get the elfin_gui.py path
         btn_lengths=[]
+        self.DO_DI_btn_length=[0,92,157,133] # 20201209: the length come from servo on, servo off, home, stop button
+        self.btn_interstice=22 # 20201209: come from btn_interstice
+
+        self.display_init()              
+        self.key=[]
+        self.DO_btn=[0,0,0,0,0,0,0,0] # DO state, first four bits is DO, the other is LED
+        self.DI_show=[0,0,0,0,0,0,0,0] # DI state, first four bits is DI, the other is the end button
                 
         self.power_on_btn=wx.Button(self.panel, label=' Servo On ', name='Servo On',
-                                    pos=(20, btn_height))
+                                    pos=(20, self.btn_height))
         btn_lengths.append(self.power_on_btn.GetSize()[0])
         btn_total_length=btn_lengths[0]
         
@@ -121,79 +146,83 @@ class MyFrame(wx.Frame):
         self.stop_btn=wx.Button(self.panel, label='Stop', name='Stop')
         btn_lengths.append(self.stop_btn.GetSize()[0])
         btn_total_length+=btn_lengths[4]
+
+        self.btn_interstice=(550-btn_total_length)/4
+        btn_pos_tmp=btn_lengths[0]+self.btn_interstice+20 # 20201126: 20:init length + btn0 length + btn_inter:gap
+        self.power_off_btn.SetPosition((btn_pos_tmp, self.btn_height))
         
-        btn_interstice=(550-btn_total_length)/4
-        btn_pos_tmp=btn_lengths[0]+btn_interstice+20
-        self.power_off_btn.SetPosition((btn_pos_tmp, btn_height))
+        btn_pos_tmp+=btn_lengths[1]+self.btn_interstice
+        self.reset_btn.SetPosition((btn_pos_tmp, self.btn_height))
         
-        btn_pos_tmp+=btn_lengths[1]+btn_interstice
-        self.reset_btn.SetPosition((btn_pos_tmp, btn_height))
+        btn_pos_tmp+=btn_lengths[2]+self.btn_interstice
+        self.home_btn.SetPosition((btn_pos_tmp, self.btn_height))
         
-        btn_pos_tmp+=btn_lengths[2]+btn_interstice
-        self.home_btn.SetPosition((btn_pos_tmp, btn_height))
-        
-        btn_pos_tmp+=btn_lengths[3]+btn_interstice
-        self.stop_btn.SetPosition((btn_pos_tmp, btn_height))
+        btn_pos_tmp+=btn_lengths[3]+self.btn_interstice
+        self.stop_btn.SetPosition((btn_pos_tmp, self.btn_height))
         
         self.servo_state_label=wx.StaticText(self.panel, label='Servo state:',
-                                              pos=(590, btn_height-10))
+                                              pos=(590, self.btn_height-10))
         self.servo_state_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
-                                    value='', pos=(600, btn_height+10))
+                                    value='', pos=(600, self.btn_height+10))
         self.servo_state=bool()
         
         self.servo_state_lock=threading.Lock()
         
         self.fault_state_label=wx.StaticText(self.panel, label='Fault state:',
-                                              pos=(590, btn_height+60))
+                                              pos=(590, self.btn_height+60))
         self.fault_state_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
-                                    value='', pos=(600, btn_height+80))
+                                    value='', pos=(600, self.btn_height+80))
         self.fault_state=bool()
         
         self.fault_state_lock=threading.Lock()
+
+        # 20201209: add the description of end button
+        self.end_button_state_label=wx.StaticText(self.panel, label='END Button state',
+                                            pos=(555,self.btn_height+172))
         
         self.reply_show_label=wx.StaticText(self.panel, label='Result:',
-                                           pos=(20, btn_height+120))
+                                           pos=(20, self.btn_height+260)) # 20201126: btn_height from 120 change to 260.
         self.reply_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
-                                    value='', size=(670, 30), pos=(20, btn_height+140))
+                                    value='', size=(670, 30), pos=(20, self.btn_height+280))# 20201126: btn_height from 140 change to 280.
         
         link_textctrl_length=(btn_pos_tmp-40)/2
         
         self.ref_links_show_label=wx.StaticText(self.panel, label='Ref. link:',
-                                                    pos=(20, btn_height+60))
+                                                    pos=(20, self.btn_height+210)) # 20201126: btn_height from 60 change to 210.
         
         self.ref_link_show=wx.TextCtrl(self.panel, style=(wx.TE_READONLY),
                                            value=self.ref_link_name, size=(link_textctrl_length, 30),
-                                           pos=(20, btn_height+80))
+                                           pos=(20, self.btn_height+230)) # 20201126: btn_height from 80 change to 230.
         
         self.end_link_show_label=wx.StaticText(self.panel, label='End link:',
-                                               pos=(link_textctrl_length+30, btn_height+60))
+                                               pos=(link_textctrl_length+30, self.btn_height+210))# 20201126: btn_height from 80 change to 200.
         
         self.end_link_show=wx.TextCtrl(self.panel, style=(wx.TE_READONLY),
                                        value=self.end_link_name, size=(link_textctrl_length, 30),
-                                       pos=(link_textctrl_length+30, btn_height+80))
+                                       pos=(link_textctrl_length+30, self.btn_height+230))
         
         self.set_links_btn=wx.Button(self.panel, label='Set links', name='Set links')
-        self.set_links_btn.SetPosition((btn_pos_tmp, btn_height+75))
+        self.set_links_btn.SetPosition((btn_pos_tmp, self.btn_height+230)) # 20201126: btn_height from 75 change to 220.
         
         # the variables about velocity scaling
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
                                               default=0.4)
         default_velocity_scaling=str(round(velocity_scaling_init, 2))
         self.velocity_setting_label=wx.StaticText(self.panel, label='Velocity Scaling',
-                                                  pos=(20, btn_height-70))
+                                                  pos=(20, self.btn_height-55)) # 20201126: btn_height from 70 change to 55
         self.velocity_setting=wx.Slider(self.panel, value=int(velocity_scaling_init*100),
                                         minValue=1, maxValue=100,
                                         style = wx.SL_HORIZONTAL,
                                         size=(500, 30),
-                                        pos=(45, btn_height-50))
+                                        pos=(45, self.btn_height-35)) # 20201126: btn_height from 70 change to 35
         self.velocity_setting_txt_lower=wx.StaticText(self.panel, label='1%',
-                                                    pos=(20, btn_height-45))
+                                                    pos=(20, self.btn_height-35)) # 20201126: btn_height from 45 change to 35
         self.velocity_setting_txt_upper=wx.StaticText(self.panel, label='100%',
-                                                    pos=(550, btn_height-45))
+                                                    pos=(550, self.btn_height-35))# 20201126: btn_height from 45 change to 35
         self.velocity_setting_show=wx.TextCtrl(self.panel, 
                                                style=(wx.TE_CENTER|wx.TE_READONLY), 
                                                 value=default_velocity_scaling,
-                                                pos=(600, btn_height-55))
+                                                pos=(600, self.btn_height-45))# 20201126: btn_height from 55 change to 45
         self.velocity_setting.Bind(wx.EVT_SLIDER, self.velocity_setting_cb)
         self.teleop_api_dynamic_reconfig_client=dynamic_reconfigure.client.Client(self.elfin_basic_api_ns,
                                                                                   config_callback=self.basic_api_reconfigure_cb)
@@ -386,6 +415,30 @@ class MyFrame(wx.Frame):
                                            pos=pos_ps_display)
             self.ps_display[i].SetPosition((pos_ps_display[0], pos_ps_display[1]+abs(40-self.ps_display[i].GetSize()[1])/2))
             dis_tmp+=ps_btn_length[3]+ps_distances[3]
+
+        # 20201209: add the DO,LED,DI,end button.
+        for i in xrange(len(self.DO_btn_display)):
+            self.DO_btn_display[i]=wx.Button(self.panel,label='DO'+str(i),
+                                        pos=(20+(self.DO_DI_btn_length[i]+self.btn_interstice)*i,
+                                        self.btn_height+40))
+            self.DO_btn_display[i].Bind(wx.EVT_BUTTON,
+                                    lambda evt,marker=i,cl=self.call_write_DO : 
+                                    self.call_write_DO_command(evt,marker,cl))
+
+            self.DI_display[i]=wx.TextCtrl(self.panel, style=(wx.TE_CENTER | wx.TE_READONLY), value='DI'+str(i),
+                                size=(self.DO_btn_display[i].GetSize()), 
+                                pos=(20+(self.DO_DI_btn_length[i]+self.btn_interstice)*i,self.btn_height+80))
+
+            self.LED_display[i]=wx.Button(self.panel,label='LED'+str(i),
+                                        pos=(20+(self.DO_DI_btn_length[i]+self.btn_interstice)*i,self.btn_height+120))
+            self.LED_display[i].Bind(wx.EVT_BUTTON,
+                                    lambda evt, marker=4+i, cl=self.call_write_DO : 
+                                    self.call_write_DO_command(evt, marker,cl))
+
+            png=wx.Image(self.btn_path+'/btn_icon/End_btn'+str(i)+'_low.png',wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+            self.End_btn_display[i]=wx.StaticBitmap(self.panel,-1,png,
+                                                pos=(40+(self.DO_DI_btn_length[i]+self.btn_interstice)*i,
+                                                self.btn_height+160))
     
     def velocity_setting_cb(self, event):
         current_velocity_scaling=self.velocity_setting.GetValue()*0.01
@@ -482,6 +535,127 @@ class MyFrame(wx.Frame):
             resp.message='no such service in simulation'
             wx.CallAfter(self.update_reply_show, resp)
         wx.CallAfter(self.destroy_dialog)
+
+    # 20201201: add function for processing value to DO_btn
+    def process_DO_btn(self,value):
+        if self.DO_btn_lock.acquire():
+            for i in range(0,8):
+                tmp = (value >> (12 + i)) & 0x01
+                self.DO_btn[i]=tmp
+            self.DO_btn_lock.release()
+
+    # 20201201: add function to read DO.
+    def call_read_DO_command(self):
+        try:
+            client = self.call_read_do
+            val = client.call(self.call_read_do_req).digital_input
+            self.process_DO_btn(val)
+        except rospy.ServiceException, e:
+            resp=ElfinIODReadResponse()
+            resp.digital_input=0x0000
+
+    # 20201201: add function for processing value
+    def process_DI_btn(self,value):
+        if self.DI_show_lock.acquire():
+            if value > 0:
+                for i in range(0,8):
+                    tmp = (value >> (16 + i)) & 0x01
+                    self.DI_show[i]=tmp
+            else:
+                self.DI_show = [0,0,0,0,0,0,0,0]
+        self.DI_show_lock.release()
+    
+    # 20201201: add function to read DI.
+    def call_read_DI_command(self):
+        try:
+            client = self.call_read_di
+            val = client.call(self.call_read_di_req).digital_input
+            self.process_DI_btn(val)
+        except rospy.ServiceException, e:
+            resp=ElfinIODReadResponse()
+            resp.digital_input=0x0000
+
+    # 20201202: add function to read DO and DI.
+    def monitor_DO_DI(self,evt):
+        self.call_read_DI_command()
+        self.call_read_DO_command()
+
+    # 20201126: add function to write DO.
+    def call_write_DO_command(self, event, marker, client):
+        self.justification_DO_btn(marker)
+        request = 0
+        try:
+            self.DO_btn_lock.acquire()
+            for i in range(0,8):
+                request = request + self.DO_btn[i]*pow(2,i)
+            resp=client.call(request << 12)
+            self.DO_btn_lock.release()
+        except rospy.ServiceException, e:
+            self.DO_btn_lock.release()
+            resp=ElfinIODWriteResponse()
+            resp.success=False
+            self.justification_DO_btn(marker)
+            rp=SetBoolResponse()
+            rp.success=False
+            rp.message='no such service for DO control'
+            wx.CallAfter(self.update_reply_show, rp)
+
+    # 20201127: add justification to DO_btn
+    def justification_DO_btn(self,marker):
+        self.DO_btn_lock.acquire()
+        if 0 == self.DO_btn[marker]:
+            self.DO_btn[marker] = 1
+        else:
+             self.DO_btn[marker] = 0
+        self.DO_btn_lock.release()
+
+    # 20201201: add function to set DO_btn colour
+    def set_DO_btn_colour(self):
+        self.DO_btn_lock.acquire()
+        for i in range(0,4):
+            if 0 == self.DO_btn[i]:
+                self.DO_btn_display[i].SetBackgroundColour(wx.NullColour)
+            else:
+                self.DO_btn_display[i].SetBackgroundColour(wx.Colour(200,225,200))
+        self.DO_btn_lock.release()
+
+    # 20201201: add function to set DI_show colour
+    def set_DI_show_colour(self):
+        self.DI_show_lock.acquire()
+        for i in range(0,4):
+            if 0 == self.DI_show[i]:
+                self.DI_display[i].SetBackgroundColour(wx.NullColour)
+            else:
+                self.DI_display[i].SetBackgroundColour(wx.Colour(200,225,200))
+        self.DI_show_lock.release()
+
+    # 20201207: add function to set LED colour
+    def set_LED_show_colour(self):
+        self.DO_btn_lock.acquire()
+        for i in range(4,8):
+            if 0 == self.DO_btn[i]:
+                self.LED_display[i-4].SetBackgroundColour(wx.NullColour)
+            else:
+                self.LED_display[i-4].SetBackgroundColour(wx.Colour(200,225,200))
+        self.DO_btn_lock.release()
+
+    # 20201207: add function to set End_btn colour
+    def set_End_btn_colour(self):
+        self.DI_show_lock.acquire()
+        for i in range(4,8):
+            if 0 == self.DI_show[i]:
+                png=wx.Image(self.btn_path+'/btn_icon/End_btn'+str(i-4)+'_low.png',wx.BITMAP_TYPE_PNG)
+                self.End_btn_display[i-4].SetBitmap(wx.BitmapFromImage(png))
+            else:
+                png=wx.Image(self.btn_path+'/btn_icon/End_btn'+str(i-4)+'_high.png',wx.BITMAP_TYPE_PNG)
+                self.End_btn_display[i-4].SetBitmap(wx.BitmapFromImage(png))
+        self.DI_show_lock.release()
+
+    def set_color(self, evt):
+        wx.CallAfter(self.set_DO_btn_colour)
+        wx.CallAfter(self.set_DI_show_colour)
+        wx.CallAfter(self.set_LED_show_colour)
+        wx.CallAfter(self.set_End_btn_colour)
     
     def show_message_dialog(self, message, cl, rq):
         msg='executing ['+message+']'
@@ -567,7 +741,7 @@ class MyFrame(wx.Frame):
             self.fault_state_show.SetValue('No Fault')
         
     def update_velocity_scaling_show(self, msg):
-        self.velocity_setting_show.SetValue(str(round(msg, 2)))
+        self.velocity_setting_show.SetValue(str(round(msg, 2)*100)+'%') # 20201127: change the show format
     
     
     def js_call_back(self, data):
@@ -660,7 +834,9 @@ class MyFrame(wx.Frame):
         rospy.Subscriber(self.elfin_driver_ns+'fault_state', Bool, self.fault_state_cb)
         rospy.Subscriber(self.elfin_basic_api_ns+'reference_link_name', String, self.ref_link_name_cb)
         rospy.Subscriber(self.elfin_basic_api_ns+'end_link_name', String, self.end_link_name_cb)
-        
+
+        rospy.Timer(rospy.Duration(nsecs=50000000), self.monitor_DO_DI)
+        rospy.Timer(rospy.Duration(nsecs=50000000), self.set_color)
         rospy.Timer(rospy.Duration(nsecs=50000000), self.monitor_status)
   
 if __name__=='__main__':  
