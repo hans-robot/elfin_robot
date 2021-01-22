@@ -47,6 +47,7 @@
   <run_depend>elfin_description</run_depend>
   <run_depend>gazebo_ros</run_depend>
   <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>joint_trajectory_controller</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
