@@ -5,7 +5,6 @@ Elfin Robot
 Chinese version of the README -> please [click here](./README_cn.md)
 
 
-![elfin_robot](
 <p align="center">
   <img src="docs/images/elfin.png" />
 </p>
@@ -78,17 +77,6 @@ $ roslaunch elfin_basic_api elfin_basic_api.launch
 Tips:
 Every time you want to plan a trajectory, you should set the start state to current first.
 
-For the teleoperation with joystick, run:
-```sh
-$ roslaunch elfin3_moveit_config joystick_control.launch
-```
-> Tutorial about joystick control teleoperation:  
-http://docs.ros.org/en/melodic/api/moveit_tutorials/html/doc/joystick_control_teleoperation/joystick_control_teleoperation_tutorial.html  
-Tips:  
-> 1. In the Motion Planning plugin of Rviz, enable “Allow External Comm.” checkbox in the “Planning” tab.  
-> 2. Add “Pose” to rviz Displays and subscribe to /joy_pose in order to see the output from joystick. Note that only planning groups that have IK solvers for all their End Effector parent groups will work.
-
-For more information about API, see [docs/API_description_english.md](docs/API_description_english.md)
 
 ---
 

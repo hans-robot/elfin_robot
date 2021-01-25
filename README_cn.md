@@ -82,18 +82,6 @@ $ roslaunch elfin_basic_api elfin_basic_api.launch
 Tips:  
 每次规划路径时，都要设置初始位置为当前位置。
 
-如果你有手柄的话，可以运行以下程序开启手柄遥控功能：
-```sh
-$ roslaunch elfin3_moveit_config joystick_control.launch
-```
-> 关于手柄遥控的使用方法可以参考下面的链接：  
-http://docs.ros.org/en/melodic/api/moveit_tutorials/html/doc/joystick_control_teleoperation/joystick_control_teleoperation_tutorial.html  
-Tips:  
-> 1. In the Motion Planning plugin of Rviz, enable “Allow External Comm.” checkbox in the “Planning” tab.  
-> 2. Add “Pose” to rviz Displays and subscribe to /joy_pose in order to see the output from joystick. Note that only planning groups that have IK solvers for all their End Effector parent groups will work.
-
-更多关于API的信息请看[docs/API_description.md](docs/API_description.md)
-
 ---
 
 ### 使用真实的Elfin机器人
