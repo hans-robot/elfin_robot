@@ -3,11 +3,9 @@ Elfin Robot
 
 If you don't speak chinese, please [click here](./README_english.md)
 
-![elfin_robot](
 <p align="center">
   <img src="docs/images/elfin.png" />
 </p>
-)
 
 
 本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 18.04 + ROS Melodic, 其他环境下的运行情况没有测试过。

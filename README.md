@@ -8,7 +8,6 @@ Chinese version of the README -> please [click here](./README_cn.md)
 <p align="center">
   <img src="docs/images/elfin.png" />
 </p>
-)
 
 This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 18.04 with ROS Melodic. So far These packages haven't been tested in other environment.
 
