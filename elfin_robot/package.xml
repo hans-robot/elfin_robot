@@ -22,7 +22,7 @@
   <exec_depend>elfin_basic_api</exec_depend>
   <exec_depend>elfin_description</exec_depend>
   <exec_depend>elfin_ethercat_driver</exec_depend>
-  <exec_depend>elfin_ethercat_driver_v2</exec_depend>
+  <exec_depend>elfin_ethercat_driver</exec_depend>
   <exec_depend>elfin_gazebo</exec_depend>
   <exec_depend>elfin3_ikfast_plugin</exec_depend>
   <exec_depend>elfin5_ikfast_plugin</exec_depend>
@@ -31,7 +31,7 @@
   <exec_depend>elfin_robot_bringup</exec_depend>
   <exec_depend>elfin_robot_msgs</exec_depend>
   <exec_depend>elfin_ros_control</exec_depend>
-  <exec_depend>elfin_ros_control_v2</exec_depend>
+  <exec_depend>elfin_ros_control</exec_depend>
   <exec_depend>elfin_ros_controllers</exec_depend>
   
   <export>

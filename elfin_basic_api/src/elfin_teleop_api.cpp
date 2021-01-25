@@ -271,19 +271,19 @@ bool ElfinTeleopAPI::cartTeleop_cb(elfin_robot_msgs::SetInt16::Request &req, elf
         }
     }
 
-    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    Eigen::Isometry3d affine_rootToRef, affine_refToRoot;
     tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
     affine_refToRoot=affine_rootToRef.inverse();
 
-    Eigen::Affine3d affine_tipToEnd;
+    Eigen::Isometry3d affine_tipToEnd;
     tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
 
     tf::Pose tf_pose_tmp;
-    Eigen::Affine3d affine_pose_tmp;
+    Eigen::Isometry3d affine_pose_tmp;
     tf::poseMsgToTF(current_pose.pose, tf_pose_tmp);
     tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
 
-    Eigen::Affine3d affine_current_pose=affine_rootToRef * affine_pose_tmp;
+    Eigen::Isometry3d affine_current_pose=affine_rootToRef * affine_pose_tmp;
 
     tf::poseEigenToTF(affine_current_pose, tf_pose_tmp);
     tf::poseTFToMsg(tf_pose_tmp, current_pose.pose);

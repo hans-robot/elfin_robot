@@ -1,5 +1,9 @@
-*~
-*.txt.user
-*.pyc
-elfin_drivers.yaml
-*_backup.esi
+build
+devel
+logs
+to_do
+.catkin_workspace
+.gitignore
+
+# delete cach if git ignore doesnt work
+# git rm --cached -r .

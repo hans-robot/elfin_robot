@@ -1,11 +1,11 @@
 /*
-Created on Wed Oct 25 11:23:42 2017
+Created on Tue Sep 25 10:16 2018
 
 @author: Cong Liu
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017, Han's Robot Co., Ltd.
+ Copyright (c) 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ Created on Wed Oct 25 11:23:42 2017
  POSSIBILITY OF SUCH DAMAGE.
 */
 // author: Cong Liu
-
+// update the include file
 #include "elfin_ros_control/elfin_hardware_interface.h"
 
 namespace elfin_ros_control {
@@ -86,9 +86,11 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
     for(size_t i=0; i<module_infos_.size(); i++)
     {
         module_infos_[i].axis1.count_rad_factor=module_infos_[i].axis1.reduction_ratio*module_infos_[i].axis1.axis_position_factor/(2*M_PI);
+        module_infos_[i].axis1.count_rad_per_s_factor=module_infos_[i].axis1.count_rad_factor/750.3;
         module_infos_[i].axis1.count_Nm_factor=module_infos_[i].axis1.axis_torque_factor/module_infos_[i].axis1.reduction_ratio;
 
         module_infos_[i].axis2.count_rad_factor=module_infos_[i].axis2.reduction_ratio*module_infos_[i].axis2.axis_position_factor/(2*M_PI);
+        module_infos_[i].axis2.count_rad_per_s_factor=module_infos_[i].axis2.count_rad_factor/750.3;
         module_infos_[i].axis2.count_Nm_factor=module_infos_[i].axis2.axis_torque_factor/module_infos_[i].axis2.reduction_ratio;
     }
 
@@ -161,6 +163,36 @@ ElfinHWInterface::ElfinHWInterface(elfin_ethercat_driver::EtherCatManager *manag
     }
     registerInterface(&jnt_postrq_cmd_interface_);
 
+    for(size_t i=0; i<module_infos_.size(); i++)
+    {
+        hardware_interface::PosVelJointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
+                                                                    &module_infos_[i].axis1.position_cmd,
+                                                                    &module_infos_[i].axis1.vel_ff_cmd);
+        jnt_posvel_cmd_interface_.registerHandle(jnt_handle_tmp1);
+
+        hardware_interface::PosVelJointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
+                                                                    &module_infos_[i].axis2.position_cmd,
+                                                                    &module_infos_[i].axis2.vel_ff_cmd);
+        jnt_posvel_cmd_interface_.registerHandle(jnt_handle_tmp2);
+    }
+    registerInterface(&jnt_posvel_cmd_interface_);
+
+    for(size_t i=0; i<module_infos_.size(); i++)
+    {
+        elfin_hardware_interface::PosVelTrqJointHandle jnt_handle_tmp1(jnt_state_interface_.getHandle(module_infos_[i].axis1.name),
+                                                                       &module_infos_[i].axis1.position_cmd,
+                                                                       &module_infos_[i].axis1.vel_ff_cmd,
+                                                                       &module_infos_[i].axis1.effort_cmd);
+        jnt_posveltrq_cmd_interface_.registerHandle(jnt_handle_tmp1);
+
+        elfin_hardware_interface::PosVelTrqJointHandle jnt_handle_tmp2(jnt_state_interface_.getHandle(module_infos_[i].axis2.name),
+                                                                       &module_infos_[i].axis2.position_cmd,
+                                                                       &module_infos_[i].axis2.vel_ff_cmd,
+                                                                       &module_infos_[i].axis2.effort_cmd);
+        jnt_posveltrq_cmd_interface_.registerHandle(jnt_handle_tmp2);
+    }
+    registerInterface(&jnt_posveltrq_cmd_interface_);
+
     // Initialize motion_threshold_
     motion_threshold_=5e-5;
 }
@@ -205,6 +237,118 @@ bool ElfinHWInterface::isModuleMoving(int module_num)
     return false;
 }
 
+bool ElfinHWInterface::setGroupPosMode(const std::vector<int> &module_no)
+{
+    for(int j=0; j<module_no.size(); j++)
+    {
+        boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
+        pre_switch_flags_[module_no[j]]=true;
+        pre_switch_flags_lock.unlock();
+    }
+
+    usleep(5000);
+
+    for(int j=0; j<module_no.size(); j++)
+    {
+        module_infos_[module_no[j]].client_ptr->setAxis1VelFFCnt(0x0);
+        module_infos_[module_no[j]].client_ptr->setAxis2VelFFCnt(0x0);
+
+        module_infos_[module_no[j]].client_ptr->setAxis1TrqCnt(0x0);
+        module_infos_[module_no[j]].client_ptr->setAxis2TrqCnt(0x0);
+    }
+
+    for(int j=0; j<module_no.size(); j++)
+    {
+        module_infos_[module_no[j]].client_ptr->setPosMode();
+    }
+
+    usleep(10000);
+
+    for(int j=0; j<module_no.size(); j++)
+    {
+        if(!module_infos_[module_no[j]].client_ptr->inPosMode())
+        {
+            ROS_ERROR("module[%i]: set position mode failed", module_no[j]);
+
+            for(int k=0; k<module_no.size(); k++)
+            {
+                boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[k]]);
+                pre_switch_flags_[module_no[k]]=false;
+                pre_switch_flags_lock.unlock();
+            }
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool ElfinHWInterface::setGroupTrqMode(const std::vector<int> &module_no)
+{
+    for(int j=0; j<module_no.size(); j++)
+    {
+        boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
+        pre_switch_flags_[module_no[j]]=true;
+        pre_switch_flags_lock.unlock();
+    }
+
+    usleep(5000);
+
+    for(int j=0; j<module_no.size(); j++)
+    {
+        module_infos_[module_no[j]].client_ptr->setAxis1TrqCnt(0x0);
+        module_infos_[module_no[j]].client_ptr->setAxis2TrqCnt(0x0);
+    }
+
+    for(int j=0; j<module_no.size(); j++)
+    {
+        module_infos_[module_no[j]].client_ptr->setTrqMode();
+    }
+
+    usleep(10000);
+
+    bool set_trq_success=true;
+    for(int j=0; j<module_no.size(); j++)
+    {
+        if(!module_infos_[module_no[j]].client_ptr->inTrqMode())
+        {
+            ROS_ERROR("module[%i]: set torque mode failed, setting position mode", module_no[j]);
+            set_trq_success=false;
+            break;
+        }
+    }
+
+    if(!set_trq_success)
+    {
+        for(int j=0; j<module_no.size(); j++)
+        {
+            module_infos_[module_no[j]].client_ptr->setPosMode();
+        }
+
+        usleep(10000);
+
+        for(int j=0; j<module_no.size(); j++)
+        {
+            if(!module_infos_[module_no[j]].client_ptr->inPosMode())
+            {
+                ROS_ERROR("module[%i]: set position mode failed too", module_no[j]);
+            }
+        }
+
+        for(int j=0; j<module_no.size(); j++)
+        {
+            boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
+            pre_switch_flags_[module_no[j]]=false;
+            pre_switch_flags_lock.unlock();
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
 bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
                                      const std::list<hardware_interface::ControllerInfo> &stop_list)
 {
@@ -232,20 +376,11 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
                     }
                 }
 
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    module_infos_[module_no[j]].client_ptr->setPosMode();
-                }
+                std::vector<int> module_no_tmp=module_no;
 
-                usleep(10000);
-
-                for(int j=0; j<module_no.size(); j++)
+                if(!setGroupPosMode(module_no_tmp))
                 {
-                    if(!module_infos_[module_no[j]].client_ptr->inPosMode())
-                    {
-                        ROS_ERROR("can't stop %s, module[%i]: set position mode failed", iter->name.c_str(), module_no[j]);
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
@@ -302,145 +437,49 @@ bool ElfinHWInterface::prepareSwitch(const std::list<hardware_interface::Control
 
             if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::PositionJointInterface")==0)
             {
-                for(int j=0; j<module_no.size(); j++)
+                std::vector<int> module_no_tmp=module_no;
+
+                if(!setGroupPosMode(module_no_tmp))
                 {
-                    module_infos_[module_no[j]].client_ptr->setPosMode();
+                    return false;
                 }
+            }
 
-                usleep(10000);
+            else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::PosVelJointInterface")==0)
+            {
+                std::vector<int> module_no_tmp=module_no;
 
-                for(int j=0; j<module_no.size(); j++)
+                if(!setGroupPosMode(module_no_tmp))
                 {
-                    if(!module_infos_[module_no[j]].client_ptr->inPosMode())
-                    {
-                        ROS_ERROR("module[%i]: set position mode failed", module_no[j]);
-                        return false;
-                    }
+                    return false;
                 }
             }
 
             else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "elfin_hardware_interface::PosTrqJointInterface")==0)
             {
-                for(int j=0; j<module_no.size(); j++)
+                std::vector<int> module_no_tmp=module_no;
+
+                if(!setGroupPosMode(module_no_tmp))
                 {
-                    boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
-                    pre_switch_flags_[module_no[j]]=true;
-                    pre_switch_flags_lock.unlock();
+                    return false;
                 }
+            }
 
-                usleep(5000);
+            else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "elfin_hardware_interface::PosVelTrqJointInterface")==0)
+            {
+                std::vector<int> module_no_tmp=module_no;
 
-                for(int j=0; j<module_no.size(); j++)
+                if(!setGroupPosMode(module_no_tmp))
                 {
-                    module_infos_[module_no[j]].client_ptr->setAxis1TrqCnt(0x0);
-                    module_infos_[module_no[j]].client_ptr->setAxis2TrqCnt(0x0);
-                }
-
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    module_infos_[module_no[j]].client_ptr->setPosTrqMode();
-                }
-
-                usleep(10000);
-
-                bool set_postrq_success=true;
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    if(!module_infos_[module_no[j]].client_ptr->inPosMode())
-                    {
-                        ROS_ERROR("module[%i]: set position torque mode failed, setting position mode", module_no[j]);
-                        set_postrq_success=false;
-                        break;
-                    }
-                }
-
-                if(!set_postrq_success)
-                {
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        module_infos_[module_no[j]].client_ptr->setPosMode();
-                    }
-
-                    usleep(10000);
-
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        if(!module_infos_[module_no[j]].client_ptr->inPosMode())
-                        {
-                            ROS_ERROR("module[%i]: set position mode failed too", module_no[j]);
-                        }
-                    }
-
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
-                        pre_switch_flags_[module_no[j]]=false;
-                        pre_switch_flags_lock.unlock();
-                    }
-
                     return false;
                 }
             }
 
             else if(strcmp(start_resrcs[i].hardware_interface.c_str(), "hardware_interface::EffortJointInterface")==0)
             {
-                for(int j=0; j<module_no.size(); j++)
+                std::vector<int> module_no_tmp=module_no;
+                if(!setGroupTrqMode(module_no_tmp))
                 {
-                    boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
-                    pre_switch_flags_[module_no[j]]=true;
-                    pre_switch_flags_lock.unlock();
-                }
-
-                usleep(5000);
-
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    module_infos_[module_no[j]].client_ptr->setAxis1TrqCnt(0x0);
-                    module_infos_[module_no[j]].client_ptr->setAxis2TrqCnt(0x0);
-                }
-
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    module_infos_[module_no[j]].client_ptr->setTrqMode();
-                }
-
-                usleep(10000);
-
-                bool set_trq_success=true;
-                for(int j=0; j<module_no.size(); j++)
-                {
-                    if(!module_infos_[module_no[j]].client_ptr->inTrqMode())
-                    {
-                        ROS_ERROR("module[%i]: set torque mode failed, setting position mode", module_no[j]);
-                        set_trq_success=false;
-                        break;
-                    }
-                }
-
-                if(!set_trq_success)
-                {
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        module_infos_[module_no[j]].client_ptr->setPosMode();
-                    }
-
-                    usleep(10000);
-
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        if(!module_infos_[module_no[j]].client_ptr->inPosMode())
-                        {
-                            ROS_ERROR("module[%i]: set position mode failed too", module_no[j]);
-                        }
-                    }
-
-                    for(int j=0; j<module_no.size(); j++)
-                    {
-                        boost::mutex::scoped_lock pre_switch_flags_lock(*pre_switch_mutex_ptrs_[module_no[j]]);
-                        pre_switch_flags_[module_no[j]]=false;
-                        pre_switch_flags_lock.unlock();
-                    }
-
                     return false;
                 }
             }
@@ -468,9 +507,11 @@ void ElfinHWInterface::doSwitch(const std::list<hardware_interface::ControllerIn
         if(pre_switch_flags_[i])
         {
             module_infos_[i].axis1.velocity_cmd=0;
+            module_infos_[i].axis1.vel_ff_cmd=0;
             module_infos_[i].axis1.effort_cmd=0;
 
             module_infos_[i].axis2.velocity_cmd=0;
+            module_infos_[i].axis2.vel_ff_cmd=0;
             module_infos_[i].axis2.effort_cmd=0;
 
             pre_switch_flags_[i]=false;
@@ -523,21 +564,23 @@ void ElfinHWInterface::read_update(const ros::Time &time_now)
     for(size_t i=0; i<module_infos_.size(); i++)
     {
         int32_t pos_count1=module_infos_[i].client_ptr->getAxis1PosCnt();
+        int16_t vel_count1=module_infos_[i].client_ptr->getAxis1VelCnt();
         int16_t trq_count1=module_infos_[i].client_ptr->getAxis1TrqCnt();
         int32_t pos_count_diff_1=pos_count1-module_infos_[i].axis1.count_zero;
 
         double position_tmp1=-1*pos_count_diff_1/module_infos_[i].axis1.count_rad_factor;
-        module_infos_[i].axis1.velocity=(position_tmp1-module_infos_[i].axis1.position)/read_update_dur_.toSec();
         module_infos_[i].axis1.position=position_tmp1;
+        module_infos_[i].axis1.velocity=-1*vel_count1/module_infos_[i].axis1.count_rad_per_s_factor;
         module_infos_[i].axis1.effort=-1*trq_count1/module_infos_[i].axis1.count_Nm_factor;
 
         int32_t pos_count2=module_infos_[i].client_ptr->getAxis2PosCnt();
+        int16_t vel_count2=module_infos_[i].client_ptr->getAxis2VelCnt();
         int16_t trq_count2=module_infos_[i].client_ptr->getAxis2TrqCnt();
         int32_t pos_count_diff_2=pos_count2-module_infos_[i].axis2.count_zero;
 
         double position_tmp2=-1*pos_count_diff_2/module_infos_[i].axis2.count_rad_factor;
-        module_infos_[i].axis2.velocity=(position_tmp2-module_infos_[i].axis2.position)/read_update_dur_.toSec();
         module_infos_[i].axis2.position=position_tmp2;
+        module_infos_[i].axis2.velocity=-1*vel_count2/module_infos_[i].axis2.count_rad_per_s_factor;
         module_infos_[i].axis2.effort=-1*trq_count2/module_infos_[i].axis2.count_Nm_factor;
     }
 
@@ -565,6 +608,12 @@ void ElfinHWInterface::write_update()
 
         if(!is_preparing_switch)
         {
+            double vel_ff_cmd_count1=-1 * module_infos_[i].axis1.vel_ff_cmd * module_infos_[i].axis1.count_rad_per_s_factor / 16.0;
+            double vel_ff_cmd_count2=-1 * module_infos_[i].axis2.vel_ff_cmd * module_infos_[i].axis2.count_rad_per_s_factor / 16.0;
+
+            module_infos_[i].client_ptr->setAxis1VelFFCnt(int16_t(vel_ff_cmd_count1));
+            module_infos_[i].client_ptr->setAxis2VelFFCnt(int16_t(vel_ff_cmd_count2));
+
             double torque_cmd_count1=-1 * module_infos_[i].axis1.effort_cmd * module_infos_[i].axis1.count_Nm_factor;
             double torque_cmd_count2=-1 * module_infos_[i].axis2.effort_cmd * module_infos_[i].axis2.count_Nm_factor;
 

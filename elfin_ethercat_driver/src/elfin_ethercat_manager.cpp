@@ -184,10 +184,10 @@ EtherCatManager::EtherCatManager(const std::string& ifname)
                                   boost::ref(stop_flag_));
   } 
   else 
- {
-   // construction failed
-   throw EtherCatError("Could not initialize SOEM");
- }
+  {
+    // construction failed
+    throw EtherCatError("Could not initialize SOEM");
+  }
 }
 
 EtherCatManager::~EtherCatManager()
@@ -236,10 +236,10 @@ bool EtherCatManager::initSoem(const std::string& ifname) {
   printf("SOEM found and configured %d slaves\n", ec_slavecount);
 
   if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE*4) != EC_STATE_PRE_OP)
-    {
-      fprintf(stderr, "Could not set EC_STATE_PRE_OP\n");
-      return false;
-    }
+  {
+    fprintf(stderr, "Could not set EC_STATE_PRE_OP\n");
+    return false;
+  }
 
   // configure IOMap
   int iomap_size = ec_config_map(iomap_);
@@ -355,6 +355,7 @@ T EtherCatManager::readSDO(int slave_no, uint16_t index, uint8_t subidx) const
 
 template uint8_t EtherCatManager::writeSDO<char> (int slave_no, uint16_t index, uint8_t subidx, char value) const;
 template uint8_t EtherCatManager::writeSDO<int> (int slave_no, uint16_t index, uint8_t subidx, int value) const;
+template uint8_t EtherCatManager::writeSDO<int8_t> (int slave_no, uint16_t index, uint8_t subidx, int8_t value) const;
 template uint8_t EtherCatManager::writeSDO<short> (int slave_no, uint16_t index, uint8_t subidx, short value) const;
 template uint8_t EtherCatManager::writeSDO<long> (int slave_no, uint16_t index, uint8_t subidx, long value) const;
 template uint8_t EtherCatManager::writeSDO<unsigned char> (int slave_no, uint16_t index, uint8_t subidx, unsigned char value) const;

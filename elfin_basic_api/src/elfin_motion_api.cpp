@@ -100,19 +100,19 @@ void ElfinMotionAPI::cartGoalCB(const geometry_msgs::PoseStampedConstPtr &msg)
     if(!updateTransforms(reference_link))
         return;
 
-    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    Eigen::Isometry3d affine_rootToRef, affine_refToRoot;
     tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
     affine_refToRoot=affine_rootToRef.inverse();
 
-    Eigen::Affine3d affine_tipToEnd;
+    Eigen::Isometry3d affine_tipToEnd;
     tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
 
     tf::Pose tf_pose_tmp;
-    Eigen::Affine3d affine_pose_tmp;
+    Eigen::Isometry3d affine_pose_tmp;
     tf::poseMsgToTF(msg->pose, tf_pose_tmp);
     tf::poseTFToEigen(tf_pose_tmp, affine_pose_tmp);
 
-    Eigen::Affine3d affine_pose_goal=affine_refToRoot * affine_pose_tmp * affine_tipToEnd;
+    Eigen::Isometry3d affine_pose_goal=affine_refToRoot * affine_pose_tmp * affine_tipToEnd;
 
     if(group_->setPoseTarget(affine_pose_goal))
     {
@@ -160,16 +160,16 @@ void ElfinMotionAPI::cartPathGoalCB(const geometry_msgs::PoseArrayConstPtr &msg)
     if(!updateTransforms(reference_link))
         return;
 
-    Eigen::Affine3d affine_rootToRef, affine_refToRoot;
+    Eigen::Isometry3d affine_rootToRef, affine_refToRoot;
     tf::transformTFToEigen(transform_rootToRef_, affine_rootToRef);
     affine_refToRoot=affine_rootToRef.inverse();
 
-    Eigen::Affine3d affine_tipToEnd;
+    Eigen::Isometry3d affine_tipToEnd;
     tf::transformTFToEigen(transform_tipToEnd_, affine_tipToEnd);
 
     tf::Pose tf_pose_tmp;
-    Eigen::Affine3d affine_pose_tmp;
-    Eigen::Affine3d affine_goal_tmp;
+    Eigen::Isometry3d affine_pose_tmp;
+    Eigen::Isometry3d affine_goal_tmp;
 
     for(int i=0; i<pose_goal.size(); i++)
     {

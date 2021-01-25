@@ -1,11 +1,11 @@
 /*
-Created on Wed Oct 25 11:36:26 2017
+Created on Tue Sep 25 10:16 2018
 
 @author: Cong Liu
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017, Han's Robot Co., Ltd.
+ Copyright (c) 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,9 @@ Created on Wed Oct 25 11:36:26 2017
 
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
+#include <hardware_interface/posvel_command_interface.h>
 #include <elfin_hardware_interface/postrq_command_interface.h>
+#include <elfin_hardware_interface/posveltrq_command_interface.h>
 #include <hardware_interface/robot_hw.h>
 
 #include <controller_manager/controller_manager.h>
@@ -70,6 +72,7 @@ typedef struct{
     std::string name;
     double reduction_ratio;
     double count_rad_factor;
+    double count_rad_per_s_factor;
     double count_Nm_factor;
     int32_t count_zero;
 
@@ -82,6 +85,7 @@ typedef struct{
 
     double position_cmd;
     double velocity_cmd;
+    double vel_ff_cmd;
     double effort_cmd;
 }AxisInfo;
 
@@ -115,6 +119,8 @@ private:
     hardware_interface::PositionJointInterface jnt_position_cmd_interface_;
     hardware_interface::EffortJointInterface jnt_effort_cmd_interface_;
     elfin_hardware_interface::PosTrqJointInterface jnt_postrq_cmd_interface_;
+    hardware_interface::PosVelJointInterface jnt_posvel_cmd_interface_;
+    elfin_hardware_interface::PosVelTrqJointInterface jnt_posveltrq_cmd_interface_;
 
     ros::NodeHandle n_;
 
@@ -126,6 +132,9 @@ private:
 
     bool isModuleMoving(int module_num);
     double motion_threshold_;
+
+    bool setGroupPosMode(const std::vector<int>& module_no);
+    bool setGroupTrqMode(const std::vector<int>& module_no);
 };
 
 }

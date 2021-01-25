@@ -1,11 +1,11 @@
 /*
-Created on Mon Oct 16 10:45:10 2017
+Created on Mon Sep 17 10:02:30 2018
 
-@author: Cong Liu
+@author: Cong Liu, Burb
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017 - 2018, Han's Robot Co., Ltd.
+ Copyright (c) 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ Created on Mon Oct 16 10:45:10 2017
  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 */
-// author: Cong Liu
+// author: Cong Liu, Burb
 
 #include <elfin_ethercat_driver/elfin_ethercat_client.h>
 
@@ -68,30 +68,45 @@ ElfinEtherCATClient::ElfinEtherCATClient(EtherCatManager *manager, int slave_no)
     server_close_brake_=n_.advertiseService(close_brake_server_name, &ElfinEtherCATClient::close_brake_cb, this);
 
     // init pdo_input and output
-    std::string name_pdo_input[12]={"Axis1_Statusword", "Axis1_ActPosition", "Axis1_ActCur", "Axis1_ErrorCode",
-                                   "Axis2_Statusword", "Axis2_ActPosition", "Axis2_ActCur", "Axis2_ErrorCode",
-                                   "UDM_Status", "Acceleration_X", "Acceleration_Y", "Acceleration_Z"};
-    uint8_t channel_pdo_input[12]={0, 4, 8, 12, 40, 44, 48, 52, 80, 84, 88, 92};
+    std::string name_pdo_input[8]={"Axis1_Statusword and Axis1_Torque_Actual_Value", "Axis1_Position_Actual_Value",
+                                   "Axis1_Velocity_Actual_Value", "Axis1_ErrorCode and Axis1_Modes_of_operation_display",
+                                   "Axis2_Statusword and Axis2_Torque_Actual_Value", "Axis2_Position_Actual_Value",
+                                   "Axis2_Velocity_Actual_Value", "Axis2_ErrorCode and Axis2_Modes_of_operation_display"};
+    uint8_t channel_pdo_input[8]={0, 4, 8, 12, 32, 36, 40, 44};
     pdo_input.clear();
-    ElfinPDOunit unit_tmp;
-    for(unsigned i=0; i<12; ++i)
+    ElfinPDOunit unit_tmp; // old namespace
+    for(unsigned i=0; i<8; ++i)
     {
         unit_tmp.name=name_pdo_input[i];
         unit_tmp.channel=channel_pdo_input[i];
         pdo_input.push_back(unit_tmp);
     }
 
-    std::string name_pdo_output[9]={"Axis1_Controlword", "Axis1_Target_position", "Axis1_EndatPos_Flash",
-                                    "Axis1_FeedForWard_Cur", "Axis2_Controlword", "Axis2_Target_position",
-                                    "Axis2_EndatPos_Flash", "Axis2_FeedForWard_Cur", "UDM_Cmd"};
-    uint8_t channel_pdo_output[9]={0, 4, 8, 12, 40, 44, 48, 52, 80};
+    std::string name_pdo_output[6]={"Axis1_Controlword and Axis1_Modes_of_operation", "Axis1_Target_position", "Axis1_Target_Torque and Axis1_VelFF",
+                                    "Axis2_Controlword and Axis2_Modes_of_operation", "Axis2_Target_position", "Axis2_Target_Torque and Axis2_VelFF"};
+    uint8_t channel_pdo_output[6]={0, 4, 8, 32, 36, 40};
     pdo_output.clear();
-    for(unsigned i=0; i<9; ++i)
+    for(unsigned i=0; i<6; ++i)
     {
         unit_tmp.name=name_pdo_output[i];
         unit_tmp.channel=channel_pdo_output[i];
         pdo_output.push_back(unit_tmp);
     }
+
+    manager_->writeSDO<int8_t>(slave_no, 0x1c12, 0x00, 0x00);
+    manager_->writeSDO<int16_t>(slave_no, 0x1c12, 0x01, 0x1600);
+    manager_->writeSDO<int16_t>(slave_no, 0x1c12, 0x02, 0x1610);
+    manager_->writeSDO<int8_t>(slave_no, 0x1c12, 0x00, 0x02);
+
+    manager_->writeSDO<int8_t>(slave_no, 0x1c13, 0x00, 0x00);
+    manager_->writeSDO<int16_t>(slave_no, 0x1c13, 0x01, 0x1a00);
+    manager_->writeSDO<int16_t>(slave_no, 0x1c13, 0x02, 0x1a10);
+    manager_->writeSDO<int8_t>(slave_no, 0x1c13, 0x00, 0x02);
+
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x0, false);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x0, false);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
 }
 
 ElfinEtherCATClient::~ElfinEtherCATClient()
@@ -293,24 +308,44 @@ void ElfinEtherCATClient::setAxis2PosCnt(int32_t pos_cnt)
     writeOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION, pos_cnt);
 }
 
+int16_t ElfinEtherCATClient::getAxis1VelCnt()
+{
+    return readInput_half_unit(elfin_txpdo::AXIS1_ACTVELOCITY_L16, false);
+}
+
+int16_t ElfinEtherCATClient::getAxis2VelCnt()
+{
+    return readInput_half_unit(elfin_txpdo::AXIS2_ACTVELOCITY_L16, false);
+}
+
+void ElfinEtherCATClient::setAxis1VelFFCnt(int16_t vff_cnt)
+{
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_VELFF_H16, vff_cnt, true);
+}
+
+void ElfinEtherCATClient::setAxis2VelFFCnt(int16_t vff_cnt)
+{
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_VELFF_H16, vff_cnt, true);
+}
+
 int16_t ElfinEtherCATClient::getAxis1TrqCnt()
 {
-    return readInput_half_unit(elfin_txpdo::AXIS1_ACTCUR_L16, false);
+    return readInput_half_unit(elfin_txpdo::AXIS1_ACTTORQUE_H16, true);
 }
 
 int16_t ElfinEtherCATClient::getAxis2TrqCnt()
 {
-    return readInput_half_unit(elfin_txpdo::AXIS2_ACTCUR_L16, false);
+    return readInput_half_unit(elfin_txpdo::AXIS2_ACTTORQUE_H16, true);
 }
 
 void ElfinEtherCATClient::setAxis1TrqCnt(int16_t trq_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS1_FEEDFORWARD_CUR_L16, trq_cnt, false);
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_TARGET_TORQUE_L16, trq_cnt, false);
 }
 
 void ElfinEtherCATClient::setAxis2TrqCnt(int16_t trq_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS2_FEEDFORWARD_CUR_L16, trq_cnt, false);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_TARGET_TORQUE_L16, trq_cnt, false);
 }
 
 void ElfinEtherCATClient::readInput()
@@ -331,11 +366,11 @@ void ElfinEtherCATClient::readOutput()
 
 std::string ElfinEtherCATClient::getTxPDO()
 {
-    int length=96;
+    int length=64;
     uint8_t map[length];
     char temp[8];
     std::string result="slave";
-    result.reserve(640); // the size of result is actually 495
+    result.reserve(640); // the size of result is actually 410
     std::string slave_num=boost::lexical_cast<std::string>(slave_no_);
     result.append(slave_num);
     result.append("_txpdo:\n");
@@ -352,11 +387,11 @@ std::string ElfinEtherCATClient::getTxPDO()
 
 std::string ElfinEtherCATClient::getRxPDO()
 {
-    int length=84;
+    int length=64;
     uint8_t map[length];
     char temp[8];
     std::string result="slave";
-    result.reserve(640); // the size of result is actually 435
+    result.reserve(640); // the size of result is actually 410
     std::string slave_num=boost::lexical_cast<std::string>(slave_no_);
     result.append(slave_num);
     result.append("_rxpdo:\n");
@@ -419,46 +454,74 @@ void ElfinEtherCATClient::pubOutput()
 void ElfinEtherCATClient::clearPoseFault()
 {
     // channel1
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x011f);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
-    usleep(100000);
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x86, false);
+    usleep(20000);
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x6, false);
+    usleep(20000);
+
     // channel2
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x011f);
-    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0800);
-    usleep(100000);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x86, false);
+    usleep(20000);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x6, false);
+    usleep(20000);
 }
 
 bool ElfinEtherCATClient::recognizePose()
 {
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel1
+    if((readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel1
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x201f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0300);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6060, 0x0, 0xc);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0xc, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3024, 0x0, 0x11000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0x200000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0x200000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3024, 0x0, 0x33000000);
+                usleep(50000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
             {
-                ROS_WARN("recognizePose failed while pose recognition in slave %i, channel 1", slave_no_);
+                double result = (manager_->readSDO<int32_t>(slave_no_, 0x2043, 0x0));
+                result = result/4096/2.7*49.7*3.3;
+                fprintf(stderr,"The voltage of slave %i is: %fV.\n",slave_no_, result);
+                ROS_WARN("recognizePose phase1 failed while pose recognition in slave %i, channel 1", slave_no_);
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return false;
             }
             usleep(100000);
             clock_gettime(CLOCK_REALTIME, &tick);
         }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0)
+            {
+                manager_->writeSDO<int32_t>(slave_no_, 0x3024, 0x0, 0x0);
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 5e+9)
+            {
+                ROS_WARN("recognizePose phase 2 failed while pose recognition in slave %i, channel 1", slave_no_);
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return false;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        manager_->writeSDO<int8_t>(slave_no_, 0x6060, 0x0, 0x8);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+        usleep(50000);
     }
     else
     {
@@ -466,45 +529,71 @@ bool ElfinEtherCATClient::recognizePose()
         return false;
     }
 
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel2
+    if((readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel2
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x201f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x3000);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6860, 0x0, 0xc);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0xc, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3034, 0x0, 0x11000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0x200000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0x200000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3034, 0x0, 0x33000000);
+                usleep(50000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 20e+9)
             {
-                ROS_WARN("recognizePose failed while pose recognition in slave %i, channel 2", slave_no_);
+                ROS_WARN("recognizePose phase1 failed while pose recognition in slave %i, channel 2", slave_no_);
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return false;
             }
             usleep(100000);
             clock_gettime(CLOCK_REALTIME, &tick);
         }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0)
+            {
+                manager_->writeSDO<int32_t>(slave_no_, 0x3034, 0x0, 0x0);
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 5e+9)
+            {
+                ROS_WARN("recognizePose phase 2 failed while pose recognition in slave %i, channel 2", slave_no_);
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return false;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        manager_->writeSDO<int8_t>(slave_no_, 0x6860, 0x0, 0x8);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+        usleep(50000);
     }
     else
     {
         ROS_WARN("recognizePose failed in slave %i, channel 2, the reason might be there is a fault or the motor is enabled", slave_no_);
         return false;
     }
+
     return true;
 }
 
 bool ElfinEtherCATClient::isEnabled()
 {
-    if(inPosBasedMode() || inTrqMode())
+    if((readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false) & 0xf)==0x7
+            && (readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false) & 0xf)==0x7)
         return true;
     else
         return false;
@@ -513,30 +602,108 @@ bool ElfinEtherCATClient::isEnabled()
 void *ElfinEtherCATClient::setEnable(void* threadarg)
 {
     ElfinEtherCATClient *pthis=(ElfinEtherCATClient *)threadarg;
-    if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x6666)
+
+    if(pthis->readInput_half_unit(elfin_txpdo::AXIS1_ERRORCODE_L16, false)==0x2000
+       || pthis->readInput_half_unit(elfin_txpdo::AXIS2_ERRORCODE_L16, false)==0x2000)
+    {
+        if(pthis->isWarning())
+        {
+            pthis->clearPoseFault();
+        }
+
+        if(!pthis->recognizePose())
+        {
+            return (void *)0;
+        }
+    }
+
+    if(pthis->isWarning())
     {
         pthis->clearPoseFault();
-        if(!pthis->recognizePose())
-            return (void *)0;
     }
 
     // enable
-    if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    if(pthis->isWarning() || pthis->isEnabled())
     {
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS1_TARGET_POSITION, pthis->readInput_unit(elfin_txpdo::AXIS1_ACTPOSITION));
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION, pthis->readInput_unit(elfin_txpdo::AXIS2_ACTPOSITION));
-        usleep(100000);
-
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
-        pthis->writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0044);
-        usleep(100000);
-    }
-    else
-    {
-        ROS_WARN("UDM status is not 0x11110000 in slave %i, the reason might be there is a fault or the motor is enabled", pthis->slave_no_);
+        ROS_WARN("setEnable in slave %i failed, the reason might be there is a fault or the motor is enabled", pthis->slave_no_);
         return (void *)0;
     }
+
+    pthis->writeOutput_unit(elfin_rxpdo::AXIS1_TARGET_POSITION, pthis->readInput_unit(elfin_txpdo::AXIS1_ACTPOSITION));
+    pthis->writeOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION, pthis->readInput_unit(elfin_txpdo::AXIS2_ACTPOSITION));
+    usleep(100000);
+
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x6, false);
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x6, false);
+
+    pthis->writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+    pthis->writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+
+    struct timespec before, tick;
+    clock_gettime(CLOCK_REALTIME, &before);
+    clock_gettime(CLOCK_REALTIME, &tick);
+    while(ros::ok())
+    {
+        if(pthis->readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false)==0x21
+           && pthis->readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false)==0x21)
+        {
+            break;
+        }
+        if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+        {
+            ROS_WARN("setEnable phase1 in slave %i failed", pthis->slave_no_);
+            return (void *)0;
+        }
+        usleep(10000);
+        clock_gettime(CLOCK_REALTIME, &tick);
+    }
+
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x7, false);
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x7, false);
+
+    clock_gettime(CLOCK_REALTIME, &before);
+    clock_gettime(CLOCK_REALTIME, &tick);
+    while(ros::ok())
+    {
+        if(pthis->readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false)==0x23
+           && pthis->readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false)==0x23)
+        {
+            break;
+        }
+        if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+        {
+            ROS_WARN("setEnable phase2 in slave %i failed", pthis->slave_no_);
+            return (void *)0;
+        }
+        usleep(10000);
+        clock_gettime(CLOCK_REALTIME, &tick);
+    }
+
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0xf, false);
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0xf, false);
+
+    clock_gettime(CLOCK_REALTIME, &before);
+    clock_gettime(CLOCK_REALTIME, &tick);
+    while(ros::ok())
+    {
+        if(pthis->readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false)==0x27
+           && pthis->readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false)==0x27)
+        {
+            break;
+        }
+        if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+        {
+            ROS_WARN("setEnable phase3 in slave %i failed", pthis->slave_no_);
+            return (void *)0;
+        }
+        usleep(10000);
+        clock_gettime(CLOCK_REALTIME, &tick);
+    }
+
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x1f, false);
+    pthis->writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x1f, false);
+
+    usleep(100000);
 }
 
 void *ElfinEtherCATClient::setDisable(void *threadarg)
@@ -544,8 +711,8 @@ void *ElfinEtherCATClient::setDisable(void *threadarg)
     ElfinEtherCATClient *pthis=(ElfinEtherCATClient *)threadarg;
     if(pthis->isEnabled())
     {
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x7);
-        pthis->writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x7);
+        pthis->writeOutput_half_unit(elfin_rxpdo::AXIS1_CONTROLWORD_L16, 0x6, false);
+        pthis->writeOutput_half_unit(elfin_rxpdo::AXIS2_CONTROLWORD_L16, 0x6, false);
         return (void *)0;
     }
     else
@@ -558,21 +725,22 @@ void *ElfinEtherCATClient::recognizePoseCmd(void *threadarg)
 {
     ElfinEtherCATClient *pthis=(ElfinEtherCATClient *)threadarg;
 
-    if(pthis->readInput_unit(elfin_txpdo::UDM_STATUS) == 0x6666)
+    if(pthis->isWarning())
     {
         pthis->clearPoseFault();
     }
 
     if(!pthis->recognizePose())
     {
-            return (void *)0;
+        return (void *)0;
     }
 
 }
 
 bool ElfinEtherCATClient::isWarning()
 {
-    if((readInput_unit(elfin_txpdo::AXIS1_STATUSWORD) & 0x08)==0x08 || (readInput_unit(elfin_txpdo::AXIS2_STATUSWORD) & 0x08)==0x08 )
+    if((readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false) & 0x08)==0x08
+       || (readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false) & 0x08)==0x08)
         return true;
     else
         return false;
@@ -580,22 +748,14 @@ bool ElfinEtherCATClient::isWarning()
 
 void ElfinEtherCATClient::resetFault()
 {
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x87);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x87);
-    usleep(10000);
-
-    writeOutput_unit(elfin_rxpdo::AXIS1_TARGET_POSITION, readInput_unit(elfin_txpdo::AXIS1_ACTPOSITION));
-    writeOutput_unit(elfin_rxpdo::AXIS2_TARGET_POSITION, readInput_unit(elfin_txpdo::AXIS2_ACTPOSITION));
-    usleep(10000);
-
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x07);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x07);
+    clearPoseFault();
 }
 
 bool ElfinEtherCATClient::inPosMode()
 {
-    if(readInput_unit(elfin_txpdo::AXIS1_STATUSWORD)==0x8237
-       && readInput_unit(elfin_txpdo::AXIS2_STATUSWORD==0x8237))
+    if(isEnabled()
+       && readInput_unit_byte(elfin_txpdo::AXIS1_MODES_OF_OPERATION_DISPLAY_BYTE2, true, false)==0x8
+       && readInput_unit_byte(elfin_txpdo::AXIS2_MODES_OF_OPERATION_DISPLAY_BYTE2, true, false)==0x8)
         return true;
     else
         return false;
@@ -603,8 +763,9 @@ bool ElfinEtherCATClient::inPosMode()
 
 bool ElfinEtherCATClient::inTrqMode()
 {
-    if(readInput_unit(elfin_txpdo::AXIS1_STATUSWORD)==0x0a37
-       && readInput_unit(elfin_txpdo::AXIS2_STATUSWORD==0x0a37))
+    if(isEnabled()
+       && readInput_unit_byte(elfin_txpdo::AXIS1_MODES_OF_OPERATION_DISPLAY_BYTE2, true, false)==0xa
+       && readInput_unit_byte(elfin_txpdo::AXIS2_MODES_OF_OPERATION_DISPLAY_BYTE2, true, false)==0xa)
         return true;
     else
         return false;
@@ -617,23 +778,14 @@ bool ElfinEtherCATClient::inPosBasedMode()
 
 void ElfinEtherCATClient::setPosMode()
 {
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
-    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x44);
-}
-
-void ElfinEtherCATClient::setPosTrqMode()
-{
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x801f);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x801f);
-    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x144);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
 }
 
 void ElfinEtherCATClient::setTrqMode()
 {
-    writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x081f);
-    writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x081f);
-    writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x66);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0xa, true, false);
+    writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0xa, true, false);
 }
 
 bool ElfinEtherCATClient::enable_cb(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& resp)
@@ -651,7 +803,7 @@ bool ElfinEtherCATClient::enable_cb(std_srvs::SetBool::Request& req, std_srvs::S
     clock_gettime(CLOCK_REALTIME, &tick);
     while (ros::ok())
     {
-        if(readInput_unit(elfin_txpdo::AXIS1_STATUSWORD)==0x8237 && readInput_unit(elfin_txpdo::AXIS2_STATUSWORD)==0x8237 && readInput_unit(elfin_txpdo::UDM_STATUS)==0xffff0000)
+        if(isEnabled())
         {
             resp.success=true;
             resp.message="elfin module is enabled";
@@ -693,29 +845,51 @@ bool ElfinEtherCATClient::open_brake_cb(std_srvs::SetBool::Request &req, std_srv
         return true;
     }
 
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel1
+    if((readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel1
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x401f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0500);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6060, 0x0, 0xb);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0xb, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3023, 0x0, 0x11000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0x300000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0x300000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                usleep(20000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3023, 0x0, 0x33000000);
+                usleep(30000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
             {
-                resp.message="Channel 1 failed";
+                resp.message="Channel 1 phase 1 failed";
                 resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0)
+            {
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 1 phase 2 failed";
+                resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return true;
             }
             usleep(100000);
@@ -726,32 +900,55 @@ bool ElfinEtherCATClient::open_brake_cb(std_srvs::SetBool::Request &req, std_srv
     {
         resp.message="Channel 1 failed, the reason might be there is a fault or the motor is enabled";
         resp.success=false;
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
         return true;
     }
 
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel2
+    if((readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel2
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x401f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x5000);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6860, 0x0, 0xb);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0xb, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3033, 0x0, 0x11000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0x300000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0x300000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                usleep(20000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3033, 0x0, 0x33000000);
+                usleep(30000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
             {
-                resp.message="Channel 2 failed";
+                resp.message="Channel 2 phase 1 failed";
                 resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0)
+            {
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 2 phase 2 failed";
+                resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return true;
             }
             usleep(100000);
@@ -762,6 +959,7 @@ bool ElfinEtherCATClient::open_brake_cb(std_srvs::SetBool::Request &req, std_srv
     {
         resp.message="Channel 2 failed, the reason might be there is a fault or the motor is enabled";
         resp.success=false;
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
         return true;
     }
 
@@ -779,75 +977,129 @@ bool ElfinEtherCATClient::close_brake_cb(std_srvs::SetBool::Request &req, std_sr
         return true;
     }
 
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel1
+    if((readInput_half_unit(elfin_txpdo::AXIS1_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel1
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x401f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0600);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6060, 0x0, 0xb);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0xb, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3023, 0x0, 0x22000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0x400000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0x400000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                usleep(20000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3023, 0x0, 0x33000000);
+                usleep(30000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
             {
-                resp.message="Channel 1 failed";
+                resp.message="Channel 1 phase 1 failed";
                 resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return true;
             }
             usleep(100000);
             clock_gettime(CLOCK_REALTIME, &tick);
         }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2023, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2024, 0x0)==0)
+            {
+                manager_->writeSDO<int32_t>(slave_no_, 0x3023, 0x0, 0x0);
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 1 phase 2 failed";
+                resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        manager_->writeSDO<int8_t>(slave_no_, 0x6060, 0x0, 0x8);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+        usleep(50000);
     }
     else
     {
         resp.message="Channel 1 failed, the reason might be there is a fault or the motor is enabled";
         resp.success=false;
+        writeOutput_unit_byte(elfin_rxpdo::AXIS1_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
         return true;
     }
 
-    if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0x11110000)
+    //channel2
+    if((readInput_half_unit(elfin_txpdo::AXIS2_STATUSWORD_L16, false) & 0xc) == 0)
     {
-        //channel2
-        writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-        writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x401f);
-        writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x6000);
+        manager_->writeSDO<int8_t>(slave_no_, 0x6860, 0x0, 0xb);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0xb, true, false);
+        usleep(20000);
+        manager_->writeSDO<int32_t>(slave_no_, 0x3033, 0x0, 0x22000000);
         struct timespec before, tick;
         clock_gettime(CLOCK_REALTIME, &before);
         clock_gettime(CLOCK_REALTIME, &tick);
         while(ros::ok())
         {
-            if(readInput_unit(elfin_txpdo::UDM_STATUS) == 0xffff0000)
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0x400000
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0x400000)
             {
-                writeOutput_unit(elfin_rxpdo::AXIS1_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::AXIS2_CONTROLWORD, 0x001f);
-                writeOutput_unit(elfin_rxpdo::UDM_CMD, 0x0000);
-                usleep(100000);
+                usleep(20000);
+                manager_->writeSDO<int32_t>(slave_no_, 0x3033, 0x0, 0x33000000);
+                usleep(30000);
                 break;
             }
             if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
             {
-                resp.message="Channel 2 failed";
+                resp.message="Channel 2 phase 1 failed";
                 resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
                 return true;
             }
             usleep(100000);
             clock_gettime(CLOCK_REALTIME, &tick);
         }
+        clock_gettime(CLOCK_REALTIME, &before);
+        clock_gettime(CLOCK_REALTIME, &tick);
+        while(ros::ok())
+        {
+            if(manager_->readSDO<int32_t>(slave_no_, 0x2033, 0x0)==0
+               && manager_->readSDO<int32_t>(slave_no_, 0x2034, 0x0)==0)
+            {
+                manager_->writeSDO<int32_t>(slave_no_, 0x3033, 0x0, 0x0);
+                usleep(50000);
+                break;
+            }
+            if(tick.tv_sec*1e+9+tick.tv_nsec - before.tv_sec*1e+9 - before.tv_nsec >= 2e+9)
+            {
+                resp.message="Channel 2 phase 2 failed";
+                resp.success=false;
+                writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+                return true;
+            }
+            usleep(100000);
+            clock_gettime(CLOCK_REALTIME, &tick);
+        }
+        manager_->writeSDO<int8_t>(slave_no_, 0x6860, 0x0, 0x8);
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
+        usleep(50000);
     }
     else
     {
         resp.message="Channel 2 failed, the reason might be there is a fault or the motor is enabled";
         resp.success=false;
+        writeOutput_unit_byte(elfin_rxpdo::AXIS2_MODES_OF_OPERATION_BYTE2, 0x8, true, false);
         return true;
     }
 

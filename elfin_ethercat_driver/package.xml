@@ -2,7 +2,7 @@
 <package>
   <name>elfin_ethercat_driver</name>
   <version>0.0.0</version>
-  <description>The elfin_ethercat_driver package</description>
+  <description>The elfin_ethercat_driver_v3 package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

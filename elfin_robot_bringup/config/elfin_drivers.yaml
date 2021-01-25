@@ -14,12 +14,12 @@
 
 ## example for elfin_robot_bringup/config/elfin_drivers.yaml
 
-elfin_ethernet_name: eth0
+elfin_ethernet_name: enp59s0
 
 elfin:
     slave_no: [1, 2, 3]
     joint_names: [elfin_joint2, elfin_joint1, elfin_joint3, elfin_joint4, elfin_joint5, elfin_joint6]
     reduction_ratios: [101, 101, 101, 101, 101, 101]
-    count_zeros: [6703592, 11547377, 13255147, 6522354, 12627817, 10879255]
+    count_zeros: [8907490, 9037465, 5336080, 5456119, 4246746, 1592228]
     axis_position_factors: [131072, 131072, 131072, 131072, 131072, 131072]
     axis_torque_factors: [5251.283, 5251.283, 8533.125, 8533.125, 15975.05, 15975.05]

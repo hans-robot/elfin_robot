@@ -1,11 +1,11 @@
 /*
-Created on Mon Oct 16 10:52:07 2017
+Created on Mon Sep 17 09:42:14 2018
 
 @author: Cong Liu
 
  Software License Agreement (BSD License)
 
- Copyright (c) 2017 - 2018, Han's Robot Co., Ltd.
+ Copyright (c) 2018, Han's Robot Co., Ltd.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -55,35 +55,34 @@ Created on Mon Oct 16 10:52:07 2017
 
 namespace elfin_txpdo
 {
-    const int AXIS1_STATUSWORD=0;
+    const int AXIS1_STATUSWORD_L16=0;
+    const int AXIS1_ACTTORQUE_H16=0;
     const int AXIS1_ACTPOSITION=1;
-    const int AXIS1_ACTCUR_L16=2;
-    const int AXIS1_ERRORCODE=3;
+    const int AXIS1_ACTVELOCITY_L16=2;
+    const int AXIS1_ERRORCODE_L16=3;
+    const int AXIS1_MODES_OF_OPERATION_DISPLAY_BYTE2=3;
 
-    const int AXIS2_STATUSWORD=4;
+    const int AXIS2_STATUSWORD_L16=4;
+    const int AXIS2_ACTTORQUE_H16=4;
     const int AXIS2_ACTPOSITION=5;
-    const int AXIS2_ACTCUR_L16=6;
-    const int AXIS2_ERRORCODE=7;
-
-    const int UDM_STATUS=8;
-    const int ACCELERATION_X=9;
-    const int ACCELERATION_Y=10;
-    const int ACCELERATION_Z=11;
+    const int AXIS2_ACTVELOCITY_L16=6;
+    const int AXIS2_ERRORCODE_L16=7;
+    const int AXIS2_MODES_OF_OPERATION_DISPLAY_BYTE2=7;
 }
 
 namespace elfin_rxpdo
 {
-    const int AXIS1_CONTROLWORD=0;
+    const int AXIS1_CONTROLWORD_L16=0;
+    const int AXIS1_MODES_OF_OPERATION_BYTE2=0;
     const int AXIS1_TARGET_POSITION=1;
-    const int AXIS1_ENDATPOS_FLASH=2;
-    const int AXIS1_FEEDFORWARD_CUR_L16=3;
+    const int AXIS1_TARGET_TORQUE_L16=2;
+    const int AXIS1_VELFF_H16=2;
 
-    const int AXIS2_CONTROLWORD=4;
-    const int AXIS2_TARGET_POSITION=5;
-    const int AXIS2_ENDATPOS_FLASH=6;
-    const int AXIS2_FEEDFORWARD_CUR_L16=7;
-
-    const int UDM_CMD=8;
+    const int AXIS2_CONTROLWORD_L16=3;
+    const int AXIS2_MODES_OF_OPERATION_BYTE2=3;
+    const int AXIS2_TARGET_POSITION=4;
+    const int AXIS2_TARGET_TORQUE_L16=5;
+    const int AXIS2_VELFF_H16=5;
 }
 
 
@@ -92,7 +91,7 @@ namespace elfin_ethercat_driver
 class ElfinEtherCATClient
 {
 private:
-    EtherCatManager* manager_;
+    EtherCatManager* manager_; // old namespace
     ros::NodeHandle n_;
     ros::Publisher pub_input_;
     ros::Publisher pub_output_;
@@ -102,12 +101,12 @@ private:
     ros::ServiceServer server_close_brake_;
     std_msgs::String txpdo_msg_;
     std_msgs::String rxpdo_msg_;
-    std::vector<ElfinPDOunit> pdo_input; // txpdo
-    std::vector<ElfinPDOunit> pdo_output; //rxpdo
+    std::vector<ElfinPDOunit> pdo_input; // txpdo old namespace
+    std::vector<ElfinPDOunit> pdo_output; //rxpdo old namespace
     int slave_no_;
 
 public:
-    ElfinEtherCATClient(EtherCatManager* manager, int slave_no);
+    ElfinEtherCATClient(EtherCatManager* manager, int slave_no); // old namespace
     ~ElfinEtherCATClient();
     int32_t readInput_unit(int n);
     int32_t readOutput_unit(int n);
@@ -122,6 +121,10 @@ public:
     int32_t getAxis2PosCnt();
     void setAxis1PosCnt(int32_t pos_cnt);
     void setAxis2PosCnt(int32_t pos_cnt);
+    int16_t getAxis1VelCnt();
+    int16_t getAxis2VelCnt();
+    void setAxis1VelFFCnt(int16_t vff_cnt);
+    void setAxis2VelFFCnt(int16_t vff_cnt);
     int16_t getAxis1TrqCnt();
     int16_t getAxis2TrqCnt();
     void setAxis1TrqCnt(int16_t trq_cnt);
@@ -148,7 +151,6 @@ public:
     bool inTrqMode();
     bool inPosBasedMode();
     void setPosMode();
-    void setPosTrqMode();
     void setTrqMode();
     bool enable_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);
     bool reset_fault_cb(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &resp);

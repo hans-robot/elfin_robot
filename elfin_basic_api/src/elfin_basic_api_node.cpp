@@ -64,8 +64,11 @@ int main(int argc, char** argv)
     ros::AsyncSpinner common_spinner(1);
     common_spinner.start();
 
-    boost::shared_ptr<tf::Transformer> tf_ptr(new tf::Transformer());
-    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor(new planning_scene_monitor::PlanningSceneMonitor("robot_description", tf_ptr));
+    //boost::shared_ptr<tf::Transformer> tf_ptr(new tf::Transformer());
+
+    robot_model_loader::RobotModelLoaderPtr robot_model_loader(new robot_model_loader::RobotModelLoader("robot_description"));
+
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor(new planning_scene_monitor::PlanningSceneMonitor(robot_model_loader));
 
     planning_scene_monitor->startSceneMonitor();
     planning_scene_monitor->startStateMonitor();
