@@ -1,0 +1,13 @@
+<launch>    
+   
+  <node name="elfin_ros_control" pkg="elfin_ros_control_v2" type="elfin_hardware_interface_v2" output="screen">
+    <rosparam file="$(find elfin_robot_bringup)/config/elfin_drivers.yaml" command="load"/>
+  </node>
+ 
+  <rosparam file="$(find elfin_robot_bringup)/config/joint_state_controller.yaml" command="load"/>
+  <node name="elfin_joint_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn joint_state_controller" respawn="false" output="screen"/>
+  
+  <rosparam file="$(find elfin_robot_bringup)/config/elfin_arm_control.yaml" command="load"/>
+  <node name="elfin_arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="load elfin_arm_controller" respawn="false" output="screen"/>
+  
+</launch>
