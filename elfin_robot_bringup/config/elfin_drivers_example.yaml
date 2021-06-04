@@ -14,7 +14,7 @@
 
 ## example for elfin_robot_bringup/config/elfin_drivers.yaml
 
-elfin_ethernet_name: enp59s0
+elfin_ethernet_name: eth0
 
 elfin:
     slave_no: [1, 2, 3]
