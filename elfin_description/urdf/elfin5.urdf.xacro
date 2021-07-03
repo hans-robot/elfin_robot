@@ -379,7 +379,7 @@
   
   <joint name="elfin_end_joint" type="fixed">
     <origin
-      xyz="0 -0.0735 0"
+      xyz="0 -0.0785 0"
       rpy="${PI/2} ${PI/2} 0" />
     <parent
       link="elfin_link6" />
