@@ -182,4 +182,50 @@ bool getPositionFK(const std::vector<double>& joint_angles, Eigen::Vector3d& tra
 
 }
 
+namespace elfin15_ikfast_simple_api{
+
+// class for storing and sorting solutions
+class LimitObeyingSol
+{
+public:
+  std::vector<double> value;
+  double dist_from_seed;
+
+  bool operator<(const LimitObeyingSol& a) const
+  {
+    return dist_from_seed < a.dist_from_seed;
+  }
+};
+
+// class for forward and inverse kinematic solutions
+class Elfin15KinematicSolver{
+
+public:
+
+/**
+ * @brief Given a desired pose of the end-effector, compute the joint angles to reach it
+ * @param trans The desired position of the end-effector
+ * @param orient The desired orientation of the end-effector
+ * @param vfree The vector of the free links. Since elfin is a 6dof robot, there is no free link.
+ *              So \p vfree should be set as an empty vector
+ * @param seed_state An initial guess solution for the inverse kinematics
+ * @param solution A calculated set of joint angles that is closest to \p seed_state
+ * @return Returns \c true in the case of success, \c false otherwise.
+ */
+bool getPositionIK(const Eigen::Vector3d& trans, const Eigen::Matrix3d& orient, const std::vector<double>& vfree,
+                   const std::vector<double>& seed_state, std::vector<double>& solution);
+
+/**
+ * @brief Given a set of joint angles, compute the pose of the end-effector
+ * @param joint_angles The state for which FK is being computed
+ * @param trans The calculated position of the end-effector
+ * @param orient The calculated orientation of the end-effector
+ * @return Returns \c true in the case of success, \c false otherwise.
+ */
+bool getPositionFK(const std::vector<double>& joint_angles, Eigen::Vector3d& trans, Eigen::Matrix3d& orient);
+
+};
+
+}
+
 #endif

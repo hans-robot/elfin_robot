@@ -1,0 +1,7 @@
+<launch>
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find elfin_description)/urdf/elfin15.urdf.xacro'" />
+  
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+</launch>

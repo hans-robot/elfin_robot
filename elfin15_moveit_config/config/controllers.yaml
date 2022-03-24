@@ -1,0 +1,13 @@
+controller_manager_ns: elfin_controller_manager
+controller_list:
+  - name: elfin_arm_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - elfin_joint1
+      - elfin_joint2
+      - elfin_joint3
+      - elfin_joint4
+      - elfin_joint5
+      - elfin_joint6

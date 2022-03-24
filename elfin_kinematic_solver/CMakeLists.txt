@@ -124,6 +124,7 @@ add_library(${PROJECT_NAME}
   src/elfin3_ikfast_simple_api.cpp
   src/elfin5_ikfast_simple_api.cpp
   src/elfin10_ikfast_simple_api.cpp
+  src/elfin15_ikfast_simple_api.cpp
 )
 
 ## Add cmake target dependencies of the library
