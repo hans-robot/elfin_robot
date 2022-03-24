@@ -27,7 +27,12 @@ Install/Upgrade MoveIt!:
 
 ```sh
 $ sudo apt-get update
-$ sudo apt-get install ros-melodic-moveit
+$ sudo apt-get install ros-melodic-moveit-*
+```
+
+install trac_ik plugin
+```sh
+sudo apt-get install ros-melodic-trac-ik
 ```
 
 **Install this repository from Source**

@@ -23,7 +23,12 @@ $ sudo apt-get install ros-melodic-soem ros-melodic-gazebo-ros-control ros-melod
 安装/升级MoveIt!：
 ```sh
 $ sudo apt-get update
-$ sudo apt-get install ros-melodic-moveit
+$ sudo apt-get install ros-melodic-moveit-*
+```
+
+安装 trac_ik 插件包
+```sh
+sudo apt-get install ros-melodic-trac-ik
 ```
 
 **安装本软件包**
