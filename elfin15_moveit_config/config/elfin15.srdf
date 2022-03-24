@@ -34,6 +34,7 @@
     <disable_collisions link1="elfin_base" link2="elfin_link1" reason="Adjacent" />
     <disable_collisions link1="elfin_base" link2="elfin_link2" reason="Never" />
     <disable_collisions link1="elfin_base" link2="elfin_link3" reason="Never" />
+    <disable_collisions link1="elfin_base" link2="elfin_link5" reason="Never" />
     <disable_collisions link1="elfin_link1" link2="elfin_link2" reason="Adjacent" />
     <disable_collisions link1="elfin_link1" link2="elfin_link3" reason="Never" />
     <disable_collisions link1="elfin_link1" link2="elfin_link4" reason="Never" />

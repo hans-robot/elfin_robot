@@ -296,7 +296,7 @@ S
     <child
       link="elfin_link4" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 1 0" />
     <limit
       lower="-3.14"
       upper="3.14"

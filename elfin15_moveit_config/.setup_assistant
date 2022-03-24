@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: Burb
     author_email: burb@foxmail.com
-    generated_timestamp: 1648096873
+    generated_timestamp: 1648112914
