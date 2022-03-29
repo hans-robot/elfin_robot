@@ -1,0 +1,3 @@
+<launch>
+  sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
+</launch>

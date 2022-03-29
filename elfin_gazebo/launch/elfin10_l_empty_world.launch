@@ -2,9 +2,9 @@
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch" />
   
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find elfin_description)/urdf/elfin15.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find elfin_description)/urdf/elfin10_l.urdf.xacro'" />
       
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model elfin15 -param robot_description -z 0.1"/>
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model elfin10_l -param robot_description -z 0.1"/>
       
   <node name="fake_joint_calibration" pkg="rostopic" type="rostopic" args="pub /calibrated std_msgs/Bool true" />
       
