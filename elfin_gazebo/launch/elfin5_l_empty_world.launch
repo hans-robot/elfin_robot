@@ -1,0 +1,22 @@
+<launch>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+  
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find elfin_description)/urdf/elfin5_l.urdf.xacro'" />
+      
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model elfin5_l -param robot_description -z 0.1"/>
+      
+  <node name="fake_joint_calibration" pkg="rostopic" type="rostopic" args="pub /calibrated std_msgs/Bool true" />
+      
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+    <param name="tf_prefix" type="string" value="" />
+  </node>
+    
+  <rosparam file="$(find elfin_gazebo)/config/joint_state_controller.yaml" command="load"/>
+  <node name="joint_state_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn joint_state_controller" respawn="false" output="screen"/>
+  
+  <rosparam file="$(find elfin_gazebo)/config/elfin_arm_control.yaml" command="load"/>
+  <node name="elfin_arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn elfin_arm_controller" respawn="false" output="screen"/>
+  
+</launch>

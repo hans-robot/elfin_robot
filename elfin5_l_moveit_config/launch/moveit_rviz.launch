@@ -6,11 +6,11 @@
 
   <arg name="config" default="" />
   <arg     if="$(eval config=='')" name="command_args" value="" />
-  <arg unless="$(eval config=='')" name="command_args" value="-d $(find elfin10_l_moveit_config)/launch/moveit.rviz" />
+  <arg unless="$(eval config=='')" name="command_args" value="-d $(find elfin5_l_moveit_config)/launch/moveit.rviz" />
 
   <node name="$(anon rviz)" launch-prefix="$(arg launch_prefix)" pkg="rviz" type="rviz" respawn="false"
         args="$(arg command_args)" output="screen">
-    <rosparam command="load" file="$(find elfin10_l_moveit_config)/config/kinematics.yaml"/>
+    <rosparam command="load" file="$(find elfin5_l_moveit_config)/config/kinematics.yaml"/>
   </node>
 
 </launch>
