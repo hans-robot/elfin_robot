@@ -39,8 +39,8 @@
     name="elfin_base">
     <inertial>
       <origin
-        xyz="0.000476057496448 -0.00609847721085 0.0271227961552"
-        rpy="0 0 0"/>
+        xyz="8.7997E-06 0.00045737 0.025376"
+        rpy="0 0 0" />
       <mass value="${0.432503561632*density}"/>
       <inertia
       ixx="${0.00107966*density}" ixy="${6.43e-06*density}" ixz="${1.97e-06*density}"
@@ -72,8 +72,8 @@
     name="elfin_link1">
     <inertial>
       <origin
-        xyz="-0.0192425632808 0.120157543892 -2.05350524914e-05"
-        rpy="0 0 0"/>
+        xyz="-0.02107 1.8203E-05 0.070829"
+        rpy="0 0 0" />
       <mass value="${1.52001312557*density}"/>
       <inertia
       ixx="${0.00523815*density}" ixy="${0.00122593*density}" ixz="${-1.6e-07*density}"
@@ -105,14 +105,14 @@
     name="elfin_joint1"
     type="revolute">
     <origin
-      xyz="0 0 0.031"
-      rpy="${PI/2} 0 0" />
+      xyz="0 0 0.0745"
+      rpy="0 0 0" />
     <parent
       link="elfin_base" />
     <child
       link="elfin_link1" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -123,8 +123,8 @@
     name="elfin_link2">
     <inertial>
       <origin
-        xyz="-0.0363359816546 0.121774838175 -3.84046105722e-05"
-        rpy="0 0 0"/>
+        xyz="-2.0075E-05 0.12327 0.036666"
+        rpy="0 0 0" />
       <mass value="${0.519672255247*density}"/>
       <inertia
       ixx="${0.00564813*density}" ixy="${-0.00026473*density}" ixz="${0.0*density}"
@@ -156,14 +156,14 @@
     name="elfin_joint2"
     type="revolute">
     <origin
-      xyz="-0.068808 0.1615 0"
-      rpy="0 0 0" />
+      xyz="-0.072 0 0.117"
+      rpy="1.5708 0 -1.5708" />
     <parent
       link="elfin_link1" />
     <child
       link="elfin_link2" />
     <axis
-      xyz="-1 0 0" />
+      xyz="0 0 1" />
     <limit
       lower="-2.35"
       upper="2.35"
@@ -174,8 +174,8 @@
     name="elfin_link3">
     <inertial>
       <origin
-        xyz="0.0513625008301 -0.0377418700977 -1.41484011876e-05"
-        rpy="0 0 0"/>
+        xyz="9.6224E-06 0.042461 -0.044165"
+        rpy="0 0 0" />
       <mass value="${1.07514585114*density}"/>
       <inertia
       ixx="${0.00296619*density}" ixy="${0.00072021*density}" ixz="${7.3e-07*density}"
@@ -207,14 +207,14 @@
     name="elfin_joint3"
     type="revolute">
     <origin
-      xyz="0 0.266 0"
-      rpy="${-PI} 0 0" />
+      xyz="0 0.266 -0.007"
+      rpy="0 0 0" />
     <parent
       link="elfin_link2" />
     <child
       link="elfin_link3" />
     <axis
-      xyz="1 0 0" />
+      xyz="0 0 -1" />
     <limit
       lower="-2.61"
       upper="2.61"
@@ -225,8 +225,8 @@
     name="elfin_link4">
     <inertial>
       <origin
-        xyz="-0.0580853772834 0.10002233137 -3.45203877103e-06"
-        rpy="0 0 0"/>
+        xyz="-0.055318 3.0677E-06 0.099673"
+        rpy="0 0 0" />
       <mass value="${0.37026646381*density}"/>
       <inertia
       ixx="${0.00238279*density}" ixy="${0.00082955*density}" ixz="${1.1e-07*density}"
@@ -258,14 +258,14 @@
     name="elfin_joint4"
     type="revolute">
     <origin
-      xyz="0.068808 -0.10523 0"
-      rpy="${PI} 0 0" />
+      xyz="0 0.105 -0.065"
+      rpy="0 1.57 1.570" />
     <parent
       link="elfin_link3" />
     <child
       link="elfin_link4" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 -1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -276,8 +276,8 @@
     name="elfin_link5">
     <inertial>
       <origin
-        xyz="-0.0158710385319 -0.0365214098995 4.94388107361e-07"
-        rpy="0 0 0"/>
+        xyz="3.7144E-06 0.039279 -0.043638"
+        rpy="0 0 0" />
       <mass value="${0.807027243448*density}"/>
       <inertia
       ixx="${0.00193719*density}" ixy="${0.00047145*density}" ixz="${2e-08*density}"
@@ -309,14 +309,14 @@
     name="elfin_joint5"
     type="revolute">
     <origin
-      xyz="0 0.21877 0"
-      rpy="${-PI} 0 0" />
+      xyz="-0.06025 0 0.219"
+      rpy="1.5708 0 -1.5708" />
     <parent
       link="elfin_link4" />
     <child
       link="elfin_link5" />
     <axis
-      xyz="1 0 0" />
+      xyz="0 0 -1" />
     <limit
       lower="-2.56"
       upper="2.56"
@@ -327,7 +327,7 @@
     name="elfin_link6">
     <inertial>
       <origin
-        xyz="-0.0009237 -0.042691 -0.0003367"
+        xyz="-0.0070896 -0.00016176 0.034853"
         rpy="0 0 0" />
       <mass value="${0.147312*density}"/>
       <inertia
@@ -360,14 +360,14 @@
     name="elfin_joint6"
     type="revolute">
     <origin
-      xyz="0 -0.1065 0"
-      rpy="${-PI} 0 ${-PI}" />
+      xyz="0 0.10075 -0.06025"
+      rpy="0 1.5645 1.5734" />
     <parent
       link="elfin_link5" />
     <child
       link="elfin_link6" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 0 -1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -379,8 +379,8 @@
   
   <joint name="elfin_end_joint" type="fixed">
     <origin
-      xyz="0 -0.091 0"
-      rpy="${PI/2} ${-PI/2} 0" />
+      xyz="0 0 0.059251"
+      rpy="0.0025901 0.006253 0" />
     <parent
       link="elfin_link6" />
     <child

@@ -8,6 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   roscpp
   tf_conversions
+  tf2_kdl
+  tf2_eigen
+  eigen_conversions
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
@@ -15,10 +18,13 @@ include_directories(${catkin_INCLUDE_DIRS})
 catkin_package(
   LIBRARIES
   CATKIN_DEPENDS
-    moveit_core
-    pluginlib
-    roscpp
-    tf_conversions
+  moveit_core
+  pluginlib
+  roscpp
+  tf_conversions
+  tf2_kdl
+  tf2_eigen
+  eigen_conversions
 )
 
 include_directories(include)
