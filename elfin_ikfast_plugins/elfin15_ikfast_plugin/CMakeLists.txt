@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.8.12)
 project(elfin15_ikfast_plugin)
 
 add_compile_options(-std=c++11)
@@ -8,6 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   roscpp
   tf_conversions
+  tf2_kdl
+  tf2_eigen
+  eigen_conversions
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
@@ -19,6 +22,9 @@ catkin_package(
     pluginlib
     roscpp
     tf_conversions
+    tf2_kdl
+    tf2_eigen
+    eigen_conversions
 )
 
 include_directories(include)
