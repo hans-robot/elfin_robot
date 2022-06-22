@@ -8,27 +8,27 @@ If you don't speak chinese, please [click here](./README_english.md)
 </p>
 
 
-本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 18.04 + ROS Melodic, 其他环境下的运行情况没有测试过。
+本文件夹中包含了多个为Elfin机器人提供ROS支持的软件包。推荐的运行环境为 Ubuntu 20.04 + ROS noetic, 其他环境下的运行情况没有测试过。
 
 ### 安装软件包
 
-#### Ubuntu 18.04 + ROS Melodic
+#### Ubuntu 20.04 + ROS noetic
 
 **安装一些重要的依赖包**
 ```sh
-$ sudo apt-get install ros-melodic-soem ros-melodic-gazebo-ros-control ros-melodic-ros-control ros-melodic-ros-controllers
+$ sudo apt-get install ros-noetic-soem ros-noetic-gazebo-ros-control ros-noetic-ros-control ros-noetic-ros-controllers
 ```
 **安装和升级MoveIt!,** 注意因为MoveIt!最新版进行了很多的优化，如果你已经安装了MoveIt!, 也请一定按照以下方法升级到最新版。
 
 安装/升级MoveIt!：
 ```sh
 $ sudo apt-get update
-$ sudo apt-get install ros-melodic-moveit-*
+$ sudo apt-get install ros-noetic-moveit-*
 ```
 
 安装 trac_ik 插件包
 ```sh
-sudo apt-get install ros-melodic-trac-ik
+sudo apt-get install ros-noetic-trac-ik
 ```
 
 **安装本软件包**
@@ -37,7 +37,7 @@ sudo apt-get install ros-melodic-trac-ik
 假设你的工作空间是~/catkin_ws，你需要运行的命令如下：
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone -b melodic-devel https://github.com/hans-robot/elfin_robot.git
+$ git clone -b noetic https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash
@@ -50,7 +50,7 @@ $ source devel/setup.bash
 假设你的工作空间是~/catkin_ws，你需要运行的命令如下：
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone -b melodic-devel https://github.com/hans-robot/elfin_robot.git
+$ git clone -b noetic-devel https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash

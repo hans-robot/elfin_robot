@@ -9,7 +9,7 @@ Chinese version of the README -> please [click here](./README_cn.md)
   <img src="docs/images/elfin.png" />
 </p>
 
-This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 18.04 with ROS noetic. So far These packages haven't been tested in other environment.
+This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 20.04 with ROS noetic. So far These packages haven't been tested in other environment.
 
 ### Installation
 
@@ -44,7 +44,7 @@ Make sure to source the correct setup file according to your workspace hierarchy
 Assuming your catkin workspace folder is ~/catkin_ws, you should use the following commands:
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone -b noetic-devel https://github.com/hans-robot/elfin_robot.git
+$ git clone -b noetic https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash
