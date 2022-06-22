@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 28 12:18:05 2017
@@ -61,7 +61,7 @@ import dynamic_reconfigure.client
 class MyFrame(wx.Frame):  
   
     def __init__(self,parent,id):  
-        the_size=(700, 700) # height from 550 change to 700
+        the_size=(700, 720) # height from 550 change to 700
         wx.Frame.__init__(self,parent,id,'Elfin Control Panel',pos=(250,100)) 
         self.panel=wx.Panel(self)
         font=self.panel.GetFont()
@@ -149,16 +149,16 @@ class MyFrame(wx.Frame):
 
         self.btn_interstice=(550-btn_total_length)/4
         btn_pos_tmp=btn_lengths[0]+self.btn_interstice+20 # 20201126: 20:init length + btn0 length + btn_inter:gap
-        self.power_off_btn.SetPosition((btn_pos_tmp, self.btn_height))
+        self.power_off_btn.SetPosition((int(btn_pos_tmp), self.btn_height))
         
         btn_pos_tmp+=btn_lengths[1]+self.btn_interstice
-        self.reset_btn.SetPosition((btn_pos_tmp, self.btn_height))
+        self.reset_btn.SetPosition((int(btn_pos_tmp), self.btn_height))
         
         btn_pos_tmp+=btn_lengths[2]+self.btn_interstice
-        self.home_btn.SetPosition((btn_pos_tmp, self.btn_height))
+        self.home_btn.SetPosition((int(btn_pos_tmp), self.btn_height))
         
         btn_pos_tmp+=btn_lengths[3]+self.btn_interstice
-        self.stop_btn.SetPosition((btn_pos_tmp, self.btn_height))
+        self.stop_btn.SetPosition((int(btn_pos_tmp), self.btn_height))
         
         self.servo_state_label=wx.StaticText(self.panel, label='Servo state:',
                                               pos=(590, self.btn_height-10))
@@ -185,7 +185,7 @@ class MyFrame(wx.Frame):
         self.reply_show=wx.TextCtrl(self.panel, style=(wx.TE_CENTER |wx.TE_READONLY),
                                     value='', size=(670, 30), pos=(20, self.btn_height+280))# 20201126: btn_height from 140 change to 280.
         
-        link_textctrl_length=(btn_pos_tmp-40)/2
+        link_textctrl_length=int((btn_pos_tmp-40)/2)
         
         self.ref_links_show_label=wx.StaticText(self.panel, label='Ref. link:',
                                                     pos=(20, self.btn_height+210)) # 20201126: btn_height from 60 change to 210.
@@ -202,7 +202,7 @@ class MyFrame(wx.Frame):
                                        pos=(link_textctrl_length+30, self.btn_height+230))
         
         self.set_links_btn=wx.Button(self.panel, label='Set links', name='Set links')
-        self.set_links_btn.SetPosition((btn_pos_tmp, self.btn_height+230)) # 20201126: btn_height from 75 change to 220.
+        self.set_links_btn.SetPosition((int(btn_pos_tmp), self.btn_height+230)) # 20201126: btn_height from 75 change to 220.
         
         # the variables about velocity scaling
         velocity_scaling_init=rospy.get_param(self.elfin_basic_api_ns+'velocity_scaling',
@@ -330,7 +330,7 @@ class MyFrame(wx.Frame):
         js_btn_length=[70, 70, 61, 80]
         js_distances=[10, 20, 10, 26]
         dis_h=50
-        for i in xrange(len(self.js_display)):
+        for i in range(len(self.js_display)):
             self.jp_button[i]=wx.Button(self.panel,
                                         label='J'+str(i+1)+' +', 
                                         pos=(js_pos[0],
@@ -359,7 +359,7 @@ class MyFrame(wx.Frame):
             self.js_label[i]=wx.StaticText(self.panel,
                                            label='J'+str(i+1)+'/deg:',
                                            pos=pos_js_label)
-            self.js_label[i].SetPosition((pos_js_label[0], pos_js_label[1]+abs(40-self.js_label[i].GetSize()[1])/2))
+            self.js_label[i].SetPosition((int(pos_js_label[0]), int(pos_js_label[1]+abs(40-self.js_label[i].GetSize()[1])/2)))
             dis_tmp+=js_btn_length[2]+js_distances[2]
 
             pos_js_display=(js_pos[0]+dis_tmp, js_pos[1]+(5-i)*dis_h)
@@ -367,7 +367,7 @@ class MyFrame(wx.Frame):
                                            style=(wx.TE_CENTER |wx.TE_READONLY),
                                            value=' 0000.00 ', 
                                            pos=pos_js_display)
-            self.js_display[i].SetPosition((pos_js_display[0], pos_js_display[1]+abs(40-self.js_display[i].GetSize()[1])/2))
+            self.js_display[i].SetPosition((int(pos_js_display[0]), int(pos_js_display[1]+abs(40-self.js_display[i].GetSize()[1])/2)))
             dis_tmp+=js_btn_length[3]+js_distances[3]
 
         ps_pos=[js_pos[0]+dis_tmp, 20]
@@ -376,7 +376,7 @@ class MyFrame(wx.Frame):
         pcs_btn_label=['X', 'Y', 'Z', 'Rx', 'Ry', 'Rz']
         pcs_label=['X', 'Y', 'Z', 'R', 'P', 'Y']
         unit_label=['/mm:', '/mm:', '/mm:', '/deg:', '/deg:', '/deg:']
-        for i in xrange(len(self.ps_display)):
+        for i in range(len(self.ps_display)):
             self.pp_button[i]=wx.Button(self.panel,
                                         label=pcs_btn_label[i]+' +', 
                                         pos=(ps_pos[0],
@@ -405,7 +405,7 @@ class MyFrame(wx.Frame):
             self.ps_label[i]=wx.StaticText(self.panel, 
                                            label=pcs_label[i]+unit_label[i],
                                            pos=pos_ps_label)
-            self.ps_label[i].SetPosition((pos_ps_label[0], pos_ps_label[1]+abs(40-self.ps_label[i].GetSize()[1])/2))
+            self.ps_label[i].SetPosition((int(pos_ps_label[0]), int(pos_ps_label[1]+abs(40-self.ps_label[i].GetSize()[1])/2)))
             dis_tmp+=ps_btn_length[2]+ps_distances[2]
             
             pos_ps_display=(ps_pos[0]+dis_tmp, ps_pos[1]+(5-i)*dis_h)
@@ -413,11 +413,11 @@ class MyFrame(wx.Frame):
                                            style=(wx.TE_CENTER |wx.TE_READONLY),
                                            value='', 
                                            pos=pos_ps_display)
-            self.ps_display[i].SetPosition((pos_ps_display[0], pos_ps_display[1]+abs(40-self.ps_display[i].GetSize()[1])/2))
+            self.ps_display[i].SetPosition((int(pos_ps_display[0]), int(pos_ps_display[1]+abs(40-self.ps_display[i].GetSize()[1])/2)))
             dis_tmp+=ps_btn_length[3]+ps_distances[3]
 
         # 20201209: add the DO,LED,DI,end button.
-        for i in xrange(len(self.DO_btn_display)):
+        for i in range(len(self.DO_btn_display)):
             self.DO_btn_display[i]=wx.Button(self.panel,label='DO'+str(i),
                                         pos=(20+(self.DO_DI_btn_length[i]+self.btn_interstice)*i,
                                         self.btn_height+40))
@@ -514,7 +514,7 @@ class MyFrame(wx.Frame):
             try:
                 resp=client.call(request)
                 wx.CallAfter(self.update_reply_show, resp)
-            except rospy.ServiceException, e:
+            except rospy.ServiceException as e:
                 resp=SetBoolResponse()
                 resp.success=False
                 resp.message='no such service in simulation'
@@ -529,7 +529,7 @@ class MyFrame(wx.Frame):
         try:
             resp=client.call(request)
             wx.CallAfter(self.update_reply_show, resp)
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             resp=SetBoolResponse()
             resp.success=False
             resp.message='no such service in simulation'
@@ -550,7 +550,7 @@ class MyFrame(wx.Frame):
             client = self.call_read_do
             val = client.call(self.call_read_do_req).digital_input
             self.process_DO_btn(val)
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             resp=ElfinIODReadResponse()
             resp.digital_input=0x0000
 
@@ -571,7 +571,7 @@ class MyFrame(wx.Frame):
             client = self.call_read_di
             val = client.call(self.call_read_di_req).digital_input
             self.process_DI_btn(val)
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             resp=ElfinIODReadResponse()
             resp.digital_input=0x0000
 
@@ -590,7 +590,7 @@ class MyFrame(wx.Frame):
                 request = request + self.DO_btn[i]*pow(2,i)
             resp=client.call(request << 12)
             self.DO_btn_lock.release()
-        except rospy.ServiceException, e:
+        except rospy.ServiceException as e:
             self.DO_btn_lock.release()
             resp=ElfinIODWriteResponse()
             resp.success=False
@@ -645,10 +645,10 @@ class MyFrame(wx.Frame):
         for i in range(4,8):
             if 0 == self.DI_show[i]:
                 png=wx.Image(self.btn_path+'/btn_icon/End_btn'+str(i-4)+'_low.png',wx.BITMAP_TYPE_PNG)
-                self.End_btn_display[i-4].SetBitmap(wx.BitmapFromImage(png))
+                self.End_btn_display[i-4].SetBitmap(wx.Bitmap(png))
             else:
                 png=wx.Image(self.btn_path+'/btn_icon/End_btn'+str(i-4)+'_high.png',wx.BITMAP_TYPE_PNG)
-                self.End_btn_display[i-4].SetBitmap(wx.BitmapFromImage(png))
+                self.End_btn_display[i-4].SetBitmap(wx.Bitmap(png))
         self.DI_show_lock.release()
 
     def set_color(self, evt):
@@ -700,10 +700,10 @@ class MyFrame(wx.Frame):
         wx.CallAfter(self.update_reply_show, resp)
     
     def updateDisplay(self, msg):      
-        for i in xrange(len(self.js_display)):
+        for i in range(len(self.js_display)):
             self.js_display[i].SetValue(msg[i])
         
-        for i in xrange(len(self.ps_display)):
+        for i in range(len(self.ps_display)):
             self.ps_display[i].SetValue(msg[i+6])
             
         if self.ref_link_lock.acquire():
@@ -758,7 +758,7 @@ class MyFrame(wx.Frame):
                 continue
         rpy=tf.transformations.euler_from_quaternion(qua)
         
-        for i in xrange(len(data.position)):
+        for i in range(len(data.position)):
             self.key.append(str(round(data.position[i]*180/math.pi, 2)))
             
         self.key.append(str(round(xyz[0]*1000, 2)))
@@ -776,7 +776,7 @@ class MyFrame(wx.Frame):
         self.key=[]
         
         current_joint_values=self.group.get_current_joint_values()
-        for i in xrange(len(current_joint_values)):
+        for i in range(len(current_joint_values)):
             self.key.append(str(round(current_joint_values[i]*180/math.pi, 2)))
         
         if self.ref_link_lock.acquire():
