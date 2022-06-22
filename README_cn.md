@@ -31,6 +31,56 @@ $ sudo apt-get install ros-noetic-moveit-*
 sudo apt-get install ros-noetic-trac-ik
 ```
 
+**相关环境配置**
+请确保当前系统python版本为3.8
+如果安装完成后系统为指定python版本请执行以下指令
+
+查看Python版本
+```sh
+$ python --version
+```
+若未输出Python版本，即系统未指定Python版本，请执行以下指令
+
+查看当前系统安装的Python版本
+```sh
+$ ls /usr/bin/python*
+```
+
+查看python配置方案
+```sh
+$ sudo update-alternativers --list python
+```
+
+配置Python方案
+```sh
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+```
+
+切换python版本
+```sh
+$ sudo update-alternatives --config python
+```
+输入2切换至python3
+
+设置Python软链接
+```sh
+$ sudo ln -s /usr/bin/python2.7 python
+```
+如果存在软链接，则先删除
+```sh
+$ sudo rm python
+```
+再次设置软链接
+
+设置完成后请再次查看Python版本，确保版本为3.8
+
+安装相关软件包
+```sh
+$ sudo apt-get install build-essential libgtk-3-dev
+$ sudo pip install wxpython
+```
+
 **安装本软件包**
 
 首先创建catkin工作空间 ([教程](http://wiki.ros.org/catkin/Tutorials))。 然后将本文件夹克隆到src/目录下，之后用catkin_make来编译。  
