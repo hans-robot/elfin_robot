@@ -32,8 +32,8 @@ sudo apt-get install ros-noetic-trac-ik
 ```
 
 **相关环境配置**
-请确保当前系统python版本为3.8
-如果安装完成后系统为指定python版本请执行以下指令
+请确保当前系统python版本为3.8，
+如果安装完成后系统未指定python版本请执行以下指令
 
 查看Python版本
 ```sh
@@ -65,7 +65,7 @@ $ sudo update-alternatives --config python
 
 设置Python软链接
 ```sh
-$ sudo ln -s /usr/bin/python2.7 python
+$ sudo ln -s /usr/bin/python3.8 python
 ```
 如果存在软链接，则先删除
 ```sh
