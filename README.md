@@ -35,6 +35,60 @@ install trac_ik plugin
 sudo apt-get install ros-noetic-trac-ik
 ```
 
+**Related environment configuration**
+Please ensure that the current system Python version is 3.8. 
+If the system does not specify a python version after installation, please execute the following instructions
+
+Check Python version
+```sh
+$ python --version
+```
+
+If the python version is not output, that is, the system does not specify a python version, execute the following instructions
+Check the python version installed on the current system
+```sh
+$ ls /usr/bin/python*
+```
+
+Check Python configuration scheme
+```sh
+$ sudo update-alternativers --list python
+```
+
+Configure Python scheme
+```sh
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+```
+
+Change Python Version
+```sh
+$ sudo update-alternatives --config python
+```
+Enter 2 to switch to python3
+
+Set Python links
+```sh
+$ sudo ln -s /usr/bin/python3.8 python
+```
+
+If there are hava links, delete them first
+```sh
+$ sudo rm python
+```
+And set Python links again
+
+After setting, please check the python version again to ensure that the version is 3.8
+```sh
+$ python --version
+```
+
+Install related software packages
+```sh
+$ sudo apt-get install build-essential libgtk-3-dev
+$ sudo pip install wxpython
+```
+
 **Install this repository from Source**
 
 First set up a catkin workspace (see [this tutorials](http://wiki.ros.org/catkin/Tutorials)).  
