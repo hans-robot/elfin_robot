@@ -9,15 +9,15 @@ Chinese version of the README -> please [click here](./README_cn.md)
   <img src="docs/images/elfin.png" />
 </p>
 
-This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 18.04 with ROS Melodic. So far These packages haven't been tested in other environment.
+This repository provides ROS support for the Elfin Robot. The recommend operating environment is on Ubuntu 18.04 with ROS noetic. So far These packages haven't been tested in other environment.
 
 ### Installation
 
-#### Ubuntu 18.04 + ROS Melodic
+#### Ubuntu 20.04 + ROS noetic
 
 **Install some important dependent software packages:**
 ```sh
-$ sudo apt-get install ros-melodic-soem ros-melodic-gazebo-ros-control ros-melodic-ros-control ros-melodic-ros-controllers
+$ sudo apt-get install ros-noetic-soem ros-noetic-gazebo-ros-control ros-noetic-ros-control ros-noetic-ros-controllers
 ```
 **Install or upgrade MoveIt!.** 
 
@@ -27,12 +27,12 @@ Install/Upgrade MoveIt!:
 
 ```sh
 $ sudo apt-get update
-$ sudo apt-get install ros-melodic-moveit-*
+$ sudo apt-get install ros-noetic-moveit-*
 ```
 
 install trac_ik plugin
 ```sh
-sudo apt-get install ros-melodic-trac-ik
+sudo apt-get install ros-noetic-trac-ik
 ```
 
 **Install this repository from Source**
@@ -44,7 +44,7 @@ Make sure to source the correct setup file according to your workspace hierarchy
 Assuming your catkin workspace folder is ~/catkin_ws, you should use the following commands:
 ```sh
 $ cd ~/catkin_ws/src
-$ git clone -b melodic-devel https://github.com/hans-robot/elfin_robot.git
+$ git clone -b noetic-devel https://github.com/hans-robot/elfin_robot.git
 $ cd ..
 $ catkin_make
 $ source devel/setup.bash
