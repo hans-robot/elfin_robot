@@ -608,14 +608,14 @@ void ElfinHWInterface::write_update()
 
         if(!is_preparing_switch)
         {
-            double vel_ff_cmd_count1=-1 * module_infos_[i].axis1.vel_ff_cmd * module_infos_[i].axis1.count_rad_per_s_factor / 16.0;
-            double vel_ff_cmd_count2=-1 * module_infos_[i].axis2.vel_ff_cmd * module_infos_[i].axis2.count_rad_per_s_factor / 16.0;
+            double vel_ff_cmd_count1=-1 * module_infos_[i].axis1.vel_ff_cmd * module_infos_[i].axis1.count_rad_per_s_factor / 16.25;
+            double vel_ff_cmd_count2=-1 * module_infos_[i].axis2.vel_ff_cmd * module_infos_[i].axis2.count_rad_per_s_factor / 16.25;
 
             module_infos_[i].client_ptr->setAxis1VelFFCnt(int16_t(vel_ff_cmd_count1));
             module_infos_[i].client_ptr->setAxis2VelFFCnt(int16_t(vel_ff_cmd_count2));
 
-            double torque_cmd_count1=-1 * module_infos_[i].axis1.effort_cmd * module_infos_[i].axis1.count_Nm_factor;
-            double torque_cmd_count2=-1 * module_infos_[i].axis2.effort_cmd * module_infos_[i].axis2.count_Nm_factor;
+            double torque_cmd_count1=-1 * module_infos_[i].axis1.effort * module_infos_[i].axis1.count_Nm_factor;
+            double torque_cmd_count2=-1 * module_infos_[i].axis2.effort * module_infos_[i].axis2.count_Nm_factor;
 
             module_infos_[i].client_ptr->setAxis1TrqCnt(int16_t(torque_cmd_count1));
             module_infos_[i].client_ptr->setAxis2TrqCnt(int16_t(torque_cmd_count2));
