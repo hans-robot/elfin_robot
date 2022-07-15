@@ -320,12 +320,12 @@ int16_t ElfinEtherCATClient::getAxis2VelCnt()
 
 void ElfinEtherCATClient::setAxis1VelFFCnt(int16_t vff_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS1_VELFF_H16, vff_cnt, false);
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_VELFF_H16, vff_cnt, true);
 }
 
 void ElfinEtherCATClient::setAxis2VelFFCnt(int16_t vff_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS2_VELFF_H16, vff_cnt, false);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_VELFF_H16, vff_cnt, true);
 }
 
 int16_t ElfinEtherCATClient::getAxis1TrqCnt()
@@ -340,12 +340,12 @@ int16_t ElfinEtherCATClient::getAxis2TrqCnt()
 
 void ElfinEtherCATClient::setAxis1TrqCnt(int16_t trq_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS1_TARGET_TORQUE_L16, trq_cnt, true);
+    writeOutput_half_unit(elfin_rxpdo::AXIS1_TARGET_TORQUE_L16, trq_cnt, false);
 }
 
 void ElfinEtherCATClient::setAxis2TrqCnt(int16_t trq_cnt)
 {
-    writeOutput_half_unit(elfin_rxpdo::AXIS2_TARGET_TORQUE_L16, trq_cnt, true);
+    writeOutput_half_unit(elfin_rxpdo::AXIS2_TARGET_TORQUE_L16, trq_cnt, false);
 }
 
 void ElfinEtherCATClient::readInput()
