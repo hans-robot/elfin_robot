@@ -69,6 +69,7 @@ class ElfinModuleCmdPub(object):
         point_goal.positions=[self.joint_pos[0]+0.4, self.joint_pos[1]-0.5]
         point_goal.velocities=[0, 0]
         point_goal.accelerations=[0, 0]
+        # 注意nsecs为纳秒，而secs为秒
         point_goal.time_from_start=rospy.Time(secs=2, nsecs=0)
         
         self.action_goal.trajectory.points.append(point_goal)
