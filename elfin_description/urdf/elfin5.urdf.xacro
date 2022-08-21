@@ -265,7 +265,7 @@
     <child
       link="elfin_link4" />
     <axis
-      xyz="0 0 -1" />
+      xyz="0 0 1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -379,8 +379,8 @@
   
   <joint name="elfin_end_joint" type="fixed">
     <origin
-      xyz="0 0 0.0485"
-      rpy="0 0 0" />
+      xyz="0 0 0.0545"
+      rpy="0 0 -1.5708" />
     <parent
       link="elfin_link6" />
     <child
