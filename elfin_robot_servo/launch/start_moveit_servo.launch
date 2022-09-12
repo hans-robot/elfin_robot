@@ -1,0 +1,9 @@
+<launch>
+
+  <node name="spacenav_node" pkg="spacenav_node" type="spacenav_node" />
+  <node name="servo_server" pkg="moveit_servo" type="servo_server" output="screen" >
+    <param name="parameter_ns" type="string" value="optional_parameter_namespace" />
+    <rosparam ns="optional_parameter_namespace" command="load" file="$(find elfin_robot_servo)/config/elfin_robot_config.yaml" />
+  </node>
+
+</launch>
