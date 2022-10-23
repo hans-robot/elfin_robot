@@ -1,0 +1,19 @@
+controller_manager_ns: elfin_controller_manager
+controller_list:
+  - name: elfin_arm_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - elfin_joint1
+      - elfin_joint2
+      - elfin_joint3
+      - elfin_joint4
+      - elfin_joint5
+      - elfin_joint6
+    constraints:
+        goal_time: 0.6
+        stopped_velocity_tolerance: 0.1
+    stop_trajectory_duration: 0.05
+    state_publish_rate:  100
+    action_monitor_rate: 10

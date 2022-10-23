@@ -1,0 +1,8 @@
+<launch>
+  <!-- Define the controller manager plugin to use for trajectory execution -->
+<arg name="moveit_controller_manager" default="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
+<param name="moveit_controller_manager" value="$(arg moveit_controller_manager)"/>
+
+  <!-- loads controller list to the param server -->
+  <rosparam file="$(find elfin5_l_moveit_config)/config/controllers.yaml"/>
+</launch>

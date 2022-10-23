@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="lib/libelfin5_l_elfin_arm_moveit_ikfast_plugin">
+  <class base_class_type="kinematics::KinematicsBase" name="elfin5_l_elfin_arm/IKFastKinematicsPlugin" type="elfin5_l_elfin_arm::IKFastKinematicsPlugin">
+    <description>IKFast61 plugin for closed-form kinematics of elfin5_l elfin_arm</description>
+  </class>
+</library>

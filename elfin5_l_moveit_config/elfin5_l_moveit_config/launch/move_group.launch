@@ -1,5 +1,5 @@
 <launch>
-
+  <include file="$(find elfin5_l_moveit_config)/launch/planning_context.launch" />
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
@@ -12,16 +12,15 @@
   <arg     if="$(arg info)" name="command_args" value="--debug" />
 
   <!-- move_group settings -->
-  <arg name="pipeline" default="ompl" />
   <arg name="allow_trajectory_execution" default="true"/>
   <arg name="fake_execution" default="false"/>
-  <arg name="fake_execution_type" default="interpolate" />
   <arg name="max_safe_path_cost" default="1"/>
   <arg name="jiggle_fraction" default="0.05" />
   <arg name="publish_monitored_planning_scene" default="true"/>
 
-  <arg name="capabilities" default=""/>
-  <arg name="disable_capabilities" default=""/>
+
+  <!--arg name="capabilities" default=""/>
+  <arg name="disable_capabilities" default=""/-->
   <!-- load these non-default MoveGroup capabilities (space seperated) -->
   <!--
   <arg name="capabilities" value="
@@ -38,17 +37,15 @@
                 " />
   -->
 
-  <arg name="load_robot_description" default="true" />
   <!-- load URDF, SRDF and joint_limits configuration -->
+  <!--arg name="load_robot_description" default="true" />
   <include file="$(find elfin5_l_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="$(arg load_robot_description)" />
-  </include>
+  </include-->
 
   <!-- Planning Functionality -->
   <include ns="move_group" file="$(find elfin5_l_moveit_config)/launch/planning_pipeline.launch.xml">
-    <arg name="pipeline" value="$(arg pipeline)" />
-    <arg name="capabilities" value="$(arg capabilities)"/>
-    <arg name="disable_capabilities" value="$(arg disable_capabilities)"/>
+    <arg name="pipeline" value="ompl" />
   </include>
 
   <!-- Trajectory Execution Functionality -->
@@ -56,7 +53,6 @@
     <arg name="moveit_manage_controllers" value="true" />
     <arg name="moveit_controller_manager" value="elfin5_l" unless="$(arg fake_execution)"/>
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>
-    <arg name="fake_execution_type" value="$(arg fake_execution_type)" />
   </include>
 
   <!-- Sensors Functionality -->
