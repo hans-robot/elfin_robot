@@ -82,6 +82,28 @@ ElfinEtherCATIOClient::~ElfinEtherCATIOClient()
 
 }
 
+int16_t ElfinEtherCATIOClient::readInput_unit(int n)
+{
+
+    int16_t map;
+    map = (manager_->readSDO<int16_t>(4, 0x6001, 0x01));// << 16; // read the end DI
+    // printf("map: %d\n", map);
+    return map;
+}
+
+int32_t ElfinEtherCATIOClient::readOutput_unit(int n)
+{
+    int32_t map;
+    map = (manager_->readSDO<int32_t>(4, 0x7001, 0x01)) << 12; 
+    return map;
+}
+
+void ElfinEtherCATIOClient::writeOutput_unit(int n, int32_t val)
+{
+
+    manager_->writeSDO<int32_t>(4,0x7001,0x01, val >> 12);
+}
+
 // 20201116: read the end SDO
 int32_t ElfinEtherCATIOClient::readSDO_unit(int n)
 {
@@ -116,7 +138,7 @@ int32_t ElfinEtherCATIOClient::readDO_unit(int n)
     usleep(50000);
     // 0x310C, DO.
     int32_t map;
-    map = (manager_->readSDO<int32_t>(3, 0x310C, 0x0)) << 12; // read the end DO
+    map = (manager_->readSDO<int32_t>(4, 0x7001, 0x0)) << 12; // read the end DO
     manager_->writeSDO<int>(3,0x3100,0x0,0); // Modbus DO command 0
     usleep(50000);
     return map;
@@ -139,6 +161,7 @@ int32_t ElfinEtherCATIOClient::writeSDO_unit(int32_t val)
 
     return 0;
 }
+
 
 // 20201120: add the getTxSDO and getRxSDO for confirming the same as old IO
 std::string ElfinEtherCATIOClient::getTxSDO()
@@ -183,21 +206,21 @@ std::string ElfinEtherCATIOClient::getRxSDO()
 // 20201116: read the end SDO
 bool ElfinEtherCATIOClient::readSDO_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp)
 {
-    resp.digital_input=readSDO_unit(elfin_io_txpdo::DIGITAL_INPUT);
+    resp.digital_input=readInput_unit(elfin_io_txpdo::DIGITAL_INPUT);//elfin_io_txpdo::DIGITAL_INPUT
     return true;
 }
 
 // 20201130: read the end DO
 bool ElfinEtherCATIOClient::readDO_cb(elfin_robot_msgs::ElfinIODRead::Request &req, elfin_robot_msgs::ElfinIODRead::Response &resp)
 {
-    resp.digital_input=readDO_unit(elfin_io_txpdo::DIGITAL_INPUT); // 20201130: digital_input for convenience
+    resp.digital_input=readOutput_unit(elfin_io_txpdo::DIGITAL_INPUT); // 20201130: digital_input for convenience
     return true;
 }
 
 // 20201117: write the end SDO
 bool ElfinEtherCATIOClient::writeSDO_cb(elfin_robot_msgs::ElfinIODWrite::Request &req, elfin_robot_msgs::ElfinIODWrite::Response &resp)
 {
-    writeSDO_unit(req.digital_output);
+    writeOutput_unit(elfin_io_rxpdo::DIGITAL_OUTPUT,req.digital_output);
     resp.success=true;
     return true;
 }

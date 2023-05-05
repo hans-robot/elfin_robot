@@ -24,28 +24,28 @@
   <joint name="elfin_base_joint" type="fixed">
     <origin
       xyz="0 0 0"
-      rpy="0 0 1.5708" />
+      rpy="0 0 0" />
     <parent
       link="elfin_base_link" />
     <child
       link="elfin_base" />
   </joint>
 
-  <link
+ <link
     name="elfin_base">
     <inertial>
       <origin
-        xyz="2.654E-09 0.0003357 0.036153"
+        xyz="-0.00137018130408533 -2.08409607078139E-06 0.0376538014243397"
         rpy="0 0 0" />
       <mass
-        value="2.8356" />
+        value="2.70257461902285" />
       <inertia
-        ixx="0.0097381"
-        ixy="-1.8821E-10"
-        ixz="-9.0965E-11"
-        iyy="0.0098176"
-        iyz="2.182E-05"
-        izz="0.016617" />
+        ixx="0.00938125784352759"
+        ixy="-3.1887671545475E-09"
+        ixz="-6.8867614840487E-05"
+        iyy="0.00898645591278108"
+        iyz="-1.99352142230335E-07"
+        izz="0.015708544428067" />
     </inertial>
     <visual>
       <origin
@@ -58,7 +58,7 @@
       <material
         name="">
         <color
-          rgba="0.86667 0.86667 0.8902 1" />
+          rgba="0.866666666666667 0.866666666666667 0.890196078431372 1" />
       </material>
     </visual>
     <collision>
@@ -75,17 +75,17 @@
     name="elfin_link1">
     <inertial>
       <origin
-        xyz="-0.0040174 0.2265 4.5331E-06"
+        xyz="8.16871679225712E-06 -0.00327076216928575 -0.0357443582073996"
         rpy="0 0 0" />
       <mass
-        value="9.7894" />
+        value="9.72548992374063" />
       <inertia
-        ixx="0.07916"
-        ixy="0.0021604"
-        ixz="4.5316E-06"
-        iyy="0.060146"
-        iyz="-5.7743E-06"
-        izz="0.088867" />
+        ixx="0.0877898222410778"
+        ixy="7.51166191337628E-06"
+        ixz="-1.02593778354047E-05"
+        iyy="0.0787662782449541"
+        iyz="0.00190236579914971"
+        izz="0.0591572039539081" />
     </inertial>
     <visual>
       <origin
@@ -98,7 +98,7 @@
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="1 1 1 1" />
       </material>
     </visual>
     <collision>
@@ -115,14 +115,14 @@
     name="elfin_joint1"
     type="revolute">
     <origin
-      xyz="0 0 0"
-      rpy="1.5708 0 0" />
+      xyz="0 0 0.262"
+      rpy="0 0 0" />
     <parent
       link="elfin_base" />
     <child
       link="elfin_link1" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -133,17 +133,17 @@
     name="elfin_link2">
     <inertial>
       <origin
-        xyz="-0.035073 0.29215 1.7591E-05"
+        xyz="1.9322796757489E-05 0.292090106394198 0.154041257842535"
         rpy="0 0 0" />
       <mass
-        value="9.5865" />
+        value="9.54890458234143" />
       <inertia
-        ixx="0.59803"
-        ixy="-0.031615"
-        ixz="4.8599E-06"
-        iyy="0.022645"
-        iyz="-4.8185E-05"
-        izz="0.59118" />
+        ixx="0.589316783120317"
+        ixy="-5.67663608156346E-05"
+        ixz="-4.92933877201573E-06"
+        iyy="0.0224325491073289"
+        iyz="0.0314559548025455"
+        izz="0.596074459786394" />
     </inertial>
     <visual>
       <origin
@@ -156,7 +156,7 @@
       <material
         name="">
         <color
-          rgba="0.8902 0.8902 0.9098 1" />
+          rgba="0.890196078431372 0.890196078431372 0.913725490196078 1" />
       </material>
     </visual>
     <collision>
@@ -173,14 +173,14 @@
     name="elfin_joint2"
     type="revolute">
     <origin
-      xyz="-0.121 0.262 0"
-      rpy="0 0 0" />
+      xyz="0 0 0"
+      rpy="1.5708 0 0" />
     <parent
       link="elfin_link1" />
     <child
       link="elfin_link2" />
     <axis
-      xyz="-1 0 0" />
+      xyz="0 0 1" />
     <limit
       lower="-2.35"
       upper="2.35"
@@ -191,17 +191,17 @@
     name="elfin_link3">
     <inertial>
       <origin
-        xyz="-0.0049696 -0.035269 2.0786E-06"
+        xyz="0.0361016983818296 -3.38362974484633E-06 -0.00436863890994984"
         rpy="0 0 0" />
       <mass
-        value="2.9386" />
+        value="2.91695075996986" />
       <inertia
-        ixx="0.011876"
-        ixy="0.00059921"
-        ixz="1.0886E-07"
-        iyy="0.0075913"
-        iyz="4.8168E-07"
-        izz="0.013762" />
+        ixx="0.00742981276706272"
+        ixy="4.86606934151244E-07"
+        ixz="-0.00053693424418515"
+        iyy="0.0135717990039811"
+        iyz="-2.96883650370105E-07"
+        izz="0.0118099746880734" />
     </inertial>
     <visual>
       <origin
@@ -231,14 +231,14 @@
     name="elfin_joint3"
     type="revolute">
     <origin
-      xyz="0.121 0.73 0"
-      rpy="3.1416 0 0" />
+      xyz="0 0.73 0"
+      rpy="3.1416 0 1.5708" />
     <parent
       link="elfin_link2" />
     <child
       link="elfin_link3" />
     <axis
-      xyz="1 0 0" />
+      xyz="0 0 1" />
     <limit
       lower="-2.61"
       upper="2.61"
@@ -249,17 +249,17 @@
     name="elfin_link4">
     <inertial>
       <origin
-        xyz="-0.064982 0.17333 3.5794E-05"
+        xyz="3.96882664917223E-05 -0.0650155012932467 0.320832871798224"
         rpy="0 0 0" />
       <mass
-        value="2.8258" />
+        value="2.82013622854974" />
       <inertia
-        ixx="0.055923"
-        ixy="0.01272"
-        ixz="3.6239E-06"
-        iyy="0.0079448"
-        iyz="-1.9213E-05"
-        izz="0.060085" />
+        ixx="0.0599767754983284"
+        ixy="3.79711278862776E-06"
+        ixz="-1.98444520882357E-05"
+        iyy="0.055825005713191"
+        iyz="0.0126917031165986"
+        izz="0.0079193539729856" />
     </inertial>
     <visual>
       <origin
@@ -272,7 +272,7 @@
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
       </material>
     </visual>
     <collision>
@@ -289,14 +289,14 @@
     name="elfin_joint4"
     type="revolute">
     <origin
-      xyz="0 -0.147 0"
-      rpy="-3.1416 0 0" />
+      xyz="0 0 0"
+      rpy="1.5708 0 1.5708" />
     <parent
       link="elfin_link3" />
     <child
       link="elfin_link4" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 1" />
     <limit
       lower="-3.14"
       upper="3.14"
@@ -307,17 +307,17 @@
     name="elfin_link5">
     <inertial>
       <origin
-        xyz="-0.002491 -0.025023 -6.7752E-06"
+        xyz="-7.13592588147179E-06 0.0250238965255321 -0.00249029500068249"
         rpy="0 0 0" />
       <mass
-        value="1.2566" />
+        value="1.25663090248721" />
       <inertia
-        ixx="0.0027306"
-        ixy="9.9756E-05"
-        ixz="4.9287E-07"
-        iyy="0.0020256"
-        iyz="-2.707E-07"
-        izz="0.0034996" />
+        ixx="0.00349957647668621"
+        ixy="2.50320892962179E-07"
+        ixz="4.75533746465038E-07"
+        iyy="0.00202568589371655"
+        iyz="-9.97554673070372E-05"
+        izz="0.00273058830542026" />
     </inertial>
     <visual>
       <origin
@@ -330,7 +330,7 @@
       <material
         name="">
         <color
-          rgba="0.8902 0.8902 0.9098 1" />
+          rgba="0.890196078431372 0.890196078431372 0.913725490196078 1" />
       </material>
     </visual>
     <collision>
@@ -347,14 +347,14 @@
     name="elfin_joint5"
     type="revolute">
     <origin
-      xyz="0 0.42047 0"
-      rpy="3.1416 0 0" />
+      xyz="0 0 0.57"
+      rpy="1.5708 0 3.1416" />
     <parent
       link="elfin_link4" />
     <child
       link="elfin_link5" />
     <axis
-      xyz="1 0 0" />
+      xyz="0 0 1" />
     <limit
       lower="-2.56"
       upper="2.56"
@@ -365,17 +365,17 @@
     name="elfin_link6">
     <inertial>
       <origin
-        xyz="-0.004035 -0.019415 1.3786E-07"
+        xyz="5.80862976798685E-06 -0.000263099303701575 0.140588330549588"
         rpy="0 0 0" />
       <mass
-        value="0.35802" />
+        value="0.340445821267154" />
       <inertia
-        ixx="0.00025128"
-        ixy="4.2989E-06"
-        ixz="-3.5119E-11"
-        iyy="0.00035947"
-        iyz="-8.6185E-11"
-        izz="0.0002947" />
+        ixx="0.000174302732753541"
+        ixy="-1.36563776666256E-08"
+        ixz="2.64383795850182E-08"
+        iyy="0.000178213326580043"
+        iyz="-6.34435462617436E-08"
+        izz="0.000299299639534556" />
     </inertial>
     <visual>
       <origin
@@ -388,7 +388,7 @@
       <material
         name="">
         <color
-          rgba="1 1 1 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -405,28 +405,28 @@
     name="elfin_joint6"
     type="revolute">
     <origin
-      xyz="0 -0.1594 0"
-      rpy="-3.1416 0 0" />
+      xyz="0 0 0"
+      rpy="1.5708 0 3.1416" />
     <parent
       link="elfin_link5" />
     <child
       link="elfin_link6" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 1" />
     <limit
       lower="-3.14"
       upper="3.14"
       effort="69"
-      velocity="1.57" />
+      velocity="1.57"/>
   </joint>
-  <link name="elfin_end_link" />
-
+  <link
+    name="elfin_end_link"/>
   <joint
     name="elfin_end_joint"
     type="fixed">
     <origin
-      xyz="0 0.0025333 0"
-      rpy="1.5708 -1.5708 0" />
+      xyz="0 0 0.1735"
+      rpy="0 0 0" />
     <parent
       link="elfin_link6" />
     <child

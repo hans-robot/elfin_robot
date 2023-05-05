@@ -69,7 +69,7 @@ void handleErrors()
   ec_readstate();
   for (int slave = 1; slave <= ec_slavecount; slave++)
   {
-    if ((ec_slave[slave].group == 0) && (ec_slave[slave].state != EC_STATE_OPERATIONAL))
+    if ((ec_slave[slave].group == 0) && (ec_slave[slave].state != EC_STATE_OPERATIONAL) && slave != 4)
     {
       ec_group[0].docheckstate = TRUE;
       if (ec_slave[slave].state == (EC_STATE_SAFE_OP + EC_STATE_ERROR))
@@ -78,10 +78,16 @@ void handleErrors()
         ec_slave[slave].state = (EC_STATE_SAFE_OP + EC_STATE_ACK);
         ec_writestate(slave);
       }
-      else if(ec_slave[slave].state == EC_STATE_SAFE_OP)
+      else if(ec_slave[slave].state == EC_STATE_SAFE_OP && slave != 4)
       {
         fprintf(stderr, "WARNING : slave %d is in SAFE_OP, change to OPERATIONAL.\n", slave);
         ec_slave[slave].state = EC_STATE_OPERATIONAL;
+        ec_writestate(slave);
+      }
+      else if(slave == 4 && ec_slave[slave].state != EC_STATE_SAFE_OP)
+      {
+        fprintf(stderr, "WARNING : slave %d is no in SAFE_OP, change to SAFE_OP.\n", slave);
+        ec_slave[slave].state = EC_STATE_SAFE_OP;
         ec_writestate(slave);
       }
       else if(ec_slave[slave].state > 0)
@@ -261,24 +267,25 @@ bool EtherCatManager::initSoem(const std::string& ifname) {
       then proceeding through 40 send/recieve cycles each waiting up to 50 ms for a
       response about the status. 
   */
-  ec_slave[0].state = EC_STATE_OPERATIONAL;
-  ec_send_processdata();
-  ec_receive_processdata(EC_TIMEOUTRET);
-
-  ec_writestate(0);
-  int chk = 40;
-  do {
+  for(int i=1;i<4;i++){
+    ec_slave[i].state = EC_STATE_OPERATIONAL;
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
-    ec_statecheck(0, EC_STATE_OPERATIONAL, 50000); // 50 ms wait for state check
-  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
-  if(ec_statecheck(0,EC_STATE_OPERATIONAL, EC_TIMEOUTSTATE) != EC_STATE_OPERATIONAL)
-  {
-    fprintf(stderr, "OPERATIONAL state not set, exiting\n");
-    return false;
+    ec_writestate(i);
+    int chk = 40;
+    do {
+      ec_send_processdata();
+      ec_receive_processdata(EC_TIMEOUTRET);
+      ec_statecheck(i, EC_STATE_OPERATIONAL, 50000); // 50 ms wait for state check
+    } while (chk-- && (ec_slave[i].state != EC_STATE_OPERATIONAL));
+
+    if(ec_statecheck(i,EC_STATE_OPERATIONAL, EC_TIMEOUTSTATE) != EC_STATE_OPERATIONAL)
+    {
+      fprintf(stderr, "OPERATIONAL state not set, exiting\n");
+      return false;
+    }
   }
-
   ec_readstate();
 
   printf("\nFinished configuration successfully\n");
