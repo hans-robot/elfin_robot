@@ -95,6 +95,10 @@ public:
     void writeOutput_unit(int n, int32_t val);
     int32_t writeSDO_unit(int n); // 20201117
 
+    int16_t readInput_unit(int n);
+    int32_t readOutput_unit(int n);
+    // bool writeOutput_unit(int n, int32_t val);
+
     std::string getTxSDO();
     std::string getRxSDO();
 
