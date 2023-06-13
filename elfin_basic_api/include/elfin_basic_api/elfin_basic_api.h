@@ -72,7 +72,7 @@ public:
 
     bool stopActCtrlrs(std_srvs::SetBool::Response &resp);
     bool startElfinCtrlr(std_srvs::SetBool::Response &resp);
-
+    void posePubTimer_cb(const ros::TimerEvent& evt);
 private:
     moveit::planning_interface::MoveGroupInterface *group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
@@ -117,6 +117,10 @@ private:
     ros::Publisher end_link_name_publisher_;
 
     tf::TransformListener tf_listener_;
+    ros::Timer pub_pose_timer;
+    ros::Publisher elfin_pose;
+    tf::StampedTransform poseTransForm;
+    tf::Quaternion RQ;
 };
 
 }

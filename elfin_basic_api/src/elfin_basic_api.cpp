@@ -65,12 +65,15 @@ ElfinBasicAPI::ElfinBasicAPI(moveit::planning_interface::MoveGroupInterface *gro
 
     ref_link_name_publisher_=local_nh_.advertise<std_msgs::String>("reference_link_name", 1, true);
     end_link_name_publisher_=local_nh_.advertise<std_msgs::String>("end_link_name", 1, true);
+    elfin_pose = local_nh_.advertise<geometry_msgs::Pose>("elfin_pose",1,true);
 
     ref_link_name_msg_.data=group_->getPlanningFrame();
     end_link_name_msg_.data=group_->getEndEffectorLink();
 
     ref_link_name_publisher_.publish(ref_link_name_msg_);
     end_link_name_publisher_.publish(end_link_name_msg_);
+    pub_pose_timer=local_nh_.createTimer(ros::Duration(0.005), &ElfinBasicAPI::posePubTimer_cb, this);
+    pub_pose_timer.start();
 }
 
 ElfinBasicAPI::~ElfinBasicAPI()
@@ -91,6 +94,22 @@ void ElfinBasicAPI::setVelocityScaling(double data)
     velocity_scaling_=data;
     teleop_api_->setVelocityScaling(velocity_scaling_);
     motion_api_->setVelocityScaling(velocity_scaling_);
+}
+
+void ElfinBasicAPI::posePubTimer_cb(const ros::TimerEvent& evt)
+{
+    if(tf_listener_.waitForTransform(group_->getPlanningFrame(), group_->getEndEffectorLink(),ros::Time(0), ros::Duration(2))){
+        tf_listener_.lookupTransform(group_->getPlanningFrame(), group_->getEndEffectorLink(),ros::Time(0), poseTransForm);
+        geometry_msgs::Pose msg;
+        msg.position.x = poseTransForm.getOrigin().x();
+        msg.position.y = poseTransForm.getOrigin().y();
+        msg.position.z = poseTransForm.getOrigin().z();
+        msg.orientation.x = poseTransForm.getRotation().x();
+        msg.orientation.y = poseTransForm.getRotation().y();
+        msg.orientation.z = poseTransForm.getRotation().z();
+        msg.orientation.w = poseTransForm.getRotation().w();
+        elfin_pose.publish(msg);
+    }
 }
 
 bool ElfinBasicAPI::setRefLink_cb(elfin_robot_msgs::SetString::Request &req, elfin_robot_msgs::SetString::Response &resp)
