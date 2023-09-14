@@ -152,20 +152,10 @@ elfin_ethernet_name: eth0
 ```sh
 $ roslaunch elfin_robot_bringup elfin3_bringup.launch
 ```
-启动Elfin硬件，Elfin的控制需要操作系统的实时性支持，运行下面的命令前请先为你的Linux系统内核打好实时补丁。打补丁的方法可以参考这个[教程](http://www.jianshu.com/p/8787e45a9e01)。Elfin机械臂有两种不同版本的EtherCAT从站，在启动硬件前，请先确认你的Elfin的从站版本。
+启动Elfin硬件，Elfin的控制需要操作系统的实时性支持，运行下面的命令前请先为你的Linux系统内核打好实时补丁。打补丁的方法可以参考这个[教程](http://www.jianshu.com/p/8787e45a9e01)。Elfin机械臂有两种不同版本的EtherCAT从站，在启动硬件前，请先确认你的Elfin的从站版本。**当前分支适用的机型为总线末端形，如何区分总线末端与485末端请查看本文最后一栏。**
 ```sh
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control.launch
-```
-或
-```sh
-$ sudo chrt 10 bash
-$ roslaunch elfin_robot_bringup elfin_ros_control_v2.launch
-```
-或如果购买的是RS485末端的机器人
-```sh
-$ sudo chrt 10 bash
-$ roslaunch elfin_robot_bringup elfin_ros_control_v3.launch
 ```
 
 运行MoveIt!模块, RViz界面:
@@ -191,3 +181,20 @@ Tips:
 在关闭机械臂电源前，需先按下Elfin Control Panel界面的"Servo Off"给Elfin去使能。
 
 更多关于API的信息请看[docs/API_description.md](docs/API_description.md)
+
+---
+**总线末端形与485末端形区分，请查看第六轴的区别**
+
+<p align="center">
+  <img src="docs/images/485_END.png" />
+  <br>
+  485末端
+</p>
+
+---
+
+<p align="center">
+  <img src="docs/images/ethercat_END.png" />
+  <br>
+  总线末端
+</p>
