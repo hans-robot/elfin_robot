@@ -156,7 +156,7 @@ Load Elfin robot model：
 $ roslaunch elfin_robot_bringup elfin3_bringup.launch
 ```
 
-Bring up the hardware of Elfin. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup). There are two versions of elfin EtherCAT slaves. Please bring up the hardware accordingly.**The current branch is applicable to models with bus end shapes. Please refer to the last column of this article to distinguish between bus end and 485 end.**
+Bring up the hardware of Elfin. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup). There are two versions of elfin EtherCAT slaves. Please bring up the hardware accordingly.**The current branch is applicable to models with 485 end shapes. Please refer to the last column of this article to distinguish between bus end and 485 end.**
 
 ```sh
 $ sudo chrt 10 bash
