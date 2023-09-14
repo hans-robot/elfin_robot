@@ -102,21 +102,11 @@ Load Elfin robot model：
 $ roslaunch elfin_robot_bringup elfin3_bringup.launch
 ```
 
-Bring up the hardware of Elfin. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup). There are two versions of elfin EtherCAT slaves. Please bring up the hardware accordingly.
+Bring up the hardware of Elfin. Before bringing up the hardware, you should setup Linux with PREEMPT_RT properly. There is a [tutorial](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/preemptrt_setup). There are two versions of elfin EtherCAT slaves. Please bring up the hardware accordingly.**The current branch is applicable to models with 485 end shapes. Please refer to the last column of this article to distinguish between bus end and 485 end.**
 
 ```sh
 $ sudo chrt 10 bash
 $ roslaunch elfin_robot_bringup elfin_ros_control.launch
-```
-or
-```sh
-$ sudo chrt 10 bash
-$ roslaunch elfin_robot_bringup elfin_ros_control_v2.launch
-```
-or you bought the RS485 end robot
-```sh
-$ sudo chrt 10 bash
-$ roslaunch elfin_robot_bringup elfin_ros_control_v3.launch
 ```
 
 Start up RViz with a configuration including the MoveIt! Motion Planning plugin:
@@ -142,3 +132,20 @@ Every time you want to plan a trajectory, you should set the start state to curr
 Before turning the robot off, you should press the "Servo Off" button to disable the robot.
 
 For more information about API, see [docs/API_description_english.md](docs/API_description_english.md)
+
+---
+**Distinguish between bus end shape and 485 end shape, please refer to the difference in the sixth axis**
+
+<p align="center">
+  <img src="docs/images/485_END.png" />
+  <br>
+  485 END
+</p>
+
+---
+
+<p align="center">
+  <img src="docs/images/ethercat_END.png" />
+  <br>
+  Ethercat END
+</p>
